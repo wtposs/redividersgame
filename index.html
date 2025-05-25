@@ -465,7 +465,7 @@
             secondsElapsed++;
             const minutes = Math.floor(secondsElapsed / 60);
             const seconds = secondsElapsed % 60;
-            timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.textContent = `Timer: ${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
