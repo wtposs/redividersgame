@@ -93,7 +93,7 @@
             font-size: 1.1em;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
+            border-radius: 5ppedx;
             background-color: #007bff;
             color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -223,13 +223,12 @@
 
     <div class="question">
         <p><strong>13.</strong> Rocco grew up in a rundown part of Chicago where
-            <input type="text" id="answer22" placeholder="Answer" class="medium">
+            <input type="text" id="answer27" placeholder="Answer" class="medium">
             forced him to fight for what little was available.
         </p>
         <p>So you want to know about his facial
-            <input type="text" id="answer23" placeholder="Answer" class="small"><span class="large-period">?</span><span style="padding: 0 5px;"></span>
-            <input type="text" id="answer24" placeholder="Answer" class="small"> life takes its toll!
-        </p>
+            <input type="text" id="answer28" placeholder="Answer" class="small"><span class="large-period">?</span><span style="padding: 0 5px;"></span>
+            <input type="text" id="answer29" placeholder="Answer" class="small"> life takes its toll! </p>
     </div>
 
     <div class="question">
@@ -506,7 +505,7 @@
                 10: [["buckled"], ["buck led"]],
                 11: [["etcher"], ["etc"], ["her"]],
                 12: [["significant"], ["sign if i can't"]],
-                13: [["scarcity"], ["scar"], ["city"]],
+                13: [["scarcity"], ["scar"], ["city"]], // This definition is correct for 3 blanks
                 14: [["dragon"], ["drag on"]],
                 15: [["promising"], ["prom i sing"]],
                 16: [["thinking"], ["thin king"]],
@@ -565,22 +564,26 @@
                     else if (qNum == 10) inputId = `answer${i + 20}`;
                     else if (qNum == 11) inputId = `answer${i + 22}`; // answer22, answer23, answer24
                     else if (qNum == 12) inputId = `answer${i + 25}`;
-                    else if (qNum == 13) inputId = `answer${i + 27}`;
-                    else if (qNum == 14) inputId = `answer${i + 29}`;
-                    else if (qNum == 15) inputId = `answer${i + 31}`;
-                    else if (qNum == 16) inputId = `answer${i + 33}`;
-                    else if (qNum == 17) inputId = `answer${i + 35}`;
-                    else if (qNum == 18) inputId = `answer${i + 37}`;
-                    else if (qNum == 19) inputId = `answer${i + 39}`;
-                    else if (qNum == 20) inputId = `answer${i + 41}`;
-                    else if (qNum == 21) inputId = `answer${i + 43}`;
-                    else if (qNum == 22) inputId = `answer${i + 45}`;
+                    else if (qNum == 13 && i < 2) inputId = `answer${i + 27}`; // Handles answer27 and answer28
+                    else if (qNum == 13 && i == 2) inputId = `answer29`; // MODIFICATION: Explicitly map the 3rd input of Q13
+                    else if (qNum == 14) inputId = `answer${i + 30}`; // This was answer29 before, now it's answer30.
+                    else if (qNum == 15) inputId = `answer${i + 32}`; // This was answer31 before, now it's answer32.
+                    else if (qNum == 16) inputId = `answer${i + 34}`; // This was answer33 before, now it's answer34.
+                    else if (qNum == 17) inputId = `answer${i + 36}`; // This was answer35 before, now it's answer36.
+                    else if (qNum == 18) inputId = `answer${i + 38}`; // This was answer37 before, now it's answer38.
+                    else if (qNum == 19) inputId = `answer${i + 40}`; // This was answer39 before, now it's answer40.
+                    else if (qNum == 20) inputId = `answer${i + 42}`; // This was answer41 before, now it's answer42.
+                    else if (qNum == 21) inputId = `answer${i + 44}`; // This was answer43 before, now it's answer44.
+                    else if (qNum == 22) inputId = `answer${i + 46}`; // This was answer45 before, now it's answer46.
                     // NEW DUMMY QUESTION ID MAPPINGS START HERE
                     else if (parseInt(qNum) >= 23 && parseInt(qNum) <= 42) {
                         // For each dummy question, there are 2 inputs.
                         // The base answer ID for q23 is 47.
                         // For q24, it's 47 + 2 = 49.
                         // For qN, it's 47 + (N-23)*2.
+                        // This original formula still works because the previous sequence ended at answer46 and Q23 starts at 47.
+                        // The offset for qNum == 22 is i+46 which leads to answer46 and answer47.
+                        // So q23 correctly starts at answer47.
                         let baseIdOffset = 47 + (parseInt(qNum) - 23) * 2;
                         inputId = `answer${i + baseIdOffset}`;
                     }
