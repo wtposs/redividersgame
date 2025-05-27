@@ -93,7 +93,7 @@
             font-size: 1.1em;
             cursor: pointer;
             border: none;
-            border-radius: 5ppedx;
+            border-radius: 5px;
             background-color: #007bff;
             color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -137,6 +137,29 @@
             background-color: #ffe6e6;
             color: #721c24;
         }
+
+        /* Hint button specific styling */
+        .hint-btn {
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            background-color: #6c757d; /* Grey color for hints */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 5px; /* Spacing from input field */
+            transition: background-color 0.2s ease;
+            vertical-align: middle; /* Align with input field */
+        }
+
+        .hint-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .hint-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -153,7 +176,8 @@
 
     <div class="question">
         <p><strong>1.</strong> Susan hadn't slept since her neighbor's favorite CD started playing at 3 AM. She had a presentation to give that morning at work, and though her husband tried to reassure her, she was
-            <input type="text" id="answer1" placeholder="Answer" class="medium">.
+            <input type="text" id="answer1" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="1">Hint</button>.
         </p>
         <p>"Why," she wondered angrily, "had he put his
             <input type="text" id="answer2" placeholder="Answer" class="medium">?!"
@@ -161,53 +185,63 @@
     </div>
 
     <div class="question">
-        <p><strong>2.</strong> Even a Supreme Court <input type="text" id="answer3" placeholder="Answer" class="medium"> needs an occasional break.</p>
+        <p><strong>2.</strong> Even a Supreme Court <input type="text" id="answer3" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="2">Hint</button> needs an occasional break.</p>
         <p>Sotomayor takes her tea without lemon or sugar; she has it with <input type="text" id="answer4" placeholder="Answer" class="medium">.</p>
     </div>
 
     <div class="question">
-        <p><strong>3.</strong> My dog couldn't control his bladder in the house and peed on my <input type="text" id="answer5" placeholder="Answer" class="medium">.</p>
+        <p><strong>3.</strong> My dog couldn't control his bladder in the house and peed on my <input type="text" id="answer5" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="3">Hint</button>.</p>
         <p>Now he stays in my automobile. He's a <input type="text" id="answer6" placeholder="Answer" class="medium">.</p>
     </div>
 
     <div class="question">
-        <p><strong>4.</strong> Jennifer was suspicious of the police officers huddled <input type="text" id="answer7" placeholder="Answer" class="medium">.</p>
+        <p><strong>4.</strong> Jennifer was suspicious of the police officers huddled <input type="text" id="answer7" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="4">Hint</button>.</p>
         <p>She was sure they were out <input type="text" id="answer8" placeholder="Answer" class="medium">.</p>
     </div>
 
     <div class="question">
-        <p><strong>5.</strong> It took hours, but Tom finally shaved off his beard and <input type="text" id="answer9" placeholder="Answer" class="medium">.</p>
+        <p><strong>5.</strong> It took hours, but Tom finally shaved off his beard and <input type="text" id="answer9" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="5">Hint</button>.</p>
         <p>I really think his arm <input type="text" id="answer10" placeholder="Answer" class="medium"> from all the effort.</p>
     </div>
 
     <div class="question">
-        <p><strong>6.</strong> In Paris I visited the National <input type="text" id="answer11" placeholder="Answer" class="medium">.</p>
+        <p><strong>6.</strong> In Paris I visited the National <input type="text" id="answer11" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="6">Hint</button>.</p>
         <p>And then the Triumphal <input type="text" id="answer12" placeholder="Answer" class="small">.<span class="large-period">.</span> <input type="text" id="answer13" placeholder="Answer" class="small"> never seen anything so impressive.</p>
     </div>
 
     <div class="question">
-        <p><strong>7.</strong> You shouldn't sit around and let your muscles <input type="text" id="answer14" placeholder="Answer" class="medium">.</p>
+        <p><strong>7.</strong> You shouldn't sit around and let your muscles <input type="text" id="answer14" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="7">Hint</button>.</p>
         <p>You'd better train for the marathon if you want to win <input type="text" id="answer15" placeholder="Answer" class="medium">.</p>
     </div>
 
     <div class="question">
-        <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium"> sapphires, the listless queen felt undecided.</p>
+        <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="8">Hint</button> sapphires, the listless queen felt undecided.</p>
         <p>Should she go to the banquet <input type="text" id="answer17" placeholder="Answer" class="medium">?</p>
     </div>
 
     <div class="question">
-        <p><strong>9.</strong> The clumsy chemist <input type="text" id="answer18" placeholder="Answer" class="medium"> and spilled the slimy serum on the floor.</p>
+        <p><strong>9.</strong> The clumsy chemist <input type="text" id="answer18" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="9">Hint</button> and spilled the slimy serum on the floor.</p>
         <p>Overnight, this <input type="text" id="answer19" placeholder="Answer" class="medium"> a swarm of ants that then gained superpowers.</p>
     </div>
 
     <div class="question">
-        <p><strong>10.</strong> The old deer was exhausted and his legs nearly <input type="text" id="answer20" placeholder="Answer" class="medium">.</p>
+        <p><strong>10.</strong> The old deer was exhausted and his legs nearly <input type="text" id="answer20" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="10">Hint</button>.</p>
         <p>Still, the <input type="text" id="answer21" placeholder="Answer" class="medium"> his herd through the dense forest to safety.</p>
     </div>
 
     <div class="question">
         <p><strong>11.</strong> With acid and a metal plate, she’s an
             <input type="text" id="answer22" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="11">Hint</button>
             like no other.
         </p>
         <p>She can do lettering, illustrations, patterns,
@@ -217,13 +251,15 @@
     </div>
 
     <div class="question">
-        <p><strong>12.</strong> My <input type="text" id="answer25" placeholder="Answer" class="medium"> other insists on a prenup before marriage.</p>
+        <p><strong>12.</strong> My <input type="text" id="answer25" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="12">Hint</button> other insists on a prenup before marriage.</p>
         <p>I don’t agree, but I’ll <input type="text" id="answer26" placeholder="Answer" class="medium"> change her mind.</p>
     </div>
 
     <div class="question">
         <p><strong>13.</strong> Rocco grew up in a rundown part of Chicago where
             <input type="text" id="answer27" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="13">Hint</button>
             forced him to fight for what little was available.
         </p>
         <p>So you want to know about his facial
@@ -232,230 +268,256 @@
     </div>
 
     <div class="question">
-        <p><strong>14.</strong> I stopped watching Game of Thrones. You've seen one <input type="text" id="answer29" placeholder="Answer" class="medium">, you've seen them all.</p>
-        <p>After a few episodes the series seemed to <input type="text" id="answer30" placeholder="Answer" class="medium">.</p>
+        <p><strong>14.</strong> I stopped watching Game of Thrones. You've seen one <input type="text" id="answer30" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="14">Hint</button>, you've seen them all.</p>
+        <p>After a few episodes the series seemed to <input type="text" id="answer31" placeholder="Answer" class="medium">.</p>
     </div>
 
     <div class="question">
-        <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer31" placeholder="Answer" class="medium"> to prove my feelings since our freshman year?</p>
-        <p>You'll see when at the <input type="text" id="answer32" placeholder="Answer" class="medium"> you a love ballad.</p>
+        <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer32" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="15">Hint</button> to prove my feelings since our freshman year?</p>
+        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium"> you a love ballad.</p>
     </div>
 
     <div class="question">
-        <p><strong>16.</strong> The queen can’t stop <input type="text" id="answer33" placeholder="Answer" class="medium"> about how her husband has changed for the better.</p>
-        <p>The newly <input type="text" id="answer34" placeholder="Answer" class="medium"> is the picture of health.</p>
+        <p><strong>16.</strong> The queen can’t stop <input type="text" id="answer34" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="16">Hint</button> about how her husband has changed for the better.</p>
+        <p>The newly <input type="text" id="answer35" placeholder="Answer" class="medium"> is the picture of health.</p>
     </div>
 
     <div class="question">
-        <p><strong>17.</strong> The picnic was going great, with me winning 21-16 at <input type="text" id="answer35" placeholder="Answer" class="medium">.</p>
-        <p>But when it came time to eat, with one taste I knew I'd put <input type="text" id="answer36" placeholder="Answer" class="medium"> the lamb.</p>
+        <p><strong>17.</strong> The picnic was going great, with me winning 21-16 at <input type="text" id="answer36" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="17">Hint</button>.</p>
+        <p>But when it came time to eat, with one taste I knew I'd put <input type="text" id="answer37" placeholder="Answer" class="medium"> the lamb.</p>
     </div>
 
     <div class="question">
-        <p><strong>18.</strong> Our pet Misty seems depressed and even <input type="text" id="answer37" placeholder="Answer" class="medium">, staring blankly at the wall for hours.</p>
-        <p>We need to give that <input type="text" id="answer38" placeholder="Answer" class="medium"> for her nerves.</p>
+        <p><strong>18.</strong> Our pet Misty seems depressed and even <input type="text" id="answer38" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="18">Hint</button>, staring blankly at the wall for hours.</p>
+        <p>We need to give that <input type="text" id="answer39" placeholder="Answer" class="medium"> for her nerves.</p>
     </div>
 
     <div class="question">
-        <p><strong>19.</strong> I stayed with my mother's older brother, and he was appalled at how <input type="text" id="answer39" placeholder="Answer" class="medium"> I left the room.</p>
-        <p>I felt terrible and gave my <input type="text" id="answer40" placeholder="Answer" class="medium"> an apology.</p>
+        <p><strong>19.</strong> I stayed with my mother's older brother, and he was appalled at how <input type="text" id="answer40" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="19">Hint</button> I left the room.</p>
+        <p>I felt terrible and gave my <input type="text" id="answer41" placeholder="Answer" class="medium"> an apology.</p>
     </div>
 
     <div class="question">
-        <p><strong>20.</strong> What you don’t do to help endangered animals may doom them like the <input type="text" id="answer41" placeholder="Answer" class="medium"> bird.</p>
-        <p>What you <input type="text" id="answer42" placeholder="Answer" class="medium"> can ensure their survival for years to come.</p>
+        <p><strong>20.</strong> What you don’t do to help endangered animals may doom them like the <input type="text" id="answer42" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="20">Hint</button> bird.</p>
+        <p>What you <input type="text" id="answer43" placeholder="Answer" class="medium"> can ensure their survival for years to come.</p>
     </div>
 
     <div class="question">
-        <p><strong>21.</strong> The stylist took one look at Henry's brittle nails, and asked if he'd like to add keratin treatments to his <input type="text" id="answer43" placeholder="Answer" class="medium">.</p>
-        <p>She added, "I assure you, every <input type="text" id="answer44" placeholder="Answer" class="medium"> of this condition says it's well worth the cost!"</p>
+        <p><strong>21.</strong> The stylist took one look at Henry's brittle nails, and asked if he'd like to add keratin treatments to his <input type="text" id="answer44" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="21">Hint</button>.</p>
+        <p>She added, "I assure you, every <input type="text" id="answer45" placeholder="Answer" class="medium"> of this condition says it's well worth the cost!"</p>
     </div>
 
     <div class="question">
-        <p><strong>22.</strong> Dangerously, the tiny boat began to <input type="text" id="answer45" placeholder="Answer" class="medium"> in the storm.</p>
-        <p>Engine problems arose as the wrong <input type="text" id="answer46" placeholder="Answer" class="medium"> on the fuel tank let in seawater.</p>
+        <p><strong>22.</strong> Dangerously, the tiny boat began to <input type="text" id="answer46" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="22">Hint</button> in the storm.</p>
+        <p>Engine problems arose as the wrong <input type="text" id="answer47" placeholder="Answer" class="medium"> on the fuel tank let in seawater.</p>
     </div>
 
     <div class="question">
         <p><strong>23.</strong> Janet favors aggressive investments in untested ventures;
-            <input type="text" id="answer47" placeholder="Answer" class="medium"> , her partner rarely shies away from risk.
-
+            <input type="text" id="answer48" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="23">Hint</button> , her partner rarely shies away from risk.
         </p>
         <p>On the other hand, their clients
-            <input type="text" id="answer48" placeholder="Answer" class="medium"> choices that offer slow but steady growth.
+            <input type="text" id="answer49" placeholder="Answer" class="medium"> choices that offer slow but steady growth.
         </p>
     </div>
 
     <div class="question">
         <p><strong>24.</strong> After my recent
-            <input type="text" id="answer49" placeholder="Answer" class="medium"> of my parents' vinyl in the attic, I find the 70s folk songs rather boring.
+            <input type="text" id="answer50" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="24">Hint</button> of my parents' vinyl in the attic, I find the 70s folk songs rather boring.
         </p>
-        <p>Still, I find 
-            <input type="text" id="answer50" placeholder="Answer" class="medium"> fun to dance to.
+        <p>Still, I find
+            <input type="text" id="answer51" placeholder="Answer" class="medium"> fun to dance to.
         </p>
     </div>
 
     <div class="question">
-        <p><strong>25.</strong> He warned his friend about the charming 
-            <input type="text" id="answer51" placeholder="Answer" class="medium"> who seemed too good to be true.
+        <p><strong>25.</strong> He warned his friend about the charming
+            <input type="text" id="answer52" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="25">Hint</button> who seemed too good to be true.
         </p>
         <p>He even pointed to the stray, synthetic
-            <input type="text" id="answer52" placeholder="Answer" class="medium"> lying on the floor, likely from her extensions.
+            <input type="text" id="answer53" placeholder="Answer" class="medium"> lying on the floor, likely from her extensions.
         </p>
     </div>
 
     <div class="question">
         <p><strong>26.</strong> We watched as trucks slowly rumbled past us with their hazardous
-            <input type="text" id="answer53" placeholder="Answer" class="medium"> , escorted by police vehicles.
+            <input type="text" id="answer54" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="26">Hint</button> , escorted by police vehicles.
         </p>
         <p>An officer finally waved us forward and let our
-            <input type="text" id="answer54" placeholder="Answer" class="medium"> through the intersection.
+            <input type="text" id="answer55" placeholder="Answer" class="medium"> through the intersection.
         </p>
     </div>
 
     <div class="question">
-        <p><strong>27.</strong> Volunteers at the festival sold souvenirs to raise money for 
-            <input type="text" id="answer55" placeholder="Answer" class="medium"> protection in Florida.
+        <p><strong>27.</strong> Volunteers at the festival sold souvenirs to raise money for
+            <input type="text" id="answer56" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="27">Hint</button> protection in Florida.
         </p>
         <p>Or job was to
-            <input type="text" id="answer56" placeholder="Answer" class="medium"> shirt booth.
+            <input type="text" id="answer57" placeholder="Answer" class="medium"> shirt booth.
         </p>
     </div>
 
     <div class="question">
         <p><strong>28.</strong> The landlord ousted his
-            <input type="text" id="answer57" placeholder="Answer" class="medium">, who turned out to be an amateur entomologist.
+            <input type="text" id="answer58" placeholder="Answer" class="medium">,
+            <button class="hint-btn" data-question-num="28">Hint</button> who turned out to be an amateur entomologist.
         </p>
         <p>Around the apartment were 35 terrariums of beetles, spiders, you name it, including
-            <input type="text" id="answer58" placeholder="Answer" class="medium"> farms.
+            <input type="text" id="answer59" placeholder="Answer" class="medium"> farms.
         </p>
     </div>
 
     <div class="question">
         <p><strong>29.</strong> Giuseppe crafts each sandwich with
-            <input type="text" id="answer59" placeholder="Answer" class="medium"> care and patience.
+            <input type="text" id="answer60" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="29">Hint</button> care and patience.
         </p>
         <p>Some customers at his
-            <input type="text" id="answer60" placeholder="Answer" class="medium"> him for his slow service, but he believes quality can’t be rushed.
+            <input type="text" id="answer61" placeholder="Answer" class="medium"> him for his slow service, but he believes quality can’t be rushed.
         </p>
     </div>
 
     <div class="question">
         <p><strong>30.</strong> Australian English differs from American English in its
-            <input type="text" id="answer61" placeholder="Answer" class="medium"> features, such as the rising pitch at the ends of statements.
+            <input type="text" id="answer62" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="30">Hint</button> features, such as the rising pitch at the ends of statements.
         </p>
         <p>I’d like to do further research
-            <input type="text" id="answer62" placeholder="Answer" class="medium"> accents, such as those of Canadian and Haitian French.
+            <input type="text" id="answer63" placeholder="Answer" class="medium"> accents, such as those of Canadian and Haitian French.
         </p>
     </div>
 
     <div class="question">
         <p><strong>31.</strong> Lenny is about the
-            <input type="text" id="answer63" placeholder="Answer" class="medium"> person I know; he's downright cruel.
+            <input type="text" id="answer64" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="31">Hint</button> person I know; he's downright cruel.
         </p>
-        <p>For my birthday, he gift-wrapped and gave 
-            <input type="text" id="answer64" placeholder="Answer" class="medium"> of hornets.
+        <p>For my birthday, he gift-wrapped and gave
+            <input type="text" id="answer65" placeholder="Answer" class="medium"> of hornets.
         </p>
     </div>
 
     <div class="question">
         <p><strong>32.</strong> We offer various
-            <input type="text" id="answer65" placeholder="Answer" class="medium"> for yoga practice, such as group sessions or private lessons.
+            <input type="text" id="answer66" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="32">Hint</button> for yoga practice, such as group sessions or private lessons.
         </p>
         <p>We also offer discounts
-
-
-            <input type="text" id="answer66" placeholder="Answer" class="medium"> purchased along with class packages.
+            <input type="text" id="answer67" placeholder="Answer" class="medium"> purchased along with class packages.
         </p>
     </div>
 
     <div class="question">
         <p><strong>33.</strong> There's no
-            <input type="text" id="answer67" placeholder="Answer" class="medium"> in their advertising; the pigs really do eat top-quality grub off nice plates.
+            <input type="text" id="answer68" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="33">Hint</button> in their advertising; the pigs really do eat top-quality grub off nice plates.
         </p>
         <p>And after each meal, the farmhands wash every
-            <input type="text" id="answer68" placeholder="Answer" class="medium"> at a time with care.
+            <input type="text" id="answer69" placeholder="Answer" class="medium"> at a time with care.
         </p>
     </div>
 
     <div class="question">
         <p><strong>34.</strong> After the warehouse workers voted to strike, the board members speculated
-            <input type="text" id="answer69" placeholder="Answer" class="medium"> whether one young staff member, a summer hire in the HR department, was to blame.
+            <input type="text" id="answer70" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="34">Hint</button> whether one young staff member, a summer hire in the HR department, was to blame.
         </p>
         <p>Did this
-            <input type="text" id="answer70" placeholder="Answer" class="medium"> with the union, sharing confidential data that fueled their outrage?
+            <input type="text" id="answer71" placeholder="Answer" class="medium"> with the union, sharing confidential data that fueled their outrage?
         </p>
     </div>
 
     <div class="question">
-        <p><strong>35.</strong> Everything was a sham! Her fiancé had schemed to
-            <input type="text" id="answer71" placeholder="Answer" class="medium"> everything he claimed to be.
+        <p><strong>35.</strong> Her fiancé had schemed to
+            <input type="text" id="answer72" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="35">Hint</button> everything he claimed to be.
         </p>
-        <p>So the woman holding the white, shimmery 
-            <input type="text" id="answer72" placeholder="Answer" class="medium"> the last piece of her wedding cake, before tossing the dress into the fire.
+        <p>So the woman holding the white, shimmery
+            <input type="text" id="answer73" placeholder="Answer" class="medium"> the last piece of her wedding cake, before tossing the dress into the fire.
         </p>
     </div>
 
     <div class="question">
         <p><strong>36.</strong> The strict parents made their
-            <input type="text" id="answer73" placeholder="Answer" class="medium"> quite clear: education was the priority, not romantic relationships.
+            <input type="text" id="answer74" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="36">Hint</button> quite clear: education was the priority, not romantic relationships.
         </p>
         <p>That's why they wouldn't let the young
-            <input type="text" id="answer74" placeholder="Answer" class="medium"> their daughter until she had graduated.
+            <input type="text" id="answer75" placeholder="Answer" class="medium"> their daughter until she had graduated.
         </p>
     </div>
 
     <div class="question">
         <p><strong>37.</strong> The young campers planned to visit the local park and
-            <input type="text" id="answer75" placeholder="Answer" class="medium"> for wild mushrooms.
+            <input type="text" id="answer76" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="37">Hint</button> for wild mushrooms.
         </p>
-        <p>But first they had to present their IDs to the ranger 
-            <input type="text" id="answer76" placeholder="Answer" class="medium"> verification.
+        <p>But first they had to present their IDs to the ranger
+            <input type="text" id="answer77" placeholder="Answer" class="medium"> verification.
         </p>
     </div>
 
     <div class="question">
         <p><strong>38.</strong> The general store sold
-            <input type="text" id="answer77" placeholder="Answer" class="medium"> items, from fishing lures to homemade jams.
+            <input type="text" id="answer78" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="38">Hint</button> items, from fishing lures to homemade jams.
         </p>
         <p> On summer days, a batch of freshly picked herbs would
-            <input type="text" id="answer78" placeholder="Answer" class="medium"> on racks outside.
+            <input type="text" id="answer79" placeholder="Answer" class="medium"> on racks outside.
         </p>
     </div>
 
     <div class="question">
         <p><strong>39.</strong> The low-flying
-            <input type="text" id="answer79" placeholder="Answer" class="medium"> from the nearby military base caused the ground to shake and buildings to rattle.
+            <input type="text" id="answer80" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="39">Hint</button> from the nearby military base caused the ground to shake and buildings to rattle.
         </p>
         <p>It got so bad it would crack plaster walls in homes and even
-            <input type="text" id="answer80" placeholder="Answer" class="medium"> at the bowling alley.
+            <input type="text" id="answer81" placeholder="Answer" class="medium"> at the bowling alley.
         </p>
     </div>
 
     <div class="question">
-        <p><strong>40.</strong> The guests at the gallery politely nibbled on delicate 
-            <input type="text" id="answer81" placeholder="Answer" class="medium">, a selection of toasted bread, caviar and smoked salmon, as they admired the artwork.
+        <p><strong>40.</strong> The guests at the gallery politely nibbled on delicate
+            <input type="text" id="answer82" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="40">Hint</button>, a selection of toasted bread, caviar and smoked salmon, as they admired the artwork.
         </p>
-        <p>It was a chaotic blob of paint on a canvas, like it had been flung by a chimpanzee, and I wondered, 
-            <input type="text" id="answer82" placeholder="Answer" class="medium"> be taught to create art?
+        <p>It was a chaotic blob of paint on a canvas, like it had been flung by a chimpanzee, and I wondered,
+            <input type="text" id="answer83" placeholder="Answer" class="medium"> be taught to create art?
         </p>
     </div>
 
     <div class="question">
         <p><strong>41.</strong> Look, I want to be
-            <input type="text" id="answer83" placeholder="Answer" class="medium"> with you because you're fooling yourself. You've really got to get tutored if you're going to pass this math exam.
+            <input type="text" id="answer84" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="41">Hint</button> with you because you're fooling yourself. You've really got to get tutored if you're going to pass this math exam.
         </p>
-        <p>It's not enough to say you'll do to the best of your abilities. Doing what you 
-            <input type="text" id="answer84" placeholder="Answer" class="medium"> not help the last time around.
+        <p>It's not enough to say you'll do to the best of your abilities. Doing what you
+            <input type="text" id="answer85" placeholder="Answer" class="medium"> not help the last time around.
         </p>
     </div>
 
     <div class="question">
         <p><strong>42.</strong> Here is a dummy
-            <input type="text" id="answer85" placeholder="Answer" class="medium"> to add new questions.
+            <input type="text" id="answer86" placeholder="Answer" class="medium">
+            <button class="hint-btn" data-question-num="42">Hint</button> to add new questions.
         </p>
         <p>This
-            <input type="text" id="answer86" placeholder="Answer" class="medium"> will make it easy.
+            <input type="text" id="answer87" placeholder="Answer" class="medium"> will make it easy.
         </p>
     </div>
     <div class="score-display-wrapper">
@@ -472,17 +534,190 @@
             secondsElapsed++;
             const minutes = Math.floor(secondsElapsed / 60);
             const seconds = secondsElapsed % 60;
-            timerDisplay.textContent = `Timer: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             timerInterval = setInterval(updateTimer, 1000);
             timerDisplay.textContent = `Elapsed time: 0:00`; // Initial display
+            initializeRevealedLettersPerQuestion(); // Initialize hint state on load
+
+            // Attach event listeners to all hint buttons
+            document.querySelectorAll('.hint-btn').forEach(button => {
+                button.addEventListener('click', giveHint);
+            });
         });
 
         function normalize(str) {
             // This function handles spaces for multi-word answers while lowercasing and trimming
             return str.trim().toLowerCase().replace(/[.,!?;:'"-]+/g, "").replace(/\s+/g, " ");
+        }
+
+        // Define `allAnswers` as a global variable outside `checkAnswers`
+        const allAnswers = {
+            1: ["disconsolate", "disc on so late"],
+            2: ["justice", "just ice"],
+            3: ["carpet", "car pet"],
+            4: ["together", "to get her"],
+            5: ["mustache", "must ache"],
+            6: ["archive", "arch", "ive"],
+            7: ["atrophy", "a trophy"],
+            8: ["orbed", "or bed"],
+            9: ["goofed", "goo fed"],
+            10: ["buckled", "buck led"],
+            11: ["etcher", "etc", "her"],
+            12: ["significant", "sign if i can't"],
+            13: ["scarcity", "scar", "city"],
+            14: ["dragon", "drag on"],
+            15: ["promising", "prom i sing"],
+            16: ["thinking", "thin king"],
+            17: ["badminton", "bad mint on"],
+            18: ["catatonic", "cat a tonic"],
+            19: ["unclean", "uncle an"],
+            20: ["dodo", "do do"],
+            21: ["manicure", "man i cure"],
+            22: ["capsize", "cap size"],
+            23: ["Likewise", "like wise"],
+            24: ["discovery", "disco very"],
+            25: ["temptress", "temp tress"],
+            26: ["cargo", "car go"],
+            27: ["manatee", "man a tee"],
+            28: ["tenant", "ten ant"],
+            29: ["deliberate", "deli berate"],
+            30: ["intonational", "into national"],
+            31: ["meanest", "me a nest"],
+            32: ["formats", "for mats"],
+            33: ["dishonesty", "dish one sty"],
+            34: ["internally", "intern ally"],
+            35: ["fabricate", "fabric ate"],
+            36: ["mandate", "man date"],
+            37: ["forage", "for age"],
+            38: ["sundry", "sun dry"],
+            39: ["warplanes", "warp lanes"],
+            40: ["canapes", "can apes"],
+            41: ["candid", "can did"],
+            42: ["placeholder", "place holder"]
+        };
+
+        // New global variable to track revealed letters for the *first* input of each question
+        // Map: questionNumber -> array of booleans (true if letter at index is revealed in its first input)
+        let revealedLettersPerQuestion = {};
+
+
+        // Function to initialize or reset revealedLetters for a new game
+        function initializeRevealedLettersPerQuestion() {
+            revealedLettersPerQuestion = {}; // Clear any previous state
+            for (let qNum = 1; qNum <= 42; qNum++) { // Iterate through all your questions
+                const firstCorrectWordForQ = allAnswers[qNum] ? allAnswers[qNum][0] : ''; // Get the first correct word for this question, handle potential undefined
+                if (firstCorrectWordForQ) { // Ensure the question exists
+                    revealedLettersPerQuestion[qNum] = Array(firstCorrectWordForQ.length).fill(false);
+                }
+            }
+            // Re-enable all hint buttons on reset (e.g., if you add a "start new game" button)
+            document.querySelectorAll('.hint-btn').forEach(button => {
+                button.disabled = false;
+            });
+        }
+
+
+        // Function to handle a hint request for a specific question's first input
+        function giveHint(event) {
+            const hintButton = event.target;
+            const qNum = parseInt(hintButton.dataset.questionNum); // Get the question number
+
+            // Get the first input element for this question
+            let firstInputId;
+            if (qNum == 1) firstInputId = 'answer1';
+            else if (qNum == 2) firstInputId = 'answer3';
+            else if (qNum == 3) firstInputId = 'answer5';
+            else if (qNum == 4) firstInputId = 'answer7';
+            else if (qNum == 5) firstInputId = 'answer9';
+            else if (qNum == 6) firstInputId = 'answer11';
+            else if (qNum == 7) firstInputId = 'answer14';
+            else if (qNum == 8) firstInputId = 'answer16';
+            else if (qNum == 9) firstInputId = 'answer18';
+            else if (qNum == 10) firstInputId = 'answer20';
+            else if (qNum == 11) firstInputId = 'answer22';
+            else if (qNum == 12) firstInputId = 'answer25';
+            else if (qNum == 13) firstInputId = 'answer27';
+            else if (qNum == 14) firstInputId = 'answer30';
+            else if (qNum == 15) firstInputId = 'answer32';
+            else if (qNum == 16) firstInputId = 'answer34';
+            else if (qNum == 17) firstInputId = 'answer36';
+            else if (qNum == 18) firstInputId = 'answer38';
+            else if (qNum == 19) firstInputId = 'answer40';
+            else if (qNum == 20) firstInputId = 'answer42';
+            else if (qNum == 21) firstInputId = 'answer44';
+            else if (qNum == 22) firstInputId = 'answer46';
+            // For dummy questions (23-42), the first input ID follows the pattern:
+            else if (qNum >= 23 && qNum <= 42) {
+                firstInputId = `answer${48 + (qNum - 23) * 2}`; // Corrected starting ID for dummy questions
+            } else {
+                console.error(`No first input ID defined for question number ${qNum}.`);
+                return;
+            }
+
+
+            const inputEl = document.getElementById(firstInputId);
+
+            if (!inputEl) {
+                console.error(`First input element with ID ${firstInputId} not found for question ${qNum}.`);
+                return;
+            }
+
+            const correctWord = allAnswers[qNum][0]; // Get the first correct word for this question's first blank
+
+            // Prepare the current state of the word in the input field
+            // Use the current input value, padded with underscores if shorter than correct word
+            let currentInputChars = inputEl.value.toUpperCase().split('');
+            if (currentInputChars.length < correctWord.length) {
+                currentInputChars = currentInputChars.concat(Array(correctWord.length - currentInputChars.length).fill('_'));
+            } else {
+                // If user typed more characters than the correct word, trim it
+                currentInputChars = currentInputChars.slice(0, correctWord.length);
+            }
+
+            // Initialize state if not already done (should be by initializeRevealedLettersPerQuestion)
+            if (!revealedLettersPerQuestion[qNum]) {
+                revealedLettersPerQuestion[qNum] = Array(correctWord.length).fill(false);
+            }
+
+            let unrevealedIndices = [];
+            for (let i = 0; i < correctWord.length; i++) {
+                const correctChar = correctWord[i].toUpperCase();
+                const currentChar = currentInputChars[i];
+
+                // Check if the current character is NOT correct AND has NOT been revealed by a hint yet
+                if (currentChar !== correctChar || !revealedLettersPerQuestion[qNum][i]) {
+                    unrevealedIndices.push(i);
+                }
+            }
+
+            if (unrevealedIndices.length === 0) {
+                // All letters are already revealed or correctly entered for this specific first input
+                hintButton.disabled = true; // Disable if fully revealed
+                return;
+            }
+
+            // Pick a random unrevealed index
+            const randomIndex = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+            const letterToReveal = correctWord[randomIndex];
+
+            // Update the input field value and mark as revealed
+            currentInputChars[randomIndex] = letterToReveal.toUpperCase(); // Ensure uppercase for display
+            inputEl.value = currentInputChars.join(''); // Update the actual input field
+            revealedLettersPerQuestion[qNum][randomIndex] = true; // Mark this letter as revealed
+
+            // Check if all letters are revealed for this specific input after hint
+            // This is a slightly more robust check: ensure no underscores AND all internal revealed flags are true
+            const allCorrectlyFilled = currentInputChars.every((char, index) =>
+                char === correctWord[index].toUpperCase()
+            );
+            const allHinted = revealedLettersPerQuestion[qNum].every(flag => flag === true);
+
+            if (allCorrectlyFilled || allHinted) {
+                hintButton.disabled = true;
+            }
         }
 
 
@@ -492,61 +727,15 @@
             const remainingSeconds = finalSeconds % 60;
             const formattedTime = `${finalMinutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 
-            const correctAnswers = {
-                1: [["disconsolate"], ["disc on so late"]],
-                2: [["justice"], ["just ice"]],
-                3: [["carpet"], ["car pet"]],
-                4: [["together"], ["to get her"]],
-                5: [["mustache"], ["must ache"]],
-                6: [["archive"], ["arch"], ["ive"]],
-                7: [["atrophy"], ["a trophy"]],
-                8: [["orbed"], ["or bed"]],
-                9: [["goofed"], ["goo fed"]],
-                10: [["buckled"], ["buck led"]],
-                11: [["etcher"], ["etc"], ["her"]],
-                12: [["significant"], ["sign if i can't"]],
-                13: [["scarcity"], ["scar"], ["city"]], // This definition is correct for 3 blanks
-                14: [["dragon"], ["drag on"]],
-                15: [["promising"], ["prom i sing"]],
-                16: [["thinking"], ["thin king"]],
-                17: [["badminton"], ["bad mint on"]],
-                18: [["catatonic"], ["cat a tonic"]],
-                19: [["unclean"], ["uncle an"]],
-                20: [["dodo"], ["do do"]],
-                21: [["manicure"], ["man i cure"]],
-                22: [["capsize"], ["cap size"]],
-                // ADDING 20 DUMMY PLACEHOLDER ANSWERS BELOW
-                23: [["Likewise"], ["like wise"]],
-                24: [["discovery"], ["disco very"]],
-                25: [["temptress"], ["temp tress"]],
-                26: [["cargo"], ["car go"]],
-                27: [["manatee"], ["man a tee"]],
-                28: [["tenant"], ["ten ant"]],
-                29: [["deliberate"], ["deli berate"]],
-                30: [["intonational"], ["into national"]],
-                31: [["meanest"], ["me a nest"]],
-                32: [["formats"], ["for mats"]],
-                33: [["dishonesty"], ["dish one sty"]],
-                34: [["internally"], ["intern ally"]],
-                35: [["fabricate"], ["fabric ate"]],
-                36: [["mandate"], ["man date"]],
-                37: [["forage"], ["for age"]],
-                38: [["sundry"], ["sun dry"]],
-                39: [["warplanes"], ["warp lanes"]],
-                40: [["canapes"], ["can apes"]],
-                41: [["candid"], ["can did"]],
-                42: [["placeholder"], ["place holder"]]
-            };
-
-            let totalQuestions = Object.keys(correctAnswers).length;
+            let totalQuestions = Object.keys(allAnswers).length;
             let correctCount = 0;
 
             document.querySelectorAll('input[type="text"]').forEach(input => {
                 input.classList.remove("correct", "incorrect");
             });
 
-            for (let qNum in correctAnswers) {
-                const questionBlanks = correctAnswers[qNum];
+            for (let qNum in allAnswers) {
+                const questionBlanks = allAnswers[qNum];
                 let isQuestionCorrect = true;
 
                 for (let i = 0; i < questionBlanks.length; i++) {
@@ -565,28 +754,22 @@
                     else if (qNum == 11) inputId = `answer${i + 22}`; // answer22, answer23, answer24
                     else if (qNum == 12) inputId = `answer${i + 25}`;
                     else if (qNum == 13 && i < 2) inputId = `answer${i + 27}`; // Handles answer27 and answer28
-                    else if (qNum == 13 && i == 2) inputId = `answer29`; // MODIFICATION: Explicitly map the 3rd input of Q13
-                    else if (qNum == 14) inputId = `answer${i + 30}`; // This was answer29 before, now it's answer30.
-                    else if (qNum == 15) inputId = `answer${i + 32}`; // This was answer31 before, now it's answer32.
-                    else if (qNum == 16) inputId = `answer${i + 34}`; // This was answer33 before, now it's answer34.
-                    else if (qNum == 17) inputId = `answer${i + 36}`; // This was answer35 before, now it's answer36.
-                    else if (qNum == 18) inputId = `answer${i + 38}`; // This was answer37 before, now it's answer38.
-                    else if (qNum == 19) inputId = `answer${i + 40}`; // This was answer39 before, now it's answer40.
-                    else if (qNum == 20) inputId = `answer${i + 42}`; // This was answer41 before, now it's answer42.
-                    else if (qNum == 21) inputId = `answer${i + 44}`; // This was answer43 before, now it's answer44.
-                    else if (qNum == 22) inputId = `answer${i + 46}`; // This was answer45 before, now it's answer46.
-                    // NEW DUMMY QUESTION ID MAPPINGS START HERE
+                    else if (qNum == 13 && i == 2) inputId = `answer29`; // Explicitly map the 3rd input of Q13
+                    else if (qNum == 14) inputId = `answer${i + 30}`;
+                    else if (qNum == 15) inputId = `answer${i + 32}`;
+                    else if (qNum == 16) inputId = `answer${i + 34}`;
+                    else if (qNum == 17) inputId = `answer${i + 36}`;
+                    else if (qNum == 18) inputId = `answer${i + 38}`;
+                    else if (qNum == 19) inputId = `answer${i + 40}`;
+                    else if (qNum == 20) inputId = `answer${i + 42}`;
+                    else if (qNum == 21) inputId = `answer${i + 44}`;
+                    else if (qNum == 22) inputId = `answer${i + 46}`;
+                    // NEW DUMMY QUESTION ID MAPPINGS START HERE (from answer48 onwards)
                     else if (parseInt(qNum) >= 23 && parseInt(qNum) <= 42) {
-                        // For each dummy question, there are 2 inputs.
-                        // The base answer ID for q23 is 47.
-                        // For q24, it's 47 + 2 = 49.
-                        // For qN, it's 47 + (N-23)*2.
-                        // This original formula still works because the previous sequence ended at answer46 and Q23 starts at 47.
-                        // The offset for qNum == 22 is i+46 which leads to answer46 and answer47.
-                        // So q23 correctly starts at answer47.
-                        let baseIdOffset = 47 + (parseInt(qNum) - 23) * 2;
+                        let baseIdOffset = 48 + (parseInt(qNum) - 23) * 2;
                         inputId = `answer${i + baseIdOffset}`;
                     }
+
 
                     const inputEl = document.getElementById(inputId);
                     if (!inputEl) {
@@ -596,9 +779,15 @@
                     }
 
                     const userAnswer = normalize(inputEl.value);
-                    const validAnswersForBlank = correctAnswers[qNum][i];
+                    const validAnswersForBlank = allAnswers[qNum][i];
 
-                    let isBlankCorrect = validAnswersForBlank.some(ans => userAnswer === normalize(ans));
+                    let isBlankCorrect = false;
+                    for (const correctSpelling of validAnswersForBlank) {
+                        if (userAnswer === normalize(correctSpelling)) {
+                            isBlankCorrect = true;
+                            break;
+                        }
+                    }
 
                     if (isBlankCorrect) {
                         inputEl.classList.add("correct");
