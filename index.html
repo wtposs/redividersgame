@@ -148,7 +148,6 @@
             color: white;
             border: none;
             border-radius: 4px;
-            /* Reverted: No specific margin-left/right needed here as it's on its own line */
             vertical-align: middle;
         }
 
@@ -166,11 +165,6 @@
             text-align: center; /* Center the button horizontally */
             margin-bottom: 15px; /* Space between the hint button and the question text */
         }
-
-        /* Reverted: Removed these specific flex-related adjustments */
-        /* .question p:not(:first-child) { ... } */
-        /* .question p:first-of-type input[type="text"] { ... } */
-
     </style>
 </head>
 <body>
@@ -190,10 +184,10 @@
             <button class="hint-btn" data-question-num="1">Hint</button>
         </div>
         <p><strong>1.</strong> Susan hadn't slept since her neighbor's favorite CD started playing at 3 AM. She had a presentation to give that morning at work, and though her husband tried to reassure her, she was
-            <input type="text" id="answer1" placeholder="Answer" class="medium">.
+            <input type="text" id="answer1" placeholder="Answer" class="medium" data-question-num="1" data-blank-index="0">.
         </p>
         <p>"Why," she wondered angrily, "had he put his
-            <input type="text" id="answer2" placeholder="Answer" class="medium">?!"
+            <input type="text" id="answer2" placeholder="Answer" class="medium" data-question-num="1" data-blank-index="1">?!"
         </p>
     </div>
 
@@ -201,72 +195,72 @@
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="2">Hint</button>
         </div>
-        <p><strong>2.</strong> Even a Supreme Court <input type="text" id="answer3" placeholder="Answer" class="medium"> needs an occasional break.</p>
-        <p>Sotomayor takes her tea without lemon or sugar; she has it with <input type="text" id="answer4" placeholder="Answer" class="medium">.</p>
+        <p><strong>2.</strong> Even a Supreme Court <input type="text" id="answer3" placeholder="Answer" class="medium" data-question-num="2" data-blank-index="0"> needs an occasional break.</p>
+        <p>Sotomayor takes her tea without lemon or sugar; she has it with <input type="text" id="answer4" placeholder="Answer" class="medium" data-question-num="2" data-blank-index="1">.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="3">Hint</button>
         </div>
-        <p><strong>3.</strong> My dog couldn't control his bladder in the house and peed on my <input type="text" id="answer5" placeholder="Answer" class="medium">.</p>
-        <p>Now he stays in my automobile. He's a <input type="text" id="answer6" placeholder="Answer" class="medium">.</p>
+        <p><strong>3.</strong> My dog couldn't control his bladder in the house and peed on my <input type="text" id="answer5" placeholder="Answer" class="medium" data-question-num="3" data-blank-index="0">.</p>
+        <p>Now he stays in my automobile. He's a <input type="text" id="answer6" placeholder="Answer" class="medium" data-question-num="3" data-blank-index="1">.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="4">Hint</button>
         </div>
-        <p><strong>4.</strong> Jennifer was suspicious of the police officers huddled <input type="text" id="answer7" placeholder="Answer" class="medium">.</p>
-        <p>She was sure they were out <input type="text" id="answer8" placeholder="Answer" class="medium">.</p>
+        <p><strong>4.</strong> Jennifer was suspicious of the police officers huddled <input type="text" id="answer7" placeholder="Answer" class="medium" data-question-num="4" data-blank-index="0">.</p>
+        <p>She was sure they were out <input type="text" id="answer8" placeholder="Answer" class="medium" data-question-num="4" data-blank-index="1">.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="5">Hint</button>
         </div>
-        <p><strong>5.</strong> It took hours, but Tom finally shaved off his beard and <input type="text" id="answer9" placeholder="Answer" class="medium">.</p>
-        <p>I really think his arm <input type="text" id="answer10" placeholder="Answer" class="medium"> from all the effort.</p>
+        <p><strong>5.</strong> It took hours, but Tom finally shaved off his beard and <input type="text" id="answer9" placeholder="Answer" class="medium" data-question-num="5" data-blank-index="0">.</p>
+        <p>I really think his arm <input type="text" id="answer10" placeholder="Answer" class="medium" data-question-num="5" data-blank-index="1"> from all the effort.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="6">Hint</button>
         </div>
-        <p><strong>6.</strong> In Paris I visited the National <input type="text" id="answer11" placeholder="Answer" class="medium">.</p>
-        <p>And then the Triumphal <input type="text" id="answer12" placeholder="Answer" class="small">.<span class="large-period">.</span> <input type="text" id="answer13" placeholder="Answer" class="small"> never seen anything so impressive.</p>
+        <p><strong>6.</strong> In Paris I visited the National <input type="text" id="answer11" placeholder="Answer" class="medium" data-question-num="6" data-blank-index="0">.</p>
+        <p>And then the Triumphal <input type="text" id="answer12" placeholder="Answer" class="small" data-question-num="6" data-blank-index="1">.<span class="large-period">.</span> <input type="text" id="answer13" placeholder="Answer" class="small" data-question-num="6" data-blank-index="2"> never seen anything so impressive.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="7">Hint</button>
         </div>
-        <p><strong>7.</strong> You shouldn't sit around and let your muscles <input type="text" id="answer14" placeholder="Answer" class="medium">.</p>
-        <p>You'd better train for the marathon if you want to win <input type="text" id="answer15" placeholder="Answer" class="medium">.</p>
+        <p><strong>7.</strong> You shouldn't sit around and let your muscles <input type="text" id="answer14" placeholder="Answer" class="medium" data-question-num="7" data-blank-index="0">.</p>
+        <p>You'd better train for the marathon if you want to win <input type="text" id="answer15" placeholder="Answer" class="medium" data-question-num="7" data-blank-index="1">.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="8">Hint</button>
         </div>
-        <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium"> sapphires, the listless queen felt undecided.</p>
-        <p>Should she go to the banquet <input type="text" id="answer17" placeholder="Answer" class="medium">?</p>
+        <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="0"> sapphires, the listless queen felt undecided.</p>
+        <p>Should she go to the banquet <input type="text" id="answer17" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="1">?</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="9">Hint</button>
         </div>
-        <p><strong>9.</strong> The clumsy chemist <input type="text" id="answer18" placeholder="Answer" class="medium"> and spilled the slimy serum on the floor.</p>
-        <p>Overnight, this <input type="text" id="answer19" placeholder="Answer" class="medium"> a swarm of ants that then gained superpowers.</p>
+        <p><strong>9.</strong> The clumsy chemist <input type="text" id="answer18" placeholder="Answer" class="medium" data-question-num="9" data-blank-index="0"> and spilled the slimy serum on the floor.</p>
+        <p>Overnight, this <input type="text" id="answer19" placeholder="Answer" class="medium" data-question-num="9" data-blank-index="1"> a swarm of ants that then gained superpowers.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="10">Hint</button>
         </div>
-        <p><strong>10.</strong> The old deer was exhausted and his legs nearly <input type="text" id="answer20" placeholder="Answer" class="medium">.</p>
-        <p>Still, the <input type="text" id="answer21" placeholder="Answer" class="medium"> his herd through the dense forest to safety.</p>
+        <p><strong>10.</strong> The old deer was exhausted and his legs nearly <input type="text" id="answer20" placeholder="Answer" class="medium" data-question-num="10" data-blank-index="0">.</p>
+        <p>Still, the <input type="text" id="answer21" placeholder="Answer" class="medium" data-question-num="10" data-blank-index="1"> his herd through the dense forest to safety.</p>
     </div>
 
     <div class="question">
@@ -274,11 +268,11 @@
             <button class="hint-btn" data-question-num="11">Hint</button>
         </div>
         <p><strong>11.</strong> With acid and a metal plate, she’s an
-            <input type="text" id="answer22" placeholder="Answer" class="medium"> like no other.
+            <input type="text" id="answer22" placeholder="Answer" class="medium" data-question-num="11" data-blank-index="0"> like no other.
         </p>
         <p>She can do lettering, illustrations, patterns,
-            <input type="text" id="answer23" placeholder="Answer" class="small"><span class="large-period">.</span><span style="padding: 0 5px;"></span>
-            <input type="text" id="answer24" placeholder="Answer" class="small"> talents are truly limitless.
+            <input type="text" id="answer23" placeholder="Answer" class="small" data-question-num="11" data-blank-index="1"><span class="large-period">.</span><span style="padding: 0 5px;"></span>
+            <input type="text" id="answer24" placeholder="Answer" class="small" data-question-num="11" data-blank-index="2"> talents are truly limitless.
         </p>
     </div>
 
@@ -286,8 +280,8 @@
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="12">Hint</button>
         </div>
-        <p><strong>12.</strong> My <input type="text" id="answer25" placeholder="Answer" class="medium"> other insists on a prenup before marriage.</p>
-        <p>I don’t agree, but I’ll <input type="text" id="answer26" placeholder="Answer" class="medium"> change her mind.</p>
+        <p><strong>12.</strong> My <input type="text" id="answer25" placeholder="Answer" class="medium" data-question-num="12" data-blank-index="0"> other insists on a prenup before marriage.</p>
+        <p>I don’t agree, but I’ll <input type="text" id="answer26" placeholder="Answer" class="medium" data-question-num="12" data-blank-index="1"> change her mind.</p>
     </div>
 
     <div class="question">
@@ -295,11 +289,11 @@
             <button class="hint-btn" data-question-num="13">Hint</button>
         </div>
         <p><strong>13.</strong> Rocco grew up in a rundown part of Chicago where
-            <input type="text" id="answer27" placeholder="Answer" class="medium"> forced him to fight for what little was available.
+            <input type="text" id="answer27" placeholder="Answer" class="medium" data-question-num="13" data-blank-index="0"> forced him to fight for what little was available.
         </p>
         <p>So you want to know about his facial
-            <input type="text" id="answer28" placeholder="Answer" class="small"><span class="large-period">?</span><span style="padding: 0 5px;"></span>
-            <input type="text" id="answer29" placeholder="Answer" class="small"> life takes its toll!
+            <input type="text" id="answer28" placeholder="Answer" class="small" data-question-num="13" data-blank-index="1"><span class="large-period">?</span><span style="padding: 0 5px;"></span>
+            <input type="text" id="answer29" placeholder="Answer" class="small" data-question-num="13" data-blank-index="2"> life takes its toll!
         </p>
     </div>
 
@@ -307,72 +301,72 @@
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="14">Hint</button>
         </div>
-        <p><strong>14.</strong> I stopped watching Game of Thrones. You've seen one <input type="text" id="answer30" placeholder="Answer" class="medium">, you've seen them all.</p>
-        <p>After a few episodes the series seemed to <input type="text" id="answer31" placeholder="Answer" class="medium">.</p>
+        <p><strong>14.</strong> I stopped watching Game of Thrones. You've seen one <input type="text" id="answer30" placeholder="Answer" class="medium" data-question-num="14" data-blank-index="0">, you've seen them all.</p>
+        <p>After a few episodes the series seemed to <input type="text" id="answer31" placeholder="Answer" class="medium" data-question-num="14" data-blank-index="1">.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="15">Hint</button>
         </div>
-        <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer32" placeholder="Answer" class="medium"> to prove my feelings since our freshman year?</p>
-        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium"> you a love ballad.</p>
+        <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer32" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="0"> to prove my feelings since our freshman year?</p>
+        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="1"> you a love ballad.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="16">Hint</button>
         </div>
-        <p><strong>16.</strong> The queen can’t stop <input type="text" id="answer34" placeholder="Answer" class="medium"> about how her husband has changed for the better.</p>
-        <p>The newly <input type="text" id="answer35" placeholder="Answer" class="medium"> is the picture of health.</p>
+        <p><strong>16.</strong> The queen can’t stop <input type="text" id="answer34" placeholder="Answer" class="medium" data-question-num="16" data-blank-index="0"> about how her husband has changed for the better.</p>
+        <p>The newly <input type="text" id="answer35" placeholder="Answer" class="medium" data-question-num="16" data-blank-index="1"> is the picture of health.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="17">Hint</button>
         </div>
-        <p><strong>17.</strong> The picnic was going great, with me winning 21-16 at <input type="text" id="answer36" placeholder="Answer" class="medium">.</p>
-        <p>But when it came time to eat, with one taste I knew I'd put <input type="text" id="answer37" placeholder="Answer" class="medium"> the lamb.</p>
+        <p><strong>17.</strong> The picnic was going great, with me winning 21-16 at <input type="text" id="answer36" placeholder="Answer" class="medium" data-question-num="17" data-blank-index="0">.</p>
+        <p>But when it came time to eat, with one taste I knew I'd put <input type="text" id="answer37" placeholder="Answer" class="medium" data-question-num="17" data-blank-index="1"> the lamb.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="18">Hint</button>
         </div>
-        <p><strong>18.</strong> Our pet Misty seems depressed and even <input type="text" id="answer38" placeholder="Answer" class="medium">, staring blankly at the wall for hours.</p>
-        <p>We need to give that <input type="text" id="answer39" placeholder="Answer" class="medium"> for her nerves.</p>
+        <p><strong>18.</strong> Our pet Misty seems depressed and even <input type="text" id="answer38" placeholder="Answer" class="medium" data-question-num="18" data-blank-index="0">, staring blankly at the wall for hours.</p>
+        <p>We need to give that <input type="text" id="answer39" placeholder="Answer" class="medium" data-question-num="18" data-blank-index="1"> for her nerves.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="19">Hint</button>
         </div>
-        <p><strong>19.</strong> I stayed with my mother's older brother, and he was appalled at how <input type="text" id="answer40" placeholder="Answer" class="medium"> I left the room.</p>
-        <p>I felt terrible and gave my <input type="text" id="answer41" placeholder="Answer" class="medium"> an apology.</p>
+        <p><strong>19.</strong> I stayed with my mother's older brother, and he was appalled at how <input type="text" id="answer40" placeholder="Answer" class="medium" data-question-num="19" data-blank-index="0"> I left the room.</p>
+        <p>I felt terrible and gave my <input type="text" id="answer41" placeholder="Answer" class="medium" data-question-num="19" data-blank-index="1"> an apology.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="20">Hint</button>
         </div>
-        <p><strong>20.</strong> What you don’t do to help endangered animals may doom them like the <input type="text" id="answer42" placeholder="Answer" class="medium"> bird.</p>
-        <p>What you <input type="text" id="answer43" placeholder="Answer" class="medium"> can ensure their survival for years to come.</p>
+        <p><strong>20.</strong> What you don’t do to help endangered animals may doom them like the <input type="text" id="answer42" placeholder="Answer" class="medium" data-question-num="20" data-blank-index="0"> bird.</p>
+        <p>What you <input type="text" id="answer43" placeholder="Answer" class="medium" data-question-num="20" data-blank-index="1"> can ensure their survival for years to come.</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="21">Hint</button>
         </div>
-        <p><strong>21.</strong> The stylist took one look at Henry's brittle nails, and asked if he'd like to add keratin treatments to his <input type="text" id="answer44" placeholder="Answer" class="medium">.</p>
-        <p>She added, "I assure you, every <input type="text" id="answer45" placeholder="Answer" class="medium"> of this condition says it's well worth the cost!"</p>
+        <p><strong>21.</strong> The stylist took one look at Henry's brittle nails, and asked if he'd like to add keratin treatments to his <input type="text" id="answer44" placeholder="Answer" class="medium" data-question-num="21" data-blank-index="0">.</p>
+        <p>She added, "I assure you, every <input type="text" id="answer45" placeholder="Answer" class="medium" data-question-num="21" data-blank-index="1"> of this condition says it's well worth the cost!"</p>
     </div>
 
     <div class="question">
         <div class="hint-button-container">
             <button class="hint-btn" data-question-num="22">Hint</button>
         </div>
-        <p><strong>22.</strong> Dangerously, the tiny boat began to <input type="text" id="answer46" placeholder="Answer" class="medium"> in the storm.</p>
-        <p>Engine problems arose as the wrong <input type="text" id="answer47" placeholder="Answer" class="medium"> on the fuel tank let in seawater.</p>
+        <p><strong>22.</strong> Dangerously, the tiny boat began to <input type="text" id="answer46" placeholder="Answer" class="medium" data-question-num="22" data-blank-index="0"> in the storm.</p>
+        <p>Engine problems arose as the wrong <input type="text" id="answer47" placeholder="Answer" class="medium" data-question-num="22" data-blank-index="1"> on the fuel tank let in seawater.</p>
     </div>
 
     <div class="question">
@@ -380,10 +374,10 @@
             <button class="hint-btn" data-question-num="23">Hint</button>
         </div>
         <p><strong>23.</strong> Janet favors aggressive investments in untested ventures;
-            <input type="text" id="answer48" placeholder="Answer" class="medium">, her partner rarely shies away from risk.
+            <input type="text" id="answer48" placeholder="Answer" class="medium" data-question-num="23" data-blank-index="0">, her partner rarely shies away from risk.
         </p>
         <p>On the other hand, their clients
-            <input type="text" id="answer49" placeholder="Answer" class="medium"> choices that offer slow but steady growth.
+            <input type="text" id="answer49" placeholder="Answer" class="medium" data-question-num="23" data-blank-index="1"> choices that offer slow but steady growth.
         </p>
     </div>
 
@@ -392,10 +386,10 @@
             <button class="hint-btn" data-question-num="24">Hint</button>
         </div>
         <p><strong>24.</strong> After my recent
-            <input type="text" id="answer50" placeholder="Answer" class="medium"> of my parents' vinyl in the attic, I find the 70s folk songs rather boring.
+            <input type="text" id="answer50" placeholder="Answer" class="medium" data-question-num="24" data-blank-index="0"> of my parents' vinyl in the attic, I find the 70s folk songs rather boring.
         </p>
         <p>Still, I find
-            <input type="text" id="answer51" placeholder="Answer" class="medium"> fun to dance to.
+            <input type="text" id="answer51" placeholder="Answer" class="medium" data-question-num="24" data-blank-index="1"> fun to dance to.
         </p>
     </div>
 
@@ -404,10 +398,10 @@
             <button class="hint-btn" data-question-num="25">Hint</button>
         </div>
         <p><strong>25.</strong> He warned his friend about the charming
-            <input type="text" id="answer52" placeholder="Answer" class="medium"> who seemed too good to be true.
+            <input type="text" id="answer52" placeholder="Answer" class="medium" data-question-num="25" data-blank-index="0"> who seemed too good to be true.
         </p>
         <p>He even pointed to the stray, synthetic
-            <input type="text" id="answer53" placeholder="Answer" class="medium"> lying on the floor, likely from her extensions.
+            <input type="text" id="answer53" placeholder="Answer" class="medium" data-question-num="25" data-blank-index="1"> lying on the floor, likely from her extensions.
         </p>
     </div>
 
@@ -416,10 +410,10 @@
             <button class="hint-btn" data-question-num="26">Hint</button>
         </div>
         <p><strong>26.</strong> We watched as trucks slowly rumbled past us with their hazardous
-            <input type="text" id="answer54" placeholder="Answer" class="medium">, escorted by police vehicles.
+            <input type="text" id="answer54" placeholder="Answer" class="medium" data-question-num="26" data-blank-index="0">, escorted by police vehicles.
         </p>
         <p>An officer finally waved us forward and let our
-            <input type="text" id="answer55" placeholder="Answer" class="medium"> through the intersection.
+            <input type="text" id="answer55" placeholder="Answer" class="medium" data-question-num="26" data-blank-index="1"> through the intersection.
         </p>
     </div>
 
@@ -428,10 +422,10 @@
             <button class="hint-btn" data-question-num="27">Hint</button>
         </div>
         <p><strong>27.</strong> Volunteers at the festival sold souvenirs to raise money for
-            <input type="text" id="answer56" placeholder="Answer" class="medium"> protection in Florida.
+            <input type="text" id="answer56" placeholder="Answer" class="medium" data-question-num="27" data-blank-index="0"> protection in Florida.
         </p>
         <p>Or job was to
-            <input type="text" id="answer57" placeholder="Answer" class="medium"> shirt booth.
+            <input type="text" id="answer57" placeholder="Answer" class="medium" data-question-num="27" data-blank-index="1"> shirt booth.
         </p>
     </div>
 
@@ -440,10 +434,10 @@
             <button class="hint-btn" data-question-num="28">Hint</button>
         </div>
         <p><strong>28.</strong> The landlord ousted his
-            <input type="text" id="answer58" placeholder="Answer" class="medium">, who turned out to be an amateur entomologist.
+            <input type="text" id="answer58" placeholder="Answer" class="medium" data-question-num="28" data-blank-index="0">, who turned out to be an amateur entomologist.
         </p>
         <p>Around the apartment were 35 terrariums of beetles, spiders, you name it, including
-            <input type="text" id="answer59" placeholder="Answer" class="medium"> farms.
+            <input type="text" id="answer59" placeholder="Answer" class="medium" data-question-num="28" data-blank-index="1"> farms.
         </p>
     </div>
 
@@ -452,10 +446,10 @@
             <button class="hint-btn" data-question-num="29">Hint</button>
         </div>
         <p><strong>29.</strong> Giuseppe crafts each sandwich with
-            <input type="text" id="answer60" placeholder="Answer" class="medium"> care and patience.
+            <input type="text" id="answer60" placeholder="Answer" class="medium" data-question-num="29" data-blank-index="0"> care and patience.
         </p>
         <p>Some customers at his
-            <input type="text" id="answer61" placeholder="Answer" class="medium"> him for his slow service, but he believes quality can’t be rushed.
+            <input type="text" id="answer61" placeholder="Answer" class="medium" data-question-num="29" data-blank-index="1"> him for his slow service, but he believes quality can’t be rushed.
         </p>
     </div>
 
@@ -464,10 +458,10 @@
             <button class="hint-btn" data-question-num="30">Hint</button>
         </div>
         <p><strong>30.</strong> Australian English differs from American English in its
-            <input type="text" id="answer62" placeholder="Answer" class="medium"> features, such as the rising pitch at the ends of statements.
+            <input type="text" id="answer62" placeholder="Answer" class="medium" data-question-num="30" data-blank-index="0"> features, such as the rising pitch at the ends of statements.
         </p>
         <p>I’d like to do further research
-            <input type="text" id="answer63" placeholder="Answer" class="medium"> accents, such as those of Canadian and Haitian French.
+            <input type="text" id="answer63" placeholder="Answer" class="medium" data-question-num="30" data-blank-index="1"> accents, such as those of Canadian and Haitian French.
         </p>
     </div>
 
@@ -476,10 +470,10 @@
             <button class="hint-btn" data-question-num="31">Hint</button>
         </div>
         <p><strong>31.</strong> Lenny is about the
-            <input type="text" id="answer64" placeholder="Answer" class="medium"> person I know; he's downright cruel.
+            <input type="text" id="answer64" placeholder="Answer" class="medium" data-question-num="31" data-blank-index="0"> person I know; he's downright cruel.
         </p>
         <p>For my birthday, he gift-wrapped and gave
-            <input type="text" id="answer65" placeholder="Answer" class="medium"> of hornets.
+            <input type="text" id="answer65" placeholder="Answer" class="medium" data-question-num="31" data-blank-index="1"> of hornets.
         </p>
     </div>
 
@@ -488,10 +482,10 @@
             <button class="hint-btn" data-question-num="32">Hint</button>
         </div>
         <p><strong>32.</strong> We offer various
-            <input type="text" id="answer66" placeholder="Answer" class="medium"> for yoga practice, such as group sessions or private lessons.
+            <input type="text" id="answer66" placeholder="Answer" class="medium" data-question-num="32" data-blank-index="0"> for yoga practice, such as group sessions or private lessons.
         </p>
         <p>We also offer discounts
-            <input type="text" id="answer67" placeholder="Answer" class="medium"> purchased along with class packages.
+            <input type="text" id="answer67" placeholder="Answer" class="medium" data-question-num="32" data-blank-index="1"> purchased along with class packages.
         </p>
     </div>
 
@@ -500,10 +494,10 @@
             <button class="hint-btn" data-question-num="33">Hint</button>
         </div>
         <p><strong>33.</strong> There's no
-            <input type="text" id="answer68" placeholder="Answer" class="medium"> in their advertising; the pigs really do eat top-quality grub off nice plates.
+            <input type="text" id="answer68" placeholder="Answer" class="medium" data-question-num="33" data-blank-index="0"> in their advertising; the pigs really do eat top-quality grub off nice plates.
         </p>
         <p>And after each meal, the farmhands wash every
-            <input type="text" id="answer69" placeholder="Answer" class="medium"> at a time with care.
+            <input type="text" id="answer69" placeholder="Answer" class="medium" data-question-num="33" data-blank-index="1"> at a time with care.
         </p>
     </div>
 
@@ -512,10 +506,10 @@
             <button class="hint-btn" data-question-num="34">Hint</button>
         </div>
         <p><strong>34.</strong> After the warehouse workers voted to strike, the board members speculated
-            <input type="text" id="answer70" placeholder="Answer" class="medium"> whether one young staff member, a summer hire in the HR department, was to blame.
+            <input type="text" id="answer70" placeholder="Answer" class="medium" data-question-num="34" data-blank-index="0"> whether one young staff member, a summer hire in the HR department, was to blame.
         </p>
         <p>Did this
-            <input type="text" id="answer71" placeholder="Answer" class="medium"> with the union, sharing confidential data that fueled their outrage?
+            <input type="text" id="answer71" placeholder="Answer" class="medium" data-question-num="34" data-blank-index="1"> with the union, sharing confidential data that fueled their outrage?
         </p>
     </div>
 
@@ -524,10 +518,10 @@
             <button class="hint-btn" data-question-num="35">Hint</button>
         </div>
         <p><strong>35.</strong> Her fiancé had schemed to
-            <input type="text" id="answer72" placeholder="Answer" class="medium"> everything he claimed to be.
+            <input type="text" id="answer72" placeholder="Answer" class="medium" data-question-num="35" data-blank-index="0"> everything he claimed to be.
         </p>
         <p>So the woman holding the white, shimmery
-            <input type="text" id="answer73" placeholder="Answer" class="medium"> the last piece of her wedding cake, before tossing the dress into the fire.
+            <input type="text" id="answer73" placeholder="Answer" class="medium" data-question-num="35" data-blank-index="1"> the last piece of her wedding cake, before tossing the dress into the fire.
         </p>
     </div>
 
@@ -536,10 +530,10 @@
             <button class="hint-btn" data-question-num="36">Hint</button>
         </div>
         <p><strong>36.</strong> The strict parents made their
-            <input type="text" id="answer74" placeholder="Answer" class="medium"> quite clear: education was the priority, not romantic relationships.
+            <input type="text" id="answer74" placeholder="Answer" class="medium" data-question-num="36" data-blank-index="0"> quite clear: education was the priority, not romantic relationships.
         </p>
         <p>That's why they wouldn't let the young
-            <input type="text" id="answer75" placeholder="Answer" class="medium"> their daughter until she had graduated.
+            <input type="text" id="answer75" placeholder="Answer" class="medium" data-question-num="36" data-blank-index="1"> their daughter until she had graduated.
         </p>
     </div>
 
@@ -548,10 +542,10 @@
             <button class="hint-btn" data-question-num="37">Hint</button>
         </div>
         <p><strong>37.</strong> The young campers planned to visit the local park and
-            <input type="text" id="answer76" placeholder="Answer" class="medium"> for wild mushrooms.
+            <input type="text" id="answer76" placeholder="Answer" class="medium" data-question-num="37" data-blank-index="0"> for wild mushrooms.
         </p>
         <p>But first they had to present their IDs to the ranger
-            <input type="text" id="answer77" placeholder="Answer" class="medium"> verification.
+            <input type="text" id="answer77" placeholder="Answer" class="medium" data-question-num="37" data-blank-index="1"> verification.
         </p>
     </div>
 
@@ -560,10 +554,10 @@
             <button class="hint-btn" data-question-num="38">Hint</button>
         </div>
         <p><strong>38.</strong> The general store sold
-            <input type="text" id="answer78" placeholder="Answer" class="medium"> items, from fishing lures to homemade jams.
+            <input type="text" id="answer78" placeholder="Answer" class="medium" data-question-num="38" data-blank-index="0"> items, from fishing lures to homemade jams.
         </p>
         <p> On summer days, a batch of freshly picked herbs would
-            <input type="text" id="answer79" placeholder="Answer" class="medium"> on racks outside.
+            <input type="text" id="answer79" placeholder="Answer" class="medium" data-question-num="38" data-blank-index="1"> on racks outside.
         </p>
     </div>
 
@@ -572,10 +566,10 @@
             <button class="hint-btn" data-question-num="39">Hint</button>
         </div>
         <p><strong>39.</strong> The low-flying
-            <input type="text" id="answer80" placeholder="Answer" class="medium"> from the nearby military base caused the ground to shake and buildings to rattle.
+            <input type="text" id="answer80" placeholder="Answer" class="medium" data-question-num="39" data-blank-index="0"> from the nearby military base caused the ground to shake and buildings to rattle.
         </p>
         <p>It got so bad it would crack plaster walls in homes and even
-            <input type="text" id="answer81" placeholder="Answer" class="medium"> at the bowling alley.
+            <input type="text" id="answer81" placeholder="Answer" class="medium" data-question-num="39" data-blank-index="1"> at the bowling alley.
         </p>
     </div>
 
@@ -584,10 +578,10 @@
             <button class="hint-btn" data-question-num="40">Hint</button>
         </div>
         <p><strong>40.</strong> The guests at the gallery politely nibbled on delicate
-            <input type="text" id="answer82" placeholder="Answer" class="medium">, a selection of toasted bread, caviar and smoked salmon, as they admired the artwork.
+            <input type="text" id="answer82" placeholder="Answer" class="medium" data-question-num="40" data-blank-index="0">, a selection of toasted bread, caviar and smoked salmon, as they admired the artwork.
         </p>
         <p>It was a chaotic blob of paint on a canvas, like it had been flung by a chimpanzee, and I wondered,
-            <input type="text" id="answer83" placeholder="Answer" class="medium"> be taught to create art?
+            <input type="text" id="answer83" placeholder="Answer" class="medium" data-question-num="40" data-blank-index="1"> be taught to create art?
         </p>
     </div>
 
@@ -596,10 +590,10 @@
             <button class="hint-btn" data-question-num="41">Hint</button>
         </div>
         <p><strong>41.</strong> Look, I want to be
-            <input type="text" id="answer84" placeholder="Answer" class="medium"> with you because you're fooling yourself. You've really got to get tutored if you're going to pass this math exam.
+            <input type="text" id="answer84" placeholder="Answer" class="medium" data-question-num="41" data-blank-index="0"> with you because you're fooling yourself. You've really got to get tutored if you're going to pass this math exam.
         </p>
         <p>It's not enough to say you'll do to the best of your abilities. Doing what you
-            <input type="text" id="answer85" placeholder="Answer" class="medium"> not help the last time around.
+            <input type="text" id="answer85" placeholder="Answer" class="medium" data-question-num="41" data-blank-index="1"> not help the last time around.
         </p>
     </div>
 
@@ -608,10 +602,10 @@
             <button class="hint-btn" data-question-num="42">Hint</button>
         </div>
         <p><strong>42.</strong> Here is a dummy
-            <input type="text" id="answer86" placeholder="Answer" class="medium"> to add new questions.
+            <input type="text" id="answer86" placeholder="Answer" class="medium" data-question-num="42" data-blank-index="0"> to add new questions.
         </p>
         <p>This
-            <input type="text" id="answer87" placeholder="Answer" class="medium"> will make it easy.
+            <input type="text" id="answer87" placeholder="Answer" class="medium" data-question-num="42" data-blank-index="1"> will make it easy.
         </p>
     </div>
     <div class="score-display-wrapper">
@@ -624,6 +618,7 @@
         const timerDisplay = document.getElementById("timer");
         let timerInterval;
         let hintsUsedCount = 0; // Initialize hints count
+        let revealedLettersPerQuestion = {}; // Moved up for clarity
 
         function updateTimer() {
             secondsElapsed++;
@@ -654,7 +649,7 @@
             3: ["carpet", "car pet"],
             4: ["together", "to get her"],
             5: ["mustache", "must ache"],
-            6: ["archive", "arch", "ive"],
+            6: ["archive", "arch", "i've"], // Corrected "ive" to "i've" as commonly used for "I have"
             7: ["atrophy", "a trophy"],
             8: ["orbed", "or bed"],
             9: ["goofed", "goo fed"],
@@ -671,7 +666,7 @@
             20: ["dodo", "do do"],
             21: ["manicure", "man i cure"],
             22: ["capsize", "cap size"],
-            23: ["Likewise", "like wise"],
+            23: ["likewise", "like wise"], // Corrected "Likewise" to lowercase for normalization consistency
             24: ["discovery", "disco very"],
             25: ["temptress", "temp tress"],
             26: ["cargo", "car go"],
@@ -693,71 +688,62 @@
             42: ["placeholder", "place holder"]
         };
 
-        let revealedLettersPerQuestion = {};
-
-        // Helper function to get the first input ID for a given question number
-        function getFirstInputId(qNum) {
-            if (qNum == 1) return 'answer1';
-            else if (qNum == 2) return 'answer3';
-            else if (qNum == 3) return 'answer5';
-            else if (qNum == 4) return 'answer7';
-            else if (qNum == 5) return 'answer9';
-            else if (qNum == 6) return 'answer11';
-            else if (qNum == 7) return 'answer14';
-            else if (qNum == 8) return 'answer16';
-            else if (qNum == 9) return 'answer18';
-            else if (qNum == 10) return 'answer20';
-            else if (qNum == 11) return 'answer22';
-            else if (qNum == 12) return 'answer25';
-            else if (qNum == 13) return 'answer27';
-            else if (qNum == 14) return 'answer30';
-            else if (qNum == 15) return 'answer32';
-            else if (qNum == 16) return 'answer34';
-            else if (qNum == 17) return 'answer36';
-            else if (qNum == 18) return 'answer38';
-            else if (qNum == 19) return 'answer40';
-            else if (qNum == 20) return 'answer42';
-            else if (qNum == 21) return 'answer44';
-            else if (qNum == 22) return 'answer46';
-            else if (qNum >= 23 && qNum <= 42) {
-                return `answer${48 + (qNum - 23) * 2}`;
-            }
-            return null; // Should not happen with valid qNum
-        }
-
+        // REVISED initializeRevealedLettersPerQuestion
         function initializeRevealedLettersPerQuestion() {
             revealedLettersPerQuestion = {};
             hintsUsedCount = 0; // Reset hints count for a new game
-            for (let qNum = 1; qNum <= 42; qNum++) {
-                const firstCorrectWordForQ = allAnswers[qNum] ? allAnswers[qNum][0] : '';
-                if (firstCorrectWordForQ) {
-                    revealedLettersPerQuestion[qNum] = Array(firstCorrectWordForQ.length).fill(false);
+
+            document.querySelectorAll('.question').forEach(questionDiv => {
+                const qNumElement = questionDiv.querySelector('strong');
+                if (qNumElement) { // Check if the strong element exists
+                    const qNum = parseInt(qNumElement.textContent.replace('.', ''));
+                    if (!isNaN(qNum) && allAnswers[qNum]) {
+                        const firstCorrectWordForQ = allAnswers[qNum][0];
+                        if (firstCorrectWordForQ) {
+                            revealedLettersPerQuestion[qNum] = Array(firstCorrectWordForQ.length).fill(false);
+                        }
+                    }
                 }
-            }
+            });
+
             document.querySelectorAll('.hint-btn').forEach(button => {
                 button.disabled = false;
             });
         }
 
+
+        // REVISED giveHint function to use data attributes
         function giveHint(event) {
             const hintButton = event.target;
-            const qNum = parseInt(hintButton.dataset.questionNum);
-            const inputEl = document.getElementById(getFirstInputId(qNum));
+            const qNum = parseInt(hintButton.dataset.questionNum); // Get question number from button's data attribute
+
+            // Find the first input element for this question using data attributes
+            const inputEl = document.querySelector(`input[data-question-num="${qNum}"][data-blank-index="0"]`);
 
             if (!inputEl) {
-                console.error(`First input element with ID ${getFirstInputId(qNum)} not found for question ${qNum}.`);
+                console.error(`First input element for question ${qNum} not found.`);
                 return;
             }
 
             const correctWord = allAnswers[qNum][0];
 
+            // Ensure correctWord exists and has length
+            if (!correctWord || correctWord.length === 0) {
+                console.warn(`No correct word found for question ${qNum} to give hint.`);
+                hintButton.disabled = true;
+                return;
+            }
+
             let currentInputChars = inputEl.value.toUpperCase().split('');
+            // Pad with underscores if current input is shorter than the correct word
             if (currentInputChars.length < correctWord.length) {
                 currentInputChars = currentInputChars.concat(Array(correctWord.length - currentInputChars.length).fill('_'));
             } else {
+                // Trim if current input is longer, but retain user's existing correct letters
                 currentInputChars = currentInputChars.slice(0, correctWord.length);
             }
 
+            // Ensure revealedLettersPerQuestion is initialized for this question
             if (!revealedLettersPerQuestion[qNum]) {
                 revealedLettersPerQuestion[qNum] = Array(correctWord.length).fill(false);
             }
@@ -767,14 +753,19 @@
                 const correctChar = correctWord[i].toUpperCase();
                 const currentChar = currentInputChars[i];
 
-                // Check if the current character is NOT correct AND has NOT been revealed by a hint yet
-                if (currentChar !== correctChar || !revealedLettersPerQuestion[qNum][i]) {
+                // Add to unrevealedIndices if character is not correct AND has not been revealed by a hint
+                // Also check if index is within bounds of revealedLettersPerQuestion[qNum]
+                if (i < revealedLettersPerQuestion[qNum].length && (currentChar !== correctChar || !revealedLettersPerQuestion[qNum][i])) {
+                    unrevealedIndices.push(i);
+                } else if (i >= revealedLettersPerQuestion[qNum].length) {
+                    // This case should ideally not happen if initializeRevealedLettersPerQuestion is robust,
+                    // but as a safeguard, add any indices beyond the current revealed state.
                     unrevealedIndices.push(i);
                 }
             }
 
             if (unrevealedIndices.length === 0) {
-                hintButton.disabled = true;
+                hintButton.disabled = true; // All letters are either correct or hinted
                 return;
             }
 
@@ -788,8 +779,9 @@
             inputEl.value = currentInputChars.join('');
             revealedLettersPerQuestion[qNum][randomIndex] = true;
 
+            // Check if the input is now fully correct or fully hinted after applying the hint
             const allCorrectlyFilled = currentInputChars.every((char, index) =>
-                char === correctWord[index].toUpperCase()
+                index < correctWord.length && char.toLowerCase() === correctWord[index].toLowerCase()
             );
             const allHinted = revealedLettersPerQuestion[qNum].every(flag => flag === true);
 
@@ -798,6 +790,8 @@
             }
         }
 
+
+        // REVISED checkAnswers function to use data attributes
         function checkAnswers() {
             const finalSeconds = secondsElapsed;
             const finalMinutes = Math.floor(finalSeconds / 60);
@@ -807,53 +801,43 @@
             let totalQuestions = Object.keys(allAnswers).length;
             let correctCount = 0;
 
+            // Clear previous styling from ALL inputs
             document.querySelectorAll('input[type="text"]').forEach(input => {
                 input.classList.remove("correct", "incorrect");
             });
 
-            for (let qNum in allAnswers) {
+            // Iterate through each question div
+            document.querySelectorAll('.question').forEach(questionDiv => {
+                const qNumElement = questionDiv.querySelector('strong');
+                if (!qNumElement) {
+                    console.warn("Question div without strong tag found.");
+                    return;
+                }
+                const qNum = parseInt(qNumElement.textContent.replace('.', ''));
+
+                // Skip if question number is invalid or no answers are defined
+                if (isNaN(qNum) || !allAnswers[qNum]) {
+                    console.warn(`Question number ${qNum} is invalid or has no answers defined in allAnswers.`);
+                    return;
+                }
+
                 const questionBlanks = allAnswers[qNum];
-                let isQuestionCorrect = true;
+                let isQuestionCorrect = true; // Flag to track if ALL blanks for this question are correct
 
+                // Iterate through each expected blank for this question based on allAnswers structure
                 for (let i = 0; i < questionBlanks.length; i++) {
-                    let inputId;
-                    if (qNum == 1) inputId = `answer${i + 1}`;
-                    else if (qNum == 2) inputId = `answer${i + 3}`;
-                    else if (qNum == 3) inputId = `answer${i + 5}`;
-                    else if (qNum == 4) inputId = `answer${i + 7}`;
-                    else if (qNum == 5) inputId = `answer${i + 9}`;
-                    else if (qNum == 6) inputId = `answer${i + 11}`;
-                    else if (qNum == 7) inputId = `answer${i + 14}`;
-                    else if (qNum == 8) inputId = `answer${i + 16}`;
-                    else if (qNum == 9) inputId = `answer${i + 18}`;
-                    else if (qNum == 10) inputId = `answer${i + 20}`;
-                    else if (qNum == 11) inputId = `answer${i + 22}`;
-                    else if (qNum == 12) inputId = `answer${i + 25}`;
-                    else if (qNum == 13 && i < 2) inputId = `answer${i + 27}`;
-                    else if (qNum == 13 && i == 2) inputId = `answer29`;
-                    else if (qNum == 14) inputId = `answer${i + 30}`;
-                    else if (qNum == 15) inputId = `answer${i + 32}`;
-                    else if (qNum == 16) inputId = `answer${i + 34}`;
-                    else if (qNum == 17) inputId = `answer${i + 36}`;
-                    else if (qNum == 18) inputId = `answer${i + 38}`;
-                    else if (qNum == 19) inputId = `answer${i + 40}`;
-                    else if (qNum == 20) inputId = `answer${i + 42}`;
-                    else if (qNum == 21) inputId = `answer${i + 44}`;
-                    else if (qNum == 22) inputId = `answer${i + 46}`;
-                    else if (parseInt(qNum) >= 23 && parseInt(qNum) <= 42) {
-                        let baseIdOffset = 48 + (parseInt(qNum) - 23) * 2;
-                        inputId = `answer${i + baseIdOffset}`;
-                    }
+                    // Find the input element using data attributes
+                    const inputEl = questionDiv.querySelector(`input[data-question-num="${qNum}"][data-blank-index="${i}"]`);
 
-                    const inputEl = document.getElementById(inputId);
                     if (!inputEl) {
-                        console.warn(`Input with ID ${inputId} not found for question ${qNum}.`);
-                        isQuestionCorrect = false;
+                        console.warn(`Input element for question ${qNum}, blank index ${i} not found. Check HTML data attributes.`);
+                        isQuestionCorrect = false; // Cannot check if input is missing
                         continue;
                     }
 
                     const userAnswer = normalize(inputEl.value);
-                    const validAnswersForBlank = allAnswers[qNum][i];
+                    // Ensure validAnswersForBlank is always an array for iteration
+                    const validAnswersForBlank = Array.isArray(questionBlanks[i]) ? questionBlanks[i] : [questionBlanks[i]];
 
                     let isBlankCorrect = false;
                     for (const correctSpelling of validAnswersForBlank) {
@@ -869,25 +853,24 @@
                     } else {
                         inputEl.classList.add("incorrect");
                         inputEl.classList.remove("correct");
-                        isQuestionCorrect = false;
+                        isQuestionCorrect = false; // If any blank is incorrect, the whole question is incorrect
                     }
                 }
 
                 if (isQuestionCorrect) {
                     correctCount++;
                 }
-            }
+            });
 
-            // Scoring calculation (as discussed, will be implemented later)
+            // Scoring calculation (this part is fine as it uses correctCount and hintsUsedCount)
             let baseScore = correctCount * 25;
             let hintPenalty = hintsUsedCount * 10;
             let timePenalty = Math.floor(finalSeconds / 5);
 
             let finalScore = baseScore - hintPenalty - timePenalty;
-            finalScore = Math.max(0, finalScore);
+            finalScore = Math.max(0, finalScore); // Ensure score doesn't go below 0
 
             let message = `Score: ${finalScore} / Max Possible: ${totalQuestions * 25} (Correct: ${correctCount}/${totalQuestions}, Hints: ${hintsUsedCount}, Time: ${formattedTime})`;
-
 
             document.getElementById("result").textContent = message;
             document.getElementById("topResult").textContent = message;
