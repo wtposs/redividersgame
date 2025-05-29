@@ -236,6 +236,7 @@ let startTime;
 let dailyPuzzleDate; // Stores the date of the current daily puzzle
 let selectedCalendarDate = null; // Stores the date selected from the calendar
 let hintCounts = {}; // Stores how many hints have been used per blank for the current puzzle
+let currentCalendarDate; // Declared globally so it's accessible to all functions
 
 // DOM Elements
 const timerDisplay = document.getElementById('timer');
@@ -258,13 +259,13 @@ const modalCloseButton = document.getElementById('modalCloseButton');
 
 // --- Utility Functions ---
 
-// Helper to get today's date in YYYY-MM-DD format
+// Helper to get today's date inYYYY-MM-DD format
 function getTodayDateString() {
     const today = new Date();
     return today.toISOString().split('T')[0];
 }
 
-// Helper to format a date as YYYY-MM-DD
+// Helper to format a date asYYYY-MM-DD
 function formatDate(date) {
     const d = new Date(date); // Ensure it's a date object
     const year = d.getFullYear();
@@ -367,6 +368,8 @@ function checkAnswers() {
         const correctAnswer = questionData.answers[index]; // Keep original case for comparison/display
 
         userAnswers.push(userAnswer); // Store user answer for result text
+
+        console.log(`[DEBUG] Input ${index}: User Answer: "${userAnswer}", Correct Answer: "${correctAnswer}"`); // Debug log for comparison
 
         if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
             input.classList.remove('incorrect');
@@ -685,41 +688,61 @@ function renderCalendar(date) {
 
 // Function to load a puzzle based on a given date
 function loadPuzzleForDate(date) {
-    console.log(`[DEBUG] loadPuzzleForDate called for date: ${date}`); // Debug log
-    // Generate a consistent "seed" for the date
-    // Use the date components as the seed for Math.seedrandom
-    const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-    const seededRand = Math.seedrandom(dateSeed); // Get a seeded random function
+    console.log(`[DEBUG] loadPuzzleForDate called for date: ${date}`);
 
-    // Calculate the question index based on the seeded random number
-    // Ensure the index is within bounds of allQuestionsAndAnswers length.
-    const questionIndex = Math.floor(seededRand() * allQuestionsAndAnswers.length);
-    console.log(`[DEBUG] allQuestionsAndAnswers.length: ${allQuestionsAndAnswers.length}`); // Debug log
-    console.log(`[DEBUG] Calculated questionIndex: ${questionIndex}`); // Debug log
+    // Define the fixed start date for Question #1
+    // IMPORTANT: This date determines which question is assigned to which day.
+    const puzzleSeriesStartDate = new Date('2025-05-29T00:00:00'); // May 29, 2025, 00:00:00 local time
 
+    // Normalize the input 'date' to the start of its day for accurate comparison
+    const normalizedLoadedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    // Calculate the difference in days from the puzzle series start date
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const dayDifference = Math.floor((normalizedLoadedDate.getTime() - puzzleSeriesStartDate.getTime()) / msPerDay);
+
+    let questionIndex;
+    const today = new Date();
+    const isToday = formatDate(normalizedLoadedDate) === formatDate(today);
+
+    if (isToday) {
+        // If it's today's date, always load Question #1 (index 0)
+        questionIndex = 0;
+    } else if (dayDifference >= 0) {
+        // For dates on or after the puzzleSeriesStartDate (but not today), assign questions sequentially.
+        // Use modulo operator to cycle through the questions if there are more days than questions.
+        questionIndex = dayDifference % allQuestionsAndAnswers.length;
+    } else {
+        // For dates before the puzzleSeriesStartDate, we can default to Q1 or handle differently.
+        // As per the request "May 29 should be Q1 and so on", we'll default to Q1 for earlier dates.
+        questionIndex = 0;
+    }
+
+    console.log(`[DEBUG] Puzzle Series Start Date: ${puzzleSeriesStartDate.toISOString().split('T')[0]}`);
+    console.log(`[DEBUG] Normalized Loaded Date: ${normalizedLoadedDate.toISOString().split('T')[0]}`);
+    console.log(`[DEBUG] Day Difference from start date: ${dayDifference}`);
+    console.log(`[DEBUG] Assigned questionIndex: ${questionIndex}`);
 
     // Set the daily puzzle date to the selected date (normalized to start of day)
-    dailyPuzzleDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    dailyPuzzleDate = normalizedLoadedDate; // Use the normalized date for consistency
 
     // Show the specific question based on the calculated index
     showQuestion(questionIndex);
     startTimer(); // Restart timer for the new puzzle
 
-    // Update checkAnswerBtn text and visibility of goToTodayBtn
-    const today = new Date();
-    const isToday = formatDate(dailyPuzzleDate) === formatDate(today);
+    // Always display the check answer button. Its disabled state is handled by checkAnswers.
+    checkAnswerBtn.style.display = 'inline-block';
 
+    // Show/hide 'Go to Today's Puzzle' button based on selection
     if (isToday) {
-        checkAnswerBtn.style.display = 'inline-block';
         goToTodayBtn.style.display = 'none';
     } else {
-        // If it's a past or future date, hide check answer, show 'Go to Today's Puzzle'
-        checkAnswerBtn.style.display = 'none';
         goToTodayBtn.style.display = 'inline-block';
     }
 
     // Load saved answers and hints if available for this date and question
-    loadPuzzleState(formatDate(dailyPuzzleDate), questionIndex + 1); // questionIndex + 1 because puzzle state uses 1-based question numbers
+    // Ensure questionIndex + 1 is used for 1-based question numbers in storage
+    loadPuzzleState(formatDate(dailyPuzzleDate), questionIndex + 1);
 }
 
 // --- Custom Modal Functions ---
@@ -755,9 +778,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dailyPuzzleDate = new Date();
     selectedCalendarDate = new Date(); // Select today on load
 
-    // Initialize currentCalendarDate here, within the DOMContentLoaded scope
-    // This ensures it's defined before any event listeners use it.
-    let currentCalendarDate = new Date();
+    // Initialize currentCalendarDate globally so it's accessible to prev/next month buttons
+    currentCalendarDate = new Date();
 
     loadPuzzleForDate(dailyPuzzleDate); // Load today's puzzle initially
 
