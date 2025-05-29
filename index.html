@@ -1187,7 +1187,7 @@
                 copyResultButton.style.display = 'inline-block';
                 // Display saved time
                 const minutes = Math.floor(dailyGameState.timeTaken / 60);
-                const seconds = dailyGameState.timeTaken % 60;
+                const seconds = Math.floor(dailyGameState.timeTaken % 60);
                 timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
             } else {
                 // For unanswered puzzles, ensure button states are correct
