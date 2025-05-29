@@ -251,3 +251,515 @@ const modalMessage = document.getElementById('modalMessage');
 const modalResultText = document.getElementById('modalResultText');
 const modalCopyButton = document.getElementById('modalCopyButton');
 const modalCloseButton = document.getElementById('modalCloseButton');
+
+// --- Utility Functions ---
+
+// Helper to get today's date in YYYY-MM-DD format
+function getTodayDateString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+// Helper to format a date as YYYY-MM-DD
+function formatDate(date) {
+    const d = new Date(date); // Ensure it's a date object
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Function to start or reset the timer
+function startTimer() {
+    clearInterval(timerInterval); // Clear any existing timer
+    startTime = Date.now(); // Record the start time
+    timerInterval = setInterval(updateTimer, 1000); // Update every second
+}
+
+// Function to update the timer display
+function updateTimer() {
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Elapsed time in seconds
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+// Function to stop the timer
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
+// --- Puzzle Logic ---
+
+// Function to show a specific question
+function showQuestion(index) {
+    const questions = document.querySelectorAll('.question');
+    questions.forEach((q, i) => {
+        q.classList.remove('active'); // Hide all questions
+        // Clear previous input values and styling when switching questions
+        q.querySelectorAll('input[type="text"]').forEach(input => {
+            input.value = '';
+            input.classList.remove('correct', 'incorrect');
+            input.readOnly = false; // Make inputs editable again
+        });
+        // Reset hint displays
+        q.querySelectorAll('.hint-display').forEach(span => span.textContent = '');
+        q.querySelectorAll('.hint-btn').forEach(btn => btn.disabled = false); // Re-enable hint buttons
+    });
+
+    if (questions[index]) {
+        questions[index].classList.add('active'); // Show the active question
+        currentQuestionIndex = index; // Update global index
+        checkAnswerBtn.disabled = false; // Enable check answer button for new question
+        dailyResultDisplay.textContent = ''; // Clear result display
+        copyResultButton.style.display = 'none'; // Hide copy button
+        goToTodayBtn.style.display = 'none'; // Hide go to today button
+
+        // Re-initialize hint counts for the new question
+        const questionNum = index + 1;
+        hintCounts = {}; // Reset for the new question
+        // Hint state will be loaded from local storage by loadPuzzleState if applicable
+    } else {
+        // All questions answered, display final result or end game state
+        displayFinalResult(); // You might want to define this function for an end-game message
+    }
+}
+
+// Function to check answers for the current question
+function checkAnswers() {
+    const currentQuestionEl = document.querySelector('.question.active');
+    if (!currentQuestionEl) return;
+
+    const questionNum = parseInt(currentQuestionEl.id.replace('question', ''));
+    const questionData = allQuestionsAndAnswers[questionNum - 1]; // Adjust for 0-based array index
+
+    if (!questionData) {
+        console.error("No question data found for current question.");
+        return;
+    }
+
+    let allCorrect = true;
+    const inputFields = currentQuestionEl.querySelectorAll('input[type="text"]');
+    const userAnswers = [];
+    const correctInputs = []; // To save which inputs were correct
+    const incorrectInputs = []; // To save which inputs were incorrect
+
+    inputFields.forEach((input, index) => {
+        const userAnswer = input.value.trim(); // Keep original case for display
+        const correctAnswer = questionData.answers[index]; // Keep original case for comparison/display
+
+        userAnswers.push(userAnswer); // Store user answer for result text
+
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+            input.classList.remove('incorrect');
+            input.classList.add('correct');
+            input.readOnly = true; // Make correct inputs read-only
+            correctInputs[index] = true;
+            incorrectInputs[index] = false;
+        } else {
+            input.classList.remove('correct');
+            input.classList.add('incorrect');
+            allCorrect = false;
+            correctInputs[index] = false;
+            incorrectInputs[index] = true;
+        }
+    });
+
+    // Save current state regardless of correctness
+    savePuzzleState(questionNum, userAnswers, correctInputs, incorrectInputs);
+
+    if (allCorrect) {
+        dailyResultDisplay.textContent = 'All answers are correct! 🎉';
+        dailyResultDisplay.style.color = '#28a745'; // Green for correct
+        stopTimer(); // Stop the timer when the current question is answered correctly
+        checkAnswerBtn.disabled = true; // Disable the button after correct submission
+
+        // Store that this puzzle was solved for the current date
+        const solvedPuzzles = JSON.parse(localStorage.getItem('solvedPuzzles')) || {};
+        solvedPuzzles[formatDate(dailyPuzzleDate)] = true; // Mark as solved
+        localStorage.setItem('solvedPuzzles', JSON.stringify(solvedPuzzles));
+
+        // Generate the result string for copying
+        const resultString = generateResultString(questionNum, userAnswers);
+        modalResultText.value = resultString; // Set modal textarea value
+        modalResultText.style.display = 'block'; // Show the textarea
+        modalCopyButton.style.display = 'inline-block'; // Show copy button
+
+        showCustomModal('Congratulations! You solved the puzzle!', true);
+    } else {
+        dailyResultDisplay.textContent = 'Some answers are incorrect. Please try again.';
+        dailyResultDisplay.style.color = '#dc3545'; // Red for incorrect
+        modalResultText.style.display = 'none'; // Hide textarea
+        modalCopyButton.style.display = 'none'; // Hide copy button
+    }
+}
+
+// Function to handle hint button clicks
+function handleHint(event) {
+    const button = event.target;
+    const questionNum = parseInt(button.dataset.questionNum);
+    const blankIndex = parseInt(button.dataset.blankIndex);
+
+    const hintDisplaySpan = document.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="${blankIndex}"]`);
+    const questionData = allQuestionsAndAnswers[questionNum - 1];
+
+    if (questionData && hintDisplaySpan) {
+        const hint = questionData.hints[blankIndex];
+        if (hint) {
+            hintDisplaySpan.textContent = `Hint: ${hint}`;
+            button.disabled = true; // Disable the hint button after use
+
+            // Store hint usage for this specific blank of this question for the current puzzle date
+            const currentPuzzleKey = formatDate(dailyPuzzleDate);
+            const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
+            puzzleProgress[currentPuzzleKey] = puzzleProgress[currentPuzzleKey] || {};
+            puzzleProgress[currentPuzzleKey][questionNum] = puzzleProgress[currentPuzzleKey][questionNum] || {};
+            puzzleProgress[currentPuzzleKey][questionNum].hintsUsed = puzzleProgress[currentPuzzleKey][questionNum].hintsUsed || {};
+            puzzleProgress[currentPuzzleKey][questionNum].hintsUsed[blankIndex] = true; // Mark hint as used
+            localStorage.setItem('puzzleProgress', JSON.stringify(puzzleProgress));
+
+            // Also update the in-memory hintCounts for the current session to correctly generate result string
+            hintCounts[questionNum] = hintCounts[questionNum] || {};
+            hintCounts[questionNum][blankIndex] = true; // Mark as used
+        }
+    }
+}
+
+// Function to generate the result string for copying
+function generateResultString(questionNumber, userAnswers) {
+    const today = new Date(dailyPuzzleDate);
+    const dayOfMonth = today.getDate();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[today.getMonth()];
+    const year = today.getFullYear();
+
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+    // Get total blanks for the current question
+    const totalBlanks = allQuestionsAndAnswers[questionNumber - 1].answers.length;
+
+    // Determine how many hints were used for this specific question from the current hintCounts
+    const hintsUsedForQuestion = Object.keys(hintCounts[questionNumber] || {}).length;
+    const hintsEmoji = hintsUsedForQuestion > 0 ? `(${hintsUsedForQuestion} hint${hintsUsedForQuestion > 1 ? 's' : ''})` : '';
+
+    return `Redividers Daily Word Challenge\n${month} ${dayOfMonth}, ${year}\nPuzzle #${questionNumber}\nTime: ${formattedTime} ${hintsEmoji}\nAnswers: ${userAnswers.join(', ')}`;
+}
+
+// Function to copy the result to clipboard
+function copyResultToClipboard() {
+    const resultTextarea = document.getElementById('modalResultText');
+    resultTextarea.select(); // Select the text
+    resultTextarea.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+        document.execCommand('copy');
+        showCustomModal('Result copied to clipboard!');
+    } catch (err) {
+        showCustomModal('Failed to copy result.');
+        console.error('Failed to copy: ', err);
+    }
+}
+
+// --- Local Storage Management ---
+
+// Function to save puzzle state (answers and hints) to localStorage
+function savePuzzleState(questionNumber, answers, correctInputs, incorrectInputs) {
+    const currentPuzzleKey = formatDate(dailyPuzzleDate);
+    const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
+
+    puzzleProgress[currentPuzzleKey] = puzzleProgress[currentPuzzleKey] || {};
+    puzzleProgress[currentPuzzleKey][questionNumber] = {
+        answers: answers,
+        correctInputs: correctInputs,
+        incorrectInputs: incorrectInputs,
+        hintsUsed: hintCounts[questionNumber] // Store the current hint state
+    };
+    localStorage.setItem('puzzleProgress', JSON.stringify(puzzleProgress));
+}
+
+// Function to load puzzle state (answers and hints) from localStorage
+function loadPuzzleState(dateString, questionNumber) {
+    const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
+    const savedState = puzzleProgress[dateString];
+
+    const currentQuestionEl = document.getElementById(`question${questionNumber}`);
+    if (!currentQuestionEl) return;
+
+    // Reset current question's inputs and hints
+    currentQuestionEl.querySelectorAll('input[type="text"]').forEach(input => {
+        input.value = '';
+        input.classList.remove('correct', 'incorrect');
+        input.readOnly = false;
+    });
+    currentQuestionEl.querySelectorAll('.hint-display').forEach(span => span.textContent = '');
+    currentQuestionEl.querySelectorAll('.hint-btn').forEach(btn => btn.disabled = false);
+
+    // Reset hintCounts for the current session before loading
+    hintCounts = {};
+    hintCounts[questionNumber] = {};
+
+    if (savedState && savedState[questionNumber]) {
+        const questionData = savedState[questionNumber];
+
+        // Load answers and apply styling
+        const inputFields = currentQuestionEl.querySelectorAll('input[type="text"]');
+        inputFields.forEach((input, index) => {
+            if (questionData.answers && questionData.answers[index] !== undefined) { // Check for undefined to allow empty strings
+                input.value = questionData.answers[index];
+            }
+            if (questionData.correctInputs && questionData.correctInputs[index]) {
+                input.classList.add('correct');
+                input.readOnly = true;
+            } else if (questionData.incorrectInputs && questionData.incorrectInputs[index]) {
+                input.classList.add('incorrect');
+            }
+        });
+
+        // Load hints
+        const hintDisplaySpans = currentQuestionEl.querySelectorAll('.hint-display');
+        const hintButtons = currentQuestionEl.querySelectorAll('.hint-btn');
+        if (questionData.hintsUsed) {
+            Object.keys(questionData.hintsUsed).forEach(blankIndexStr => {
+                const blankIndex = parseInt(blankIndexStr);
+                if (questionData.hintsUsed[blankIndex]) {
+                    if (hintDisplaySpans[blankIndex]) {
+                        hintDisplaySpans[blankIndex].textContent = `Hint: ${allQuestionsAndAnswers[questionNumber - 1].hints[blankIndex]}`;
+                    }
+                    if (hintButtons[blankIndex]) {
+                        hintButtons[blankIndex].disabled = true;
+                    }
+                    // Update in-memory hintCounts for current session
+                    hintCounts[questionNumber][blankIndex] = true;
+                }
+            });
+        }
+
+        // Check if the puzzle was solved for this date
+        const solvedPuzzles = JSON.parse(localStorage.getItem('solvedPuzzles')) || {};
+        if (solvedPuzzles[dateString]) {
+            checkAnswerBtn.disabled = true; // Puzzle is solved, disable button
+            dailyResultDisplay.textContent = 'Puzzle solved!';
+            dailyResultDisplay.style.color = '#28a745';
+        } else {
+            checkAnswerBtn.disabled = false;
+            dailyResultDisplay.textContent = ''; // Clear result message if not solved
+        }
+    } else {
+        // If no saved state, ensure the check answer button is enabled
+        checkAnswerBtn.disabled = false;
+        dailyResultDisplay.textContent = '';
+    }
+}
+
+// --- Calendar Functionality ---
+
+function renderCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed
+
+    currentMonthYearDisplay.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+
+    const calendarGrid = calendarContainer.querySelector('.calendar-grid');
+    // Clear previous day cells, but keep day names (first 7 children)
+    while (calendarGrid.children.length > 7) {
+        calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+
+    // Get the first day of the month and last day of the month
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const numDays = lastDayOfMonth.getDate();
+    const startDay = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+    const today = new Date();
+    const todayStr = formatDate(today);
+    const solvedPuzzles = JSON.parse(localStorage.getItem('solvedPuzzles')) || {};
+    const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
+
+    // Add empty cells for the days before the 1st
+    for (let i = 0; i < startDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('calendar-day-cell', 'empty');
+        calendarGrid.appendChild(emptyCell);
+    }
+
+    // Add day cells
+    for (let day = 1; day <= numDays; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('calendar-day-cell');
+        dayCell.textContent = day;
+
+        const cellDate = new Date(year, month, day);
+        const cellDateStr = formatDate(cellDate);
+
+        // Add 'today' class
+        if (cellDateStr === todayStr) {
+            dayCell.classList.add('today');
+        }
+
+        // Add 'past' class for dates strictly before today
+        if (cellDate < today && cellDateStr !== todayStr) { // Exclude today from 'past'
+            dayCell.classList.add('past');
+        }
+
+        // Add 'solved' or 'unsolved' class based on localStorage
+        if (solvedPuzzles[cellDateStr]) {
+            dayCell.classList.add('solved');
+        } else if (puzzleProgress[cellDateStr] && Object.keys(puzzleProgress[cellDateStr]).length > 0) {
+            // Check if any progress was made for this date, for any question
+            let hasProgress = false;
+            for (const qNum in puzzleProgress[cellDateStr]) {
+                if (Object.keys(puzzleProgress[cellDateStr][qNum].answers || {}).length > 0 || Object.keys(puzzleProgress[cellDateStr][qNum].hintsUsed || {}).length > 0) {
+                    hasProgress = true;
+                    break;
+                }
+            }
+            if (hasProgress) {
+                dayCell.classList.add('unsolved'); // Mark as unsolved if there's progress but not solved
+            }
+        }
+
+        // Add 'selected-date' class if this date is currently selected
+        if (selectedCalendarDate && formatDate(selectedCalendarDate) === cellDateStr) {
+            dayCell.classList.add('selected-date');
+        }
+
+        dayCell.addEventListener('click', () => {
+            // Only allow selection of today's date, or any past/future date not marked as 'past' (i.e. click enabled)
+            // The 'past' class sets pointer-events: none, so this check is mostly for clarity.
+            if (!dayCell.classList.contains('past')) {
+                // Remove 'selected-date' from previously selected cell
+                const currentlySelected = calendarGrid.querySelector('.selected-date');
+                if (currentlySelected) {
+                    currentlySelected.classList.remove('selected-date');
+                }
+                dayCell.classList.add('selected-date');
+                selectedCalendarDate = cellDate;
+
+                // Close calendar and load the selected puzzle
+                calendarContainer.style.display = 'none';
+                loadPuzzleForDate(selectedCalendarDate);
+
+                // Show/hide 'Go to Today's Puzzle' button based on selection
+                if (formatDate(selectedCalendarDate) === todayStr) {
+                    goToTodayBtn.style.display = 'none';
+                } else {
+                    goToTodayBtn.style.display = 'inline-block';
+                }
+            }
+        });
+        calendarGrid.appendChild(dayCell);
+    }
+}
+
+// Function to load a puzzle based on a given date
+function loadPuzzleForDate(date) {
+    // Generate a consistent "seed" for the date
+    const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    const seededRand = Math.seedrandom(dateSeed); // Get a seeded random function
+
+    // Calculate the question index based on the seeded random number
+    // Ensure the index is within bounds of allQuestionsAndAnswers length.
+    const questionIndex = Math.floor(seededRand() * allQuestionsAndAnswers.length);
+
+    // Set the daily puzzle date to the selected date (normalized to start of day)
+    dailyPuzzleDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    // Show the specific question based on the calculated index
+    showQuestion(questionIndex);
+    startTimer(); // Restart timer for the new puzzle
+
+    // Update checkAnswerBtn text and visibility of goToTodayBtn
+    const today = new Date();
+    const isToday = formatDate(dailyPuzzleDate) === formatDate(today);
+
+    if (isToday) {
+        checkAnswerBtn.style.display = 'inline-block';
+        goToTodayBtn.style.display = 'none';
+    } else {
+        // If it's a past or future date, hide check answer, show 'Go to Today's Puzzle'
+        checkAnswerBtn.style.display = 'none';
+        goToTodayBtn.style.display = 'inline-block';
+    }
+
+    // Load saved answers and hints if available for this date and question
+    loadPuzzleState(formatDate(dailyPuzzleDate), questionIndex + 1); // questionIndex + 1 because puzzle state uses 1-based question numbers
+}
+
+// --- Custom Modal Functions ---
+
+function showCustomModal(message, showResultText = false) {
+    modalMessage.textContent = message;
+    if (showResultText) {
+        modalResultText.style.display = 'block';
+        modalCopyButton.style.display = 'inline-block';
+        // Ensure the current puzzle's solved message is copied
+        const currentQuestionEl = document.querySelector('.question.active');
+        if (currentQuestionEl) {
+            const questionNum = parseInt(currentQuestionEl.id.replace('question', ''));
+            const inputFields = currentQuestionEl.querySelectorAll('input[type="text"]');
+            const userAnswers = Array.from(inputFields).map(input => input.value.trim());
+            modalResultText.value = generateResultString(questionNum, userAnswers);
+        }
+    } else {
+        modalResultText.style.display = 'none';
+        modalCopyButton.style.display = 'none';
+    }
+    customModal.style.display = 'flex';
+}
+
+function hideCustomModal() {
+    customModal.style.display = 'none';
+}
+
+// --- Event Listeners and Initialization ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Set the initial daily puzzle date to today
+    dailyPuzzleDate = new Date();
+    selectedCalendarDate = new Date(); // Select today on load
+
+    loadPuzzleForDate(dailyPuzzleDate); // Load today's puzzle initially
+
+    // Event listener for Check Answer button
+    checkAnswerBtn.addEventListener('click', checkAnswers);
+
+    // Event listeners for Hint buttons (delegation)
+    document.querySelectorAll('.question').forEach(questionDiv => {
+        questionDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('hint-btn')) {
+                handleHint(event);
+            }
+        });
+    });
+
+    // Event listeners for Calendar buttons
+    calendarButton.addEventListener('click', () => {
+        calendarContainer.style.display = 'flex';
+        renderCalendar(currentCalendarDate); // Render the calendar for the current month
+    });
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar(currentCalendarDate);
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar(currentCalendarDate);
+    });
+
+    goToTodayBtn.addEventListener('click', () => {
+        dailyPuzzleDate = new Date(); // Reset dailyPuzzleDate to today
+        selectedCalendarDate = new Date(); // Reset selectedCalendarDate to today
+        loadPuzzleForDate(dailyPuzzleDate);
+        calendarContainer.style.display = 'none'; // Close calendar if open
+    });
+
+    // Event listeners for Custom Modal buttons
+    modalCopyButton.addEventListener('click', copyResultToClipboard);
+    modalCloseButton.addEventListener('click', hideCustomModal);
+});
