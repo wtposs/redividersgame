@@ -235,7 +235,9 @@ let timerInterval;
 let startTime;
 let dailyPuzzleDate; // Stores the date of the current daily puzzle
 let selectedCalendarDate = null; // Stores the date selected from the calendar
-let hintCounts = {}; // Stores how many hints have been used per blank for the current puzzle
+// hintCounts now stores the number of revealed letters for each blank
+// Structure: { questionNum: { blankIndex: revealedCount, ... }, ... }
+let hintCounts = {};
 let currentCalendarDate; // Declared globally so it's accessible to all functions
 
 // DOM Elements
@@ -333,9 +335,9 @@ function showQuestion(index) {
         copyResultButton.style.display = 'none'; // Hide copy button
         goToTodayBtn.style.display = 'none'; // Hide go to today button
 
-        // Re-initialize hint counts for the new question
-        const questionNum = index + 1;
-        hintCounts = {}; // Reset for the new question
+        // Re-initialize hint counts for the new question to an empty object for its blanks
+        hintCounts = {};
+        hintCounts[index + 1] = {}; // Initialize for the current question number (1-based)
         // Hint state will be loaded from local storage by loadPuzzleState if applicable
     } else {
         console.log(`[DEBUG] No question found at index ${index}. Calling displayFinalResult.`); // Debug log
@@ -423,26 +425,36 @@ function handleHint(event) {
 
     const hintDisplaySpan = document.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="${blankIndex}"]`);
     const questionData = allQuestionsAndAnswers[questionNum - 1];
+    const correctAnswer = questionData.answers[blankIndex];
 
-    if (questionData && hintDisplaySpan) {
-        const hint = questionData.hints[blankIndex];
-        if (hint) {
-            hintDisplaySpan.textContent = `Hint: ${hint}`;
-            button.disabled = true; // Disable the hint button after use
+    // Initialize revealedCount for this blank if not present
+    hintCounts[questionNum] = hintCounts[questionNum] || {};
+    hintCounts[questionNum][blankIndex] = hintCounts[questionNum][blankIndex] || 0;
 
-            // Store hint usage for this specific blank of this question for the current puzzle date
-            const currentPuzzleKey = formatDate(dailyPuzzleDate);
-            const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
-            puzzleProgress[currentPuzzleKey] = puzzleProgress[currentPuzzleKey] || {};
-            puzzleProgress[currentPuzzleKey][questionNum] = puzzleProgress[currentPuzzleKey][questionNum] || {};
-            puzzleProgress[currentPuzzleKey][questionNum].hintsUsed = puzzleProgress[currentPuzzleKey][questionNum].hintsUsed || {};
-            puzzleProgress[currentPuzzleKey][questionNum].hintsUsed[blankIndex] = true; // Mark hint as used
-            localStorage.setItem('puzzleProgress', JSON.stringify(puzzleProgress));
+    let revealedCount = hintCounts[questionNum][blankIndex];
 
-            // Also update the in-memory hintCounts for the current session to correctly generate result string
-            hintCounts[questionNum] = hintCounts[questionNum] || {};
-            hintCounts[questionNum][blankIndex] = true; // Mark as used
+    if (revealedCount < correctAnswer.length) {
+        revealedCount++; // Reveal one more letter
+        hintCounts[questionNum][blankIndex] = revealedCount; // Update in-memory count
+
+        const revealedPart = correctAnswer.substring(0, revealedCount);
+        const hiddenPart = '_'.repeat(correctAnswer.length - revealedCount);
+        hintDisplaySpan.textContent = `${revealedPart}${hiddenPart}`;
+
+        // Save updated hint progress to local storage
+        const currentPuzzleKey = formatDate(dailyPuzzleDate);
+        const puzzleProgress = JSON.parse(localStorage.getItem('puzzleProgress')) || {};
+        puzzleProgress[currentPuzzleKey] = puzzleProgress[currentPuzzleKey] || {};
+        puzzleProgress[currentPuzzleKey][questionNum] = puzzleProgress[currentPuzzleKey][questionNum] || {};
+        puzzleProgress[currentPuzzleKey][questionNum].revealedHintLetters = puzzleProgress[currentPuzzleKey][questionNum].revealedHintLetters || {};
+        puzzleProgress[currentPuzzleKey][questionNum].revealedHintLetters[blankIndex] = revealedCount;
+        localStorage.setItem('puzzleProgress', JSON.stringify(puzzleProgress));
+
+        if (revealedCount === correctAnswer.length) {
+            button.disabled = true; // Disable if all letters are revealed
         }
+    } else {
+        button.disabled = true; // Already fully revealed
     }
 }
 
@@ -459,12 +471,15 @@ function generateResultString(questionNumber, userAnswers) {
     const seconds = elapsedTime % 60;
     const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-    // Get total blanks for the current question
-    const totalBlanks = allQuestionsAndAnswers[questionNumber - 1].answers.length;
-
-    // Determine how many hints were used for this specific question from the current hintCounts
-    const hintsUsedForQuestion = Object.keys(hintCounts[questionNumber] || {}).length;
-    const hintsEmoji = hintsUsedForQuestion > 0 ? `(${hintsUsedForQuestion} hint${hintsUsedForQuestion > 1 ? 's' : ''})` : '';
+    // Count how many blanks had at least one letter revealed as a hint
+    const currentQuestionHintState = hintCounts[questionNumber] || {};
+    let hintsUsedCount = 0;
+    for (const blankIndex in currentQuestionHintState) {
+        if (currentQuestionHintState[blankIndex] > 0) {
+            hintsUsedCount++;
+        }
+    }
+    const hintsEmoji = hintsUsedCount > 0 ? `(${hintsUsedCount} hint${hintsUsedCount > 1 ? 's' : ''})` : '';
 
     return `Redividers Daily Word Challenge\n${month} ${dayOfMonth}, ${year}\nPuzzle #${questionNumber}\nTime: ${formattedTime} ${hintsEmoji}\nAnswers: ${userAnswers.join(', ')}`;
 }
@@ -496,7 +511,8 @@ function savePuzzleState(questionNumber, answers, correctInputs, incorrectInputs
         answers: answers,
         correctInputs: correctInputs,
         incorrectInputs: incorrectInputs,
-        hintsUsed: hintCounts[questionNumber] // Store the current hint state
+        // Store the number of revealed letters for each blank
+        revealedHintLetters: hintCounts[questionNumber] || {}
     };
     localStorage.setItem('puzzleProgress', JSON.stringify(puzzleProgress));
 }
@@ -542,19 +558,27 @@ function loadPuzzleState(dateString, questionNumber) {
         // Load hints
         const hintDisplaySpans = currentQuestionEl.querySelectorAll('.hint-display');
         const hintButtons = currentQuestionEl.querySelectorAll('.hint-btn');
-        if (questionData.hintsUsed) {
-            Object.keys(questionData.hintsUsed).forEach(blankIndexStr => {
+        if (questionData.revealedHintLetters) {
+            Object.keys(questionData.revealedHintLetters).forEach(blankIndexStr => {
                 const blankIndex = parseInt(blankIndexStr);
-                if (questionData.hintsUsed[blankIndex]) {
-                    if (hintDisplaySpans[blankIndex]) {
-                        hintDisplaySpans[blankIndex].textContent = `Hint: ${allQuestionsAndAnswers[questionNumber - 1].hints[blankIndex]}`;
-                    }
-                    if (hintButtons[blankIndex]) {
-                        hintButtons[blankIndex].disabled = true;
-                    }
-                    // Update in-memory hintCounts for current session
-                    hintCounts[questionNumber][blankIndex] = true;
+                const revealedCount = questionData.revealedHintLetters[blankIndex];
+                const correctAnswer = allQuestionsAndAnswers[questionNumber - 1].answers[blankIndex];
+
+                if (revealedCount > 0 && hintDisplaySpans[blankIndex]) {
+                    const revealedPart = correctAnswer.substring(0, revealedCount);
+                    const hiddenPart = '_'.repeat(correctAnswer.length - revealedCount);
+                    hintDisplaySpans[blankIndex].textContent = `${revealedPart}${hiddenPart}`;
                 }
+                if (hintButtons[blankIndex]) {
+                    // Disable button if all letters are revealed
+                    if (revealedCount === correctAnswer.length) {
+                        hintButtons[blankIndex].disabled = true;
+                    } else {
+                        hintButtons[blankIndex].disabled = false; // Ensure enabled if not fully revealed
+                    }
+                }
+                // Update in-memory hintCounts for current session
+                hintCounts[questionNumber][blankIndex] = revealedCount;
             });
         }
 
@@ -641,7 +665,9 @@ function renderCalendar(date) {
             // Check if any progress was made for this date, for any question
             let hasProgress = false;
             for (const qNum in puzzleProgress[cellDateStr]) {
-                if (Object.keys(puzzleProgress[cellDateStr][qNum].answers || {}).length > 0 || Object.keys(puzzleProgress[cellDateStr][qNum].hintsUsed || {}).length > 0) {
+                // Check if there are saved answers or revealed hint letters for this question
+                if ((puzzleProgress[cellDateStr][qNum].answers && puzzleProgress[cellDateStr][qNum].answers.some(ans => ans !== '')) ||
+                    (puzzleProgress[cellDateStr][qNum].revealedHintLetters && Object.values(puzzleProgress[cellDateStr][qNum].revealedHintLetters).some(count => count > 0))) {
                     hasProgress = true;
                     break;
                 }
@@ -802,12 +828,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     prevMonthBtn.addEventListener('click', () => {
+        console.log(`[DEBUG] prevMonthBtn clicked. currentCalendarDate BEFORE: ${currentCalendarDate}`); // Debug log
         currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        console.log(`[DEBUG] prevMonthBtn clicked. currentCalendarDate AFTER: ${currentCalendarDate}`); // Debug log
         renderCalendar(currentCalendarDate);
     });
 
     nextMonthBtn.addEventListener('click', () => {
+        console.log(`[DEBUG] nextMonthBtn clicked. currentCalendarDate BEFORE: ${currentCalendarDate}`); // Debug log
         currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        console.log(`[DEBUG] nextMonthBtn clicked. currentCalendarDate AFTER: ${currentCalendarDate}`); // Debug log
         renderCalendar(currentCalendarDate);
     });
 
