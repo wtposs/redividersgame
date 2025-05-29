@@ -255,13 +255,13 @@ const modalCloseButton = document.getElementById('modalCloseButton');
 
 // --- Utility Functions ---
 
-// Helper to get today's date in YYYY-MM-DD format
+// Helper to get today's date inilizce-MM-DD format
 function getTodayDateString() {
     const today = new Date();
     return today.toISOString().split('T')[0];
 }
 
-// Helper to format a date as YYYY-MM-DD
+// Helper to format a date asilizce-MM-DD
 function formatDate(date) {
     const d = new Date(date); // Ensure it's a date object
     const year = d.getFullYear();
@@ -304,6 +304,9 @@ function displayFinalResult() {
 // Function to show a specific question
 function showQuestion(index) {
     const questions = document.querySelectorAll('.question');
+    console.log(`[DEBUG] showQuestion called with index: ${index}`); // Debug log
+    console.log(`[DEBUG] Total questions found in HTML: ${questions.length}`); // Debug log
+
     questions.forEach((q, i) => {
         q.classList.remove('active'); // Hide all questions
         // Clear previous input values and styling when switching questions
@@ -318,6 +321,7 @@ function showQuestion(index) {
     });
 
     if (questions[index]) {
+        console.log(`[DEBUG] Displaying question with ID: ${questions[index].id}`); // Debug log
         questions[index].classList.add('active'); // Show the active question
         currentQuestionIndex = index; // Update global index
         checkAnswerBtn.disabled = false; // Enable check answer button for new question
@@ -330,6 +334,7 @@ function showQuestion(index) {
         hintCounts = {}; // Reset for the new question
         // Hint state will be loaded from local storage by loadPuzzleState if applicable
     } else {
+        console.log(`[DEBUG] No question found at index ${index}. Calling displayFinalResult.`); // Debug log
         // All questions answered, display final result or end game state
         displayFinalResult(); // Call the newly defined function
     }
@@ -573,10 +578,17 @@ function renderCalendar(date) {
     currentMonthYearDisplay.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
 
     const calendarGrid = calendarContainer.querySelector('.calendar-grid');
+    console.log(`[DEBUG] renderCalendar: calendarGrid found:`, calendarGrid); // Debug log
+    console.log(`[DEBUG] renderCalendar: Initial children count: ${calendarGrid ? calendarGrid.children.length : 'N/A'}`); // Debug log
+
+
     // Clear previous day cells, but keep day names (first 7 children)
     while (calendarGrid.children.length > 7) {
+        console.log(`[DEBUG] Removing child: ${calendarGrid.lastChild.textContent}`); // Debug log
         calendarGrid.removeChild(calendarGrid.lastChild);
     }
+    console.log(`[DEBUG] After clearing, children count: ${calendarGrid ? calendarGrid.children.length : 'N/A'}`); // Debug log
+
 
     // Get the first day of the month and last day of the month
     const firstDayOfMonth = new Date(year, month, 1);
@@ -594,6 +606,7 @@ function renderCalendar(date) {
         const emptyCell = document.createElement('div');
         emptyCell.classList.add('calendar-day-cell', 'empty');
         calendarGrid.appendChild(emptyCell);
+        console.log(`[DEBUG] Added empty cell for pre-1st: ${i}`); // Debug log
     }
 
     // Add day cells
@@ -662,11 +675,14 @@ function renderCalendar(date) {
             }
         });
         calendarGrid.appendChild(dayCell);
+        console.log(`[DEBUG] Added day cell: ${day}`); // Debug log
     }
+    console.log(`[DEBUG] After adding days, children count: ${calendarGrid ? calendarGrid.children.length : 'N/A'}`); // Debug log
 }
 
 // Function to load a puzzle based on a given date
 function loadPuzzleForDate(date) {
+    console.log(`[DEBUG] loadPuzzleForDate called for date: ${date}`); // Debug log
     // Generate a consistent "seed" for the date
     const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
     const seededRand = Math.seedrandom(dateSeed); // Get a seeded random function
@@ -674,6 +690,9 @@ function loadPuzzleForDate(date) {
     // Calculate the question index based on the seeded random number
     // Ensure the index is within bounds of allQuestionsAndAnswers length.
     const questionIndex = Math.floor(seededRand() * allQuestionsAndAnswers.length);
+    console.log(`[DEBUG] allQuestionsAndAnswers.length: ${allQuestionsAndAnswers.length}`); // Debug log
+    console.log(`[DEBUG] Calculated questionIndex: ${questionIndex}`); // Debug log
+
 
     // Set the daily puzzle date to the selected date (normalized to start of day)
     dailyPuzzleDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
