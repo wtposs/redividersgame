@@ -25,7 +25,7 @@
         }
 
         #logo {
-            max-width: 250px;
+            max-width: 60%; /* Changed to 60% of its container width */
             height: auto;
         }
 
@@ -1130,7 +1130,8 @@
         function loadAndDisplayQuestionForDate(dateString) {
             stopTimer(); // Stop any running timer
             currentLoadedDate = dateString;
-            const todayDateString = getTodayDateString();
+            // Define todayDateString locally within this function
+            const todayDateString = getTodayDateString(); 
 
             // Get the game state for the selected date (from archive or create new if today)
             dailyGameState = getOrCreateDailyGameState(dateString);
@@ -1215,7 +1216,7 @@
             }
 
             // Show/hide "Go to Today's Puzzle" button
-            if (dateString === todayString) {
+            if (dateString === todayDateString) { 
                 goToTodayBtn.style.display = 'none';
             } else {
                 goToTodayBtn.style.display = 'inline-block';
@@ -1262,7 +1263,7 @@
         function updateTimer() {
             secondsElapsed++;
             const minutes = Math.floor(secondsElapsed / 60);
-            const seconds = secondsElapsed % 60;
+            const seconds = Math.floor(secondsElapsed % 60);
             timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
             console.log(`updateTimer: secondsElapsed: ${secondsElapsed}, display: ${timerDisplay.textContent}`); // Debug log
             if (getTodayDateString() === currentLoadedDate && !dailyGameState.answered) {
