@@ -1,5 +1,6 @@
 // A simple seedable random number generator function
 // From: https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+// This function ensures that for a given date, the same puzzle is always presented.
 Math.seedrandom = Math.seedrandom || function(seed) {
     var x = Math.sin(seed || 0) * 10000;
     return function() {
@@ -289,6 +290,15 @@ function stopTimer() {
     clearInterval(timerInterval);
 }
 
+// Function to call when all questions have been exhausted or the game ends
+function displayFinalResult() {
+    // You can customize this message for when all questions have been attempted
+    showCustomModal('All daily puzzles have been displayed! Check the calendar for more.');
+    checkAnswerBtn.disabled = true; // Disable the check answer button
+    dailyResultDisplay.textContent = 'All puzzles shown!';
+    dailyResultDisplay.style.color = '#333';
+}
+
 // --- Puzzle Logic ---
 
 // Function to show a specific question
@@ -321,7 +331,7 @@ function showQuestion(index) {
         // Hint state will be loaded from local storage by loadPuzzleState if applicable
     } else {
         // All questions answered, display final result or end game state
-        displayFinalResult(); // You might want to define this function for an end-game message
+        displayFinalResult(); // Call the newly defined function
     }
 }
 
