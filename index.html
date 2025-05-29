@@ -173,14 +173,6 @@
             font-size: 1em;
         }
 
-        #gameOverDisplay {
-            margin-top: 20px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #007bff;
-            display: none;
-        }
-
         /* --- Calendar Specific Styles --- */
         #calendarButton {
             background-color: #28a745;
@@ -283,6 +275,14 @@
 
         .calendar-day-cell.selected-date {
             border: 2px solid #dc3545; /* Red border for selected date */
+        }
+
+        /* New style for past dates */
+        .calendar-day-cell.past {
+            background-color: #e9ecef; /* Lighter background */
+            color: #aaa; /* Faded text */
+            pointer-events: none; /* Prevent click events */
+            /* text-decoration: line-through; Optional: cross out */
         }
 
         /* Custom Modal Styles */
@@ -837,12 +837,8 @@
         </p>
     </div>
 
-    <div id="gameOverDisplay">
-        You've completed all available challenges! Come back later for new ones.
-    </div>
-
     <div id="calendarContainer">
-        <div class="calendar-content">
+        <div id="calendar-content">
             <div class="calendar-header">
                 <button id="prevMonth">&lt;</button>
                 <h3 id="currentMonthYear"></h3>
@@ -880,7 +876,9 @@
 
         // Configuration for daily challenge
         // Set to a fixed start date for consistent puzzle numbering.
-        const GAME_START_DATE = new Date('2025-05-29T00:00:00');
+        // Defined as UTC timestamp to avoid timezone issues.
+        // If May 29th, 2025 is intended to be "Puzzle #1" for everyone, this is the correct UTC start.
+        const GAME_START_DATE_UTC = Date.UTC(2025, 4, 29); // Month is 0-indexed (May is 4)
 
         const allQuestions = document.querySelectorAll('.question');
         let currentLoadedDate = null; // The date for the puzzle currently displayed (today or archived)
@@ -967,40 +965,40 @@
         }
 
         function getTodayDateString(date = new Date()) {
-            // Adjust to a specific timezone (e.g., 'America/New_York') for consistent daily puzzle assignment
-            // This ensures that "today" is the same for all users regardless of their local timezone.
-            const options = { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' };
-            const formatter = new Intl.DateTimeFormat('en-US', options);
-            const parts = formatter.formatToParts(date);
-            const year = parts.find(p => p.type === 'year').value;
-            const month = parts.find(p => p.type === 'month').value;
-            const day = parts.find(p => p.type === 'day').value;
+            // Use local date components directly to getYYYY-MM-DD based on user's local timezone
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
             return `${year}-${month}-${day}`; // Format:YYYY-MM-DD
         }
 
-        function getDaysSinceStart(date) {
-            const targetDate = new Date(date);
-            targetDate.setHours(0, 0, 0, 0); // Set to midnight for consistent comparison
+        function getDaysSinceStart(dateString) {
+            const parts = dateString.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+            const day = parseInt(parts[2]);
 
-            const startDate = new Date(GAME_START_DATE);
-            startDate.setHours(0, 0, 0, 0); // Set to midnight
+            // Create a Date object from the parts, then get its UTC milliseconds
+            const targetDateObj = new Date(year, month, day);
+            const targetUTC_MS = Date.UTC(targetDateObj.getFullYear(), targetDateObj.getMonth(), targetDateObj.getDate());
 
-            // If targetDate is before startDate, return -1 (or handle as an error)
-            if (targetDate.getTime() < startDate.getTime()) {
-                return -1; // Indicates a date before the game started
-            }
+            const startUTC_MS = GAME_START_DATE_UTC; // Already defined as UTC timestamp
 
-            const diffTime = targetDate.getTime() - startDate.getTime();
+            console.log(`getDaysSinceStart: Target Date String: ${dateString}, Target UTC (ms): ${targetUTC_MS}, Game Start UTC (ms): ${startUTC_MS}`);
+
+            const diffTime = targetUTC_MS - startUTC_MS;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            console.log(`getDaysSinceStart: Diff Time (ms): ${diffTime}, Diff Days: ${diffDays}`);
             return diffDays;
         }
 
         function normalize(str) {
-            // This function handles spaces for multi-word answers while lowercasing and trimming
-            // It also removes all punctuation (except internal spaces)
+            // This function handles spaces for multi-word answers while removing all punctuation
+            // It also lowercases and trims.
             if (typeof str !== 'string') {
                 return ''; // Ensure it's a string
             }
+            // Remove all punctuation and then normalize spaces
             return str.trim().toLowerCase().replace(/[.,!?;:'"-]+/g, "").replace(/\s+/g, " ");
         }
 
@@ -1017,6 +1015,10 @@
                         } else if (allGameStates[date].hintsUsedCount === undefined) {
                             allGameStates[date].hintsUsedCount = 0; // Initialize if missing
                         }
+                        // Ensure timeTaken is a number, default to 0 if not
+                        if (typeof allGameStates[date].timeTaken !== 'number' || isNaN(allGameStates[date].timeTaken)) {
+                            allGameStates[date].timeTaken = 0;
+                        }
                     }
                 } catch (e) {
                     console.error("Error parsing localStorage game archive:", e);
@@ -1032,45 +1034,49 @@
         }
 
         function getOrCreateDailyGameState(dateString) {
-            if (!allGameStates[dateString]) {
-                const questionIndex = getDaysSinceStart(dateString);
+            const questionIndex = getDaysSinceStart(dateString);
 
-                // Check if the calculated index is valid for available puzzles
-                if (questionIndex < 0 || questionIndex >= allQuestions.length) {
-                    // Date is before GAME_START_DATE or beyond available puzzles
-                    console.warn(`Attempted to load puzzle for invalid date or index: ${dateString}, Index: ${questionIndex}`);
-                    return {
-                        questionPuzzleNum: -1, // Invalid puzzle number
-                        answered: false,
-                        isCorrect: false,
-                        inputs: [],
-                        hintsUsedCount: 0, // Initialize hint count
-                        timeTaken: 0,
-                        revealedLetters: {}
-                    };
-                }
-
-                // Map to a puzzle number. If there are more dates than puzzles, cycle through them.
-                const mappedPuzzleNum = (questionIndex % Object.keys(allAnswers).length) + 1; // 1-indexed
-
-                const numBlanks = allAnswers[mappedPuzzleNum] ? allAnswers[mappedPuzzleNum].length : 0;
-                const initialInputs = Array(numBlanks).fill('');
-                const initialRevealedLetters = {};
-                for (let i = 0; i < numBlanks; i++) {
-                    // Initialize revealedLetters for each blank with an array of falses
-                    const wordLength = allAnswers[mappedPuzzleNum]?.[i]?.length || 0;
-                    initialRevealedLetters[i] = Array(wordLength).fill(false);
-                }
-
-                allGameStates[dateString] = {
-                    questionPuzzleNum: mappedPuzzleNum,
+            // If date is before GAME_START_DATE, return invalid state
+            if (questionIndex < 0) {
+                console.warn(`getOrCreateDailyGameState: Date (${dateString}) is before GAME_START_DATE. Calculated index: ${questionIndex}`);
+                return {
+                    questionPuzzleNum: -1, // Invalid puzzle number
                     answered: false,
                     isCorrect: false,
-                    inputs: initialInputs,
-                    hintsUsedCount: 0, // Initialize hint count
-                    revealedLetters: initialRevealedLetters // Initialize for all blanks
+                    inputs: [],
+                    hintsUsedCount: 0,
+                    timeTaken: 0, // Ensure timeTaken is initialized to 0
+                    revealedLetters: {}
                 };
             }
+
+            // If game state already exists for this date, return it
+            if (allGameStates[dateString]) {
+                return allGameStates[dateString];
+            }
+
+            // For any date on or after GAME_START_DATE, map to a puzzle number by cycling
+            // This ensures that puzzles always exist by looping through the defined ones.
+            const totalAvailablePuzzles = Object.keys(allAnswers).length;
+            const mappedPuzzleNum = (questionIndex % totalAvailablePuzzles) + 1; // 1-indexed
+
+            const numBlanks = allAnswers[mappedPuzzleNum] ? allAnswers[mappedPuzzleNum].length : 0;
+            const initialInputs = Array(numBlanks).fill('');
+            const initialRevealedLetters = {};
+            for (let i = 0; i < numBlanks; i++) {
+                const wordLength = allAnswers[mappedPuzzleNum]?.[i]?.length || 0;
+                initialRevealedLetters[i] = Array(wordLength).fill(false);
+            }
+
+            allGameStates[dateString] = {
+                questionPuzzleNum: mappedPuzzleNum,
+                answered: false,
+                isCorrect: false,
+                inputs: initialInputs,
+                hintsUsedCount: 0,
+                timeTaken: 0, // Ensure timeTaken is initialized to 0
+                revealedLetters: initialRevealedLetters
+            };
             return allGameStates[dateString];
         }
 
@@ -1097,7 +1103,9 @@
 
         function initializeGame() {
             loadAllGameStates();
-            const todayDateString = getTodayDateString();
+            const todayDate = new Date(); // Get today's local date
+            const todayDateString = getTodayDateString(todayDate);
+            console.log(`initializeGame: Today's local date object: ${todayDate.toISOString()}, string: ${todayDateString}`);
             loadAndDisplayQuestionForDate(todayDateString);
 
             // Set up input event listeners for saving raw input
@@ -1128,22 +1136,19 @@
             dailyGameState = getOrCreateDailyGameState(dateString);
             currentDailyQuestionIndex = dailyGameState.questionPuzzleNum - 1; // Convert back to 0-indexed for array access
 
-            // Hide game over display
-            document.getElementById('gameOverDisplay').style.display = 'none';
-
             // Hide all questions
             allQuestions.forEach(q => q.classList.remove('active'));
 
             const currentQuestionElement = allQuestions[currentDailyQuestionIndex]; // Use 0-indexed
 
             if (!currentQuestionElement || dailyGameState.questionPuzzleNum === -1) {
-                // If there's no question for this index (e.g., beyond available questions or invalid date), show game over
-                document.getElementById('gameOverDisplay').style.display = 'block';
+                // If there's no question for this index (e.g., invalid date before start date), show a message
+                console.error(`loadAndDisplayQuestionForDate: Invalid puzzle number for date ${dateString}. Puzzle index: ${currentDailyQuestionIndex}.`);
                 checkAnswerBtn.disabled = true;
                 copyResultButton.style.display = 'none';
-                dailyResultElement.textContent = '';
-                timerDisplay.textContent = 'Game Over!';
-                goToTodayBtn.style.display = 'none';
+                dailyResultElement.textContent = 'Puzzle not available for this date.';
+                timerDisplay.textContent = 'N/A';
+                goToTodayBtn.style.display = 'inline-block'; // Show "Go to Today's Puzzle"
                 return; // Stop execution
             }
 
@@ -1189,4 +1194,445 @@
                 checkAnswerBtn.disabled = false; // Always enabled for current puzzle
                 copyResultButton.style.display = 'none';
                 dailyResultElement.textContent = ''; // Clear result message
-                dailyRes
+                dailyResultElement.style.backgroundColor = '#e9ecef';
+                dailyResultElement.style.color = '#333';
+            }
+
+            // Handle hint button state - ALLOW HINTS FOR ANY DATE IF NOT ANSWERED AND NOT ALL HINTS USED
+            const hintButton = currentQuestionElement.querySelector('.hint-btn');
+            if (hintButton) {
+                // Hint button is disabled if the puzzle is answered, or if all letters for the first blank are revealed
+                if (dailyGameState.answered) {
+                    hintButton.disabled = true;
+                } else {
+                    const correctWordForBlank0 = allAnswers[dailyGameState.questionPuzzleNum]?.[0];
+                    if (correctWordForBlank0 && dailyGameState.revealedLetters[0] && dailyGameState.revealedLetters[0].every(flag => flag === true)) {
+                        hintButton.disabled = true;
+                    } else {
+                        hintButton.disabled = false;
+                    }
+                }
+            }
+
+            // Show/hide "Go to Today's Puzzle" button
+            if (dateString === todayString) {
+                goToTodayBtn.style.display = 'none';
+            } else {
+                goToTodayBtn.style.display = 'inline-block';
+            }
+
+            // Hide calendar if it's open
+            document.getElementById('calendarContainer').style.display = 'none';
+        }
+
+        function applySavedAnswers(questionElement, savedInputs, correctAnswersForQuestion) {
+            const inputs = questionElement.querySelectorAll('input[type="text"]');
+            inputs.forEach((input, index) => {
+                const savedValue = savedInputs[index] || '';
+                input.value = savedValue;
+                // input.disabled = true; // Inputs are no longer disabled after checking
+
+                const correctSpellings = Array.isArray(correctAnswersForQuestion[index]) ? correctAnswersForQuestion[index] : [correctAnswersForQuestion[index]];
+                let isBlankCorrect = false;
+                for (const correctSpelling of correctSpellings) {
+                    if (normalize(savedValue) === normalize(correctSpelling)) {
+                        isBlankCorrect = true;
+                        break;
+                    }
+                }
+
+                if (isBlankCorrect) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                }
+
+                // Also clear hint display for answered puzzles
+                const hintDisplaySpan = questionElement.querySelector(`.hint-display[data-blank-index="${index}"]`);
+                if (hintDisplaySpan) {
+                    hintDisplaySpan.textContent = '';
+                }
+            });
+        }
+
+        // --- TIMER LOGIC ---
+
+        function updateTimer() {
+            secondsElapsed++;
+            const minutes = Math.floor(secondsElapsed / 60);
+            const seconds = secondsElapsed % 60;
+            timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            console.log(`updateTimer: secondsElapsed: ${secondsElapsed}, display: ${timerDisplay.textContent}`); // Debug log
+            if (getTodayDateString() === currentLoadedDate && !dailyGameState.answered) {
+                dailyGameState.timeTaken = secondsElapsed; // Only save time if actively playing today's puzzle
+                saveAllGameStates();
+            }
+        }
+
+        function startTimer(initialSeconds = 0) {
+            clearInterval(timerInterval); // Clear any existing timer
+            secondsElapsed = initialSeconds;
+            console.log(`startTimer: Timer started with initialSeconds: ${initialSeconds}, secondsElapsed: ${secondsElapsed}`);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        // --- ANSWER CHECKING ---
+
+        function checkDailyAnswer() {
+            const currentQuestionElement = allQuestions[currentDailyQuestionIndex];
+            const inputs = currentQuestionElement.querySelectorAll('input[type="text"]');
+            const correctAnswersForCurrentPuzzle = allAnswers[dailyGameState.questionPuzzleNum];
+            let correctCount = 0;
+            let totalBlanks = 0;
+            let allCorrect = true;
+
+            // Only update dailyGameState.inputs if it's today's puzzle being answered
+            if (currentLoadedDate === getTodayDateString()) {
+                // Re-read current input values just before checking
+                inputs.forEach((input, index) => {
+                    dailyGameState.inputs[index] = input.value.trim();
+                });
+                saveAllGameStates(); // Save raw input state
+            }
+
+            inputs.forEach((input, index) => {
+                const userAnswer = input.value.trim();
+                totalBlanks++;
+
+                // Ensure validAnswersForBlank is always an array for iteration
+                const validAnswersForBlank = Array.isArray(correctAnswersForCurrentPuzzle[index]) ? correctAnswersForCurrentPuzzle[index] : [correctAnswersForCurrentPuzzle[index]];
+
+                let isBlankCorrect = false;
+                for (const correctSpelling of validAnswersForBlank) {
+                    if (normalize(userAnswer) === normalize(correctSpelling)) {
+                        isBlankCorrect = true;
+                        break;
+                    }
+                }
+
+                if (isBlankCorrect) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                    correctCount++;
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                    allCorrect = false;
+                }
+            });
+
+            // Only update game state for today's puzzle if it's being answered
+            if (currentLoadedDate === getTodayDateString()) {
+                dailyGameState.answered = allCorrect; // Mark as answered ONLY if all are correct
+                dailyGameState.isCorrect = allCorrect; // Store if all were correct
+                dailyGameState.timeTaken = secondsElapsed; // Final time taken
+                saveAllGameStates(); // Save ALL states
+            } else if (allCorrect) {
+                // If it's a past puzzle and they get it all correct, mark it as solved in the archive
+                dailyGameState.answered = true;
+                dailyGameState.isCorrect = true;
+                saveAllGameStates();
+                // Reload the current puzzle to reflect the solved status in the calendar
+                loadAndDisplayQuestionForDate(currentLoadedDate);
+            }
+
+
+            displayResult(allCorrect, dailyGameState.timeTaken, dailyGameState.hintsUsedCount, dailyGameState.questionPuzzleNum);
+            copyResultButton.style.display = 'inline-block'; // Show copy button
+        }
+
+        function displayResult(allCorrect, timeTaken, hintsUsedCount, questionPuzzleNum) {
+            // Ensure timeTaken is a number, default to 0 if not
+            const safeTimeTaken = typeof timeTaken === 'number' && !isNaN(timeTaken) ? timeTaken : 0;
+
+            const minutes = Math.floor(safeTimeTaken / 60);
+            const seconds = Math.floor(safeTimeTaken % 60);
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            const totalBlanksForPuzzle = allAnswers[questionPuzzleNum] ? allAnswers[questionPuzzleNum].length : 0;
+            const questionElement = allQuestions[questionPuzzleNum - 1];
+            const inputs = questionElement ? questionElement.querySelectorAll('input[type="text"]') : [];
+            let correctBlanksCount = 0;
+            inputs.forEach((input, index) => {
+                if (allAnswers[questionPuzzleNum] && allAnswers[questionPuzzleNum][index]) {
+                    const userAnswer = input.value.trim();
+                    const correctForThisBlank = Array.isArray(allAnswers[questionPuzzleNum][index]) ? allAnswers[questionPuzzleNum][index] : [allAnswers[questionPuzzleNum][index]];
+
+                    if (correctForThisBlank.includes(normalize(userAnswer))) {
+                        correctBlanksCount++;
+                    }
+                }
+            });
+
+            // Simplified message format
+            let message = `Correct: ${correctBlanksCount}/${totalBlanksForPuzzle}, Hints Used: ${hintsUsedCount}, Time: ${timeString}`;
+
+            dailyResultElement.textContent = message;
+            console.log("Displaying result message:", message); // Debug log
+            console.log("dailyResultElement.textContent after update:", dailyResultElement.textContent); // Debug log
+
+            if (allCorrect) {
+                dailyResultElement.style.backgroundColor = '#d4edda'; // Light green
+                dailyResultElement.style.color = '#155724'; // Dark green text
+            } else {
+                dailyResultElement.style.backgroundColor = '#f8d7da'; // Light red
+                dailyResultElement.style.color = '#721c24'; // Dark red text
+            }
+        }
+
+        // --- HINT SYSTEM ---
+
+        document.querySelectorAll('.hint-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const questionNum = parseInt(event.target.dataset.questionNum);
+                const blankIndex = parseInt(event.target.dataset.blankIndex); // Get the blank index from the button
+                
+                // Allow hint for any loaded puzzle as long as it's not answered yet
+                if (questionNum === dailyGameState.questionPuzzleNum && !dailyGameState.answered) {
+                    giveHint(questionNum, blankIndex); // Pass blankIndex to giveHint
+                    dailyGameState.hintsUsedCount++; // Increment hint count
+                    saveAllGameStates(); // Save state after using hint
+                    // The hint button will be disabled by giveHint if all letters are revealed
+                }
+            });
+        });
+
+        function giveHint(qNum, blankIndex) { // Accept blankIndex as argument
+            const currentQuestionElement = allQuestions[qNum - 1]; // Use 0-indexed for allQuestions array
+            const inputEl = currentQuestionElement.querySelector(`input[data-blank-index="${blankIndex}"]`); // Target specific input
+            const hintDisplaySpan = currentQuestionElement.querySelector(`.hint-display[data-blank-index="${blankIndex}"]`); // Target specific hint span
+            const correctWordForBlank = allAnswers[qNum] && allAnswers[qNum][blankIndex] ? allAnswers[qNum][blankIndex] : ''; // Get correct word for this blank
+
+            if (!correctWordForBlank || correctWordForBlank.length === 0) {
+                console.warn(`No correct word found for question ${qNum}, blank ${blankIndex} to give hint or word is empty.`);
+                return;
+            }
+
+            // Ensure revealedLetters for this blank is initialized in dailyGameState
+            if (!dailyGameState.revealedLetters[blankIndex]) {
+                dailyGameState.revealedLetters[blankIndex] = Array(correctWordForBlank.length).fill(false);
+            }
+
+            let unrevealedIndices = [];
+            for (let i = 0; i < correctWordForBlank.length; i++) {
+                if (!dailyGameState.revealedLetters[blankIndex][i]) {
+                    unrevealedIndices.push(i);
+                }
+            }
+
+            if (unrevealedIndices.length === 0) {
+                // All letters are already revealed, disable hint button
+                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
+                if (hintButton) hintButton.disabled = true;
+                return;
+            }
+
+            const randomIndex = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+            // Mark the letter as revealed in the revealedLetters state
+            dailyGameState.revealedLetters[blankIndex][randomIndex] = true;
+            saveAllGameStates(); // Save state after revealing hint
+
+            // Update the hint display without touching the input value
+            renderHintDisplay(hintDisplaySpan, correctWordForBlank, dailyGameState.revealedLetters[blankIndex]);
+
+            // Check if all letters for this blank are now revealed
+            const allLettersRevealedForThisBlank = dailyGameState.revealedLetters[blankIndex].every(flag => flag === true);
+            if (allLettersRevealedForThisBlank) {
+                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
+                if (hintButton) hintButton.disabled = true;
+
+                // Populate the actual input box with the full word (original casing/punctuation)
+                if (inputEl) {
+                    inputEl.value = correctWordForBlank; // Use the original correct word
+                    dailyGameState.inputs[blankIndex] = correctWordForBlank; // Update saved input
+                    saveAllGameStates(); // Save this change
+                }
+            }
+
+            // Keep focus on the input field so user can continue typing
+            if (inputEl) {
+                inputEl.focus();
+            }
+        }
+
+
+        // --- COPY RESULT ---
+
+        function copyDailyResult() {
+            // Ensure timeTaken is a number, default to 0 if not
+            const safeTimeTaken = typeof dailyGameState.timeTaken === 'number' && !isNaN(dailyGameState.timeTaken) ? dailyGameState.timeTaken : 0;
+
+            const minutes = Math.floor(safeTimeTaken / 60);
+            const seconds = Math.floor(safeTimeTaken % 60);
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            const totalBlanksForPuzzle = allAnswers[dailyGameState.questionPuzzleNum] ? allAnswers[dailyGameState.questionPuzzleNum].length : 0;
+            const questionElement = allQuestions[dailyGameState.questionPuzzleNum - 1];
+            const inputs = questionElement ? questionElement.querySelectorAll('input[type="text"]') : [];
+            let correctBlanksCount = 0;
+            inputs.forEach((input, index) => {
+                if (allAnswers[dailyGameState.questionPuzzleNum] && allAnswers[dailyGameState.questionPuzzleNum][index]) {
+                    const userAnswer = input.value.trim();
+                    const correctForThisBlank = Array.isArray(allAnswers[dailyGameState.questionPuzzleNum][index]) ? allAnswers[dailyGameState.questionPuzzleNum][index] : [allAnswers[dailyGameState.questionPuzzleNum][index]];
+
+                    if (correctForThisBlank.includes(normalize(userAnswer))) {
+                        correctBlanksCount++;
+                    }
+                }
+            });
+
+            // Calculate score for the copy text
+            let baseScore = correctBlanksCount * 25;
+            let hintPenalty = dailyGameState.hintsUsedCount * 5; // Use hintsUsedCount
+            let timePenalty = Math.floor(safeTimeTaken / 5);
+            let finalScore = Math.max(0, baseScore - hintPenalty - timePenalty);
+
+            // Simplified copy text format
+            const resultText = `Redividers Daily Challenge #${dailyGameState.questionPuzzleNum}\nStatus: ${dailyGameState.isCorrect ? 'Solved' : 'Unsolved'}\nCorrect: ${correctBlanksCount}/${totalBlanksForPuzzle}\nHints Used: ${dailyGameState.hintsUsedCount}\nTime: ${timeString}\n\n#Redividers`;
+
+            // Show the custom modal with the copy feature
+            showModal('Your Result:', true, resultText);
+        }
+
+        // --- CALENDAR LOGIC ---
+        const calendarContainer = document.getElementById('calendarContainer');
+        const currentMonthYearHeader = document.getElementById('currentMonthYear');
+        const calendarGrid = document.querySelector('.calendar-grid'); // Selects the div for day cells
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+
+        let currentCalendarDate = new Date(); // Tracks the month/year currently displayed in the calendar
+
+        function renderCalendar() {
+            // Clear all previous day cells, preserving the day names header
+            // Select all children except the first 7 (which are the day names)
+            const childrenToRemove = Array.from(calendarGrid.children).slice(7);
+            childrenToRemove.forEach(child => child.remove());
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth(); // 0-indexed
+
+            currentMonthYearHeader.textContent = `${new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+
+            // Get first day of the month (0 = Sunday, 1 = Monday, etc.)
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            // Get last day of the month
+            const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+
+            // Prepare 'today' date for comparison (local midnight)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to midnight for consistent comparison
+
+            // Add empty cells for days before the 1st
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('calendar-day-cell', 'empty');
+                calendarGrid.appendChild(emptyCell);
+            }
+
+            // Add day cells
+            for (let day = 1; day <= lastDayOfMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('calendar-day-cell');
+                dayCell.textContent = day;
+
+                const dateForCell = new Date(year, month, day); // This is the date for the current calendar cell
+                dateForCell.setHours(0, 0, 0, 0); // Ensure it's midnight for comparison
+                const dateString = getTodayDateString(dateForCell); // GetYYYY-MM-DD for this cell
+
+                dayCell.dataset.date = dateString; // Store date string for click handling
+
+                if (dateString === getTodayDateString(today)) { // Compare against today's date string
+                    dayCell.classList.add('today');
+                }
+
+                // Check if this date has a game state in the archive
+                if (allGameStates[dateString]) {
+                    if (allGameStates[dateString].answered) {
+                        dayCell.classList.add('solved');
+                    } else {
+                        // Mark as unsolved only if it's a valid puzzle number (>= 0) and hasn't been answered
+                        const puzzleIndexForDate = getDaysSinceStart(dateString);
+                        if (puzzleIndexForDate >= 0) { // Only mark as unsolved if it's a valid puzzle number
+                            dayCell.classList.add('unsolved');
+                        }
+                    }
+                }
+
+                // Add selected-date class if this is the currently loaded puzzle's date
+                if (dateString === currentLoadedDate) {
+                    dayCell.classList.add('selected-date');
+                }
+
+                // Add click listener logic
+                // Dates that are empty should never be clickable
+                if (dayCell.classList.contains('empty')) {
+                    dayCell.style.cursor = 'default';
+                } else if (dateForCell.getTime() < today.getTime()) { // If the cell's date is strictly before today
+                    dayCell.classList.add('past');
+                    dayCell.style.cursor = 'default';
+                    // No click listener for past dates
+                } else { // Today or future dates, and not empty
+                    dayCell.addEventListener('click', (event) => {
+                        const clickedDate = event.target.dataset.date;
+                        loadAndDisplayQuestionForDate(clickedDate);
+                        document.querySelectorAll('.calendar-day-cell').forEach(cell => cell.classList.remove('selected-date'));
+                        event.target.classList.add('selected-date');
+                    });
+                }
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        // Event Listeners for Calendar Navigation
+        prevMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        document.getElementById('calendarButton').addEventListener('click', () => {
+            currentCalendarDate = new Date(); // Reset calendar to current month when opened
+            renderCalendar();
+            calendarContainer.style.display = 'flex'; // Explicitly set to flex
+        });
+
+        goToTodayBtn.addEventListener('click', () => {
+            loadAndDisplayQuestionForDate(getTodayDateString());
+        });
+
+        // Event listener for the new modal copy button
+        modalCopyButton.addEventListener('click', () => {
+            modalResultText.select(); // Select the text in the textarea
+            document.execCommand('copy'); // Copy the selected text
+            showModal('Copied to clipboard!'); // Show a confirmation message
+            // You might want to close the modal automatically after a short delay or keep it open
+            // For now, it will stay open until the user clicks 'OK'
+        });
+
+        // Event listener for the modal close button (always closes the modal)
+        modalCloseButton.addEventListener('click', () => {
+            customModal.style.display = 'none';
+        });
+
+
+        // Initialize the game when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+        // Manual attachment for checkAnswerBtn and copyResultButton
+        checkAnswerBtn.addEventListener('click', checkDailyAnswer);
+        copyResultButton.addEventListener('click', copyDailyResult);
+    </script>
+</body>
+</html>
