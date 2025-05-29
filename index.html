@@ -1373,7 +1373,7 @@
             });
 
             // Simplified message format
-            let message = `Correct: ${correctBlanksCount}/${totalBlanksForPuzzle}, Hints Used: ${hintsUsedCount}, Time: ${timeString}`;
+            let message = `Correct: ${correctBlanksCount}/${totalBlanksForPuzzle}, Hints used: ${hintsUsedCount}, Time: ${timeString}`; // Changed "Used" to "used"
 
             dailyResultElement.textContent = message;
             console.log("Displaying result message:", message); // Debug log
@@ -1480,11 +1480,13 @@
 
         // Event Listeners for Calendar Navigation
         prevMonthBtn.addEventListener('click', () => {
+            console.log("Previous month clicked!"); // Debug log
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
             renderCalendar();
         });
 
         nextMonthBtn.addEventListener('click', () => {
+            console.log("Next month clicked!"); // Debug log
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
             renderCalendar();
         });
