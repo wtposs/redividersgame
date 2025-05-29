@@ -273,7 +273,7 @@ function formatDate(date) {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
     const day = String(d.getDate()).padStart(2, '0');
-    return `<span class="math-inline">\{year\}\-</span>{month}-${day}`;
+    return `${year}-${month}-${day}`;
 }
 
 // Function to start or reset the timer
@@ -288,7 +288,7 @@ function updateTimer() {
     const elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Elapsed time in seconds
     const minutes = Math.floor(elapsedTime / 60);
     const seconds = elapsedTime % 60;
-    timerDisplay.textContent = `Elapsed time: <span class="math-inline">\{minutes\}\:</span>{seconds < 10 ? '0' : ''}${seconds}`;
+    timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
 // Function to stop the timer
@@ -371,7 +371,7 @@ function checkAnswers() {
 
         userAnswers.push(userAnswer); // Store user answer for result text
 
-        console.log(`[DEBUG] Input <span class="math-inline">\{index\}\: User Answer\: "</span>{userAnswer}", Correct Answer: "${correctAnswer}"`); // Debug log for comparison
+        console.log(`[DEBUG] Input ${index}: User Answer: "${userAnswer}", Correct Answer: "${correctAnswer}"`); // Debug log for comparison
 
         if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
             input.classList.remove('incorrect');
@@ -423,7 +423,7 @@ function handleHint(event) {
     const questionNum = parseInt(button.dataset.questionNum);
     const blankIndex = parseInt(button.dataset.blankIndex);
 
-    const hintDisplaySpan = document.querySelector(`.hint-display[data-question-num="<span class="math-inline">\{questionNum\}"\]\[data\-blank\-index\="</span>{blankIndex}"]`);
+    const hintDisplaySpan = document.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="${blankIndex}"]`);
     const questionData = allQuestionsAndAnswers[questionNum - 1];
     const correctAnswer = questionData.answers[blankIndex];
 
@@ -439,7 +439,7 @@ function handleHint(event) {
 
         const revealedPart = correctAnswer.substring(0, revealedCount);
         const hiddenPart = '_'.repeat(correctAnswer.length - revealedCount);
-        hintDisplaySpan.textContent = `<span class="math-inline">\{revealedPart\}</span>{hiddenPart}`;
+        hintDisplaySpan.textContent = `${revealedPart}${hiddenPart}`;
 
         // Save updated hint progress to local storage
         const currentPuzzleKey = formatDate(dailyPuzzleDate);
@@ -469,7 +469,7 @@ function generateResultString(questionNumber, userAnswers) {
     const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
     const minutes = Math.floor(elapsedTime / 60);
     const seconds = elapsedTime % 60;
-    const formattedTime = `<span class="math-inline">\{minutes\}\:</span>{seconds < 10 ? '0' : ''}${seconds}`;
+    const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
     // Count how many blanks had at least one letter revealed as a hint
     const currentQuestionHintState = hintCounts[questionNumber] || {};
@@ -479,9 +479,9 @@ function generateResultString(questionNumber, userAnswers) {
             hintsUsedCount++;
         }
     }
-    const hintsEmoji = hintsUsedCount > 0 ? `(<span class="math-inline">\{hintsUsedCount\} hint</span>{hintsUsedCount > 1 ? 's' : ''})` : '';
+    const hintsEmoji = hintsUsedCount > 0 ? `(${hintsUsedCount} hint${hintsUsedCount > 1 ? 's' : ''})` : '';
 
-    return `Redividers Daily Word Challenge\n${month} ${dayOfMonth}, <span class="math-inline">\{year\}\\nPuzzle \#</span>{questionNumber}\nTime: ${formattedTime} ${hintsEmoji}\nAnswers: ${userAnswers.join(', ')}`;
+    return `Redividers Daily Word Challenge\n${month} ${dayOfMonth}, ${year}\nPuzzle #${questionNumber}\nTime: ${formattedTime} ${hintsEmoji}\nAnswers: ${userAnswers.join(', ')}`;
 }
 
 // Function to copy the result to clipboard
@@ -567,7 +567,7 @@ function loadPuzzleState(dateString, questionNumber) {
                 if (revealedCount > 0 && hintDisplaySpans[blankIndex]) {
                     const revealedPart = correctAnswer.substring(0, revealedCount);
                     const hiddenPart = '_'.repeat(correctAnswer.length - revealedCount);
-                    hintDisplaySpans[blankIndex].textContent = `<span class="math-inline">\{revealedPart\}</span>{hiddenPart}`;
+                    hintDisplaySpans[blankIndex].textContent = `${revealedPart}${hiddenPart}`;
                 }
                 if (hintButtons[blankIndex]) {
                     // Disable button if all letters are revealed
@@ -759,4 +759,101 @@ function loadPuzzleForDate(date) {
 
     // Show the specific question based on the calculated index
     showQuestion(questionIndex);
-    startTimer(); //
+    startTimer(); // Restart timer for the new puzzle
+
+    // Always display the check answer button. Its disabled state is handled by checkAnswers.
+    checkAnswerBtn.style.display = 'inline-block';
+
+    // Show/hide 'Go to Today's Puzzle' button based on selection
+    if (isToday) {
+        goToTodayBtn.style.display = 'none';
+    } else {
+        goToTodayBtn.style.display = 'inline-block';
+    }
+
+    // Load saved answers and hints if available for this date and question
+    // Ensure questionIndex + 1 is used for 1-based question numbers in storage
+    loadPuzzleState(formatDate(dailyPuzzleDate), questionIndex + 1);
+}
+
+// --- Custom Modal Functions ---
+
+function showCustomModal(message, showResultText = false) {
+    modalMessage.textContent = message;
+    if (showResultText) {
+        modalResultText.style.display = 'block';
+        modalCopyButton.style.display = 'inline-block';
+        // Ensure the current puzzle's solved message is copied
+        const currentQuestionEl = document.querySelector('.question.active');
+        if (currentQuestionEl) {
+            const questionNum = parseInt(currentQuestionEl.id.replace('question', ''));
+            const inputFields = currentQuestionEl.querySelectorAll('input[type="text"]');
+            const userAnswers = Array.from(inputFields).map(input => input.value.trim());
+            modalResultText.value = generateResultString(questionNum, userAnswers);
+        }
+    } else {
+        modalResultText.style.display = 'none';
+        modalCopyButton.style.display = 'none';
+    }
+    customModal.style.display = 'flex';
+}
+
+function hideCustomModal() {
+    customModal.style.display = 'none';
+}
+
+// --- Event Listeners and Initialization ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Set the initial daily puzzle date to today
+    dailyPuzzleDate = new Date();
+    selectedCalendarDate = new Date(); // Select today on load
+
+    // Initialize currentCalendarDate globally so it's accessible to prev/next month buttons
+    currentCalendarDate = new Date();
+
+    loadPuzzleForDate(dailyPuzzleDate); // Load today's puzzle initially
+
+    // Event listener for Check Answer button
+    checkAnswerBtn.addEventListener('click', checkAnswers);
+
+    // Event listeners for Hint buttons (delegation)
+    document.querySelectorAll('.question').forEach(questionDiv => {
+        questionDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('hint-btn')) {
+                handleHint(event);
+            }
+        });
+    });
+
+    // Event listeners for Calendar buttons
+    calendarButton.addEventListener('click', () => {
+        calendarContainer.style.display = 'flex';
+        renderCalendar(currentCalendarDate); // Render the calendar for the current month
+    });
+
+    prevMonthBtn.addEventListener('click', () => {
+        console.log(`[DEBUG] prevMonthBtn clicked. currentCalendarDate BEFORE: ${currentCalendarDate}`); // Debug log
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        console.log(`[DEBUG] prevMonthBtn clicked. currentCalendarDate AFTER: ${currentCalendarDate}`); // Debug log
+        renderCalendar(currentCalendarDate);
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        console.log(`[DEBUG] nextMonthBtn clicked. currentCalendarDate BEFORE: ${currentCalendarDate}`); // Debug log
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        console.log(`[DEBUG] nextMonthBtn clicked. currentCalendarDate AFTER: ${currentCalendarDate}`); // Debug log
+        renderCalendar(currentCalendarDate);
+    });
+
+    goToTodayBtn.addEventListener('click', () => {
+        dailyPuzzleDate = new Date(); // Reset dailyPuzzleDate to today
+        selectedCalendarDate = new Date(); // Reset selectedCalendarDate to today
+        loadPuzzleForDate(dailyPuzzleDate);
+        calendarContainer.style.display = 'none'; // Close calendar if open
+    });
+
+    // Event listeners for Custom Modal buttons
+    modalCopyButton.addEventListener('click', copyResultToClipboard);
+    modalCloseButton.addEventListener('click', hideCustomModal);
+});
