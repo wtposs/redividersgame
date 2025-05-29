@@ -1147,7 +1147,7 @@
                 checkAnswerBtn.disabled = true;
                 copyResultButton.style.display = 'none';
                 dailyResultElement.textContent = 'Puzzle not available for this date.';
-                timerDisplay.textContent = 'N/A';
+                timerDisplay.textContent = 'Elapsed time: 0:00'; // Default timer to 0:00 for unavailable puzzles
                 goToTodayBtn.style.display = 'inline-block'; // Show "Go to Today's Puzzle"
                 return; // Stop execution
             }
@@ -1187,7 +1187,7 @@
                 // Display saved time
                 const minutes = Math.floor(dailyGameState.timeTaken / 60);
                 const seconds = dailyGameState.timeTaken % 60;
-                timerDisplay.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
             } else {
                 // For unanswered puzzles, ensure button states are correct
                 // Timer already handled at the top of the function
@@ -1385,120 +1385,6 @@
                 dailyResultElement.style.backgroundColor = '#f8d7da'; // Light red
                 dailyResultElement.style.color = '#721c24'; // Dark red text
             }
-        }
-
-        // --- HINT SYSTEM ---
-
-        document.querySelectorAll('.hint-btn').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const questionNum = parseInt(event.target.dataset.questionNum);
-                const blankIndex = parseInt(event.target.dataset.blankIndex); // Get the blank index from the button
-                
-                // Allow hint for any loaded puzzle as long as it's not answered yet
-                if (questionNum === dailyGameState.questionPuzzleNum && !dailyGameState.answered) {
-                    giveHint(questionNum, blankIndex); // Pass blankIndex to giveHint
-                    dailyGameState.hintsUsedCount++; // Increment hint count
-                    saveAllGameStates(); // Save state after using hint
-                    // The hint button will be disabled by giveHint if all letters are revealed
-                }
-            });
-        });
-
-        function giveHint(qNum, blankIndex) { // Accept blankIndex as argument
-            const currentQuestionElement = allQuestions[qNum - 1]; // Use 0-indexed for allQuestions array
-            const inputEl = currentQuestionElement.querySelector(`input[data-blank-index="${blankIndex}"]`); // Target specific input
-            const hintDisplaySpan = currentQuestionElement.querySelector(`.hint-display[data-blank-index="${blankIndex}"]`); // Target specific hint span
-            const correctWordForBlank = allAnswers[qNum] && allAnswers[qNum][blankIndex] ? allAnswers[qNum][blankIndex] : ''; // Get correct word for this blank
-
-            if (!correctWordForBlank || correctWordForBlank.length === 0) {
-                console.warn(`No correct word found for question ${qNum}, blank ${blankIndex} to give hint or word is empty.`);
-                return;
-            }
-
-            // Ensure revealedLetters for this blank is initialized in dailyGameState
-            if (!dailyGameState.revealedLetters[blankIndex]) {
-                dailyGameState.revealedLetters[blankIndex] = Array(correctWordForBlank.length).fill(false);
-            }
-
-            let unrevealedIndices = [];
-            for (let i = 0; i < correctWordForBlank.length; i++) {
-                if (!dailyGameState.revealedLetters[blankIndex][i]) {
-                    unrevealedIndices.push(i);
-                }
-            }
-
-            if (unrevealedIndices.length === 0) {
-                // All letters are already revealed, disable hint button
-                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
-                if (hintButton) hintButton.disabled = true;
-                return;
-            }
-
-            const randomIndex = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
-            // Mark the letter as revealed in the revealedLetters state
-            dailyGameState.revealedLetters[blankIndex][randomIndex] = true;
-            saveAllGameStates(); // Save state after revealing hint
-
-            // Update the hint display without touching the input value
-            renderHintDisplay(hintDisplaySpan, correctWordForBlank, dailyGameState.revealedLetters[blankIndex]);
-
-            // Check if all letters for this blank are now revealed
-            const allLettersRevealedForThisBlank = dailyGameState.revealedLetters[blankIndex].every(flag => flag === true);
-            if (allLettersRevealedForThisBlank) {
-                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
-                if (hintButton) hintButton.disabled = true;
-
-                // Populate the actual input box with the full word (original casing/punctuation)
-                if (inputEl) {
-                    inputEl.value = correctWordForBlank; // Use the original correct word
-                    dailyGameState.inputs[blankIndex] = correctWordForBlank; // Update saved input
-                    saveAllGameStates(); // Save this change
-                }
-            }
-
-            // Keep focus on the input field so user can continue typing
-            if (inputEl) {
-                inputEl.focus();
-            }
-        }
-
-
-        // --- COPY RESULT ---
-
-        function copyDailyResult() {
-            // Ensure timeTaken is a number, default to 0 if not
-            const safeTimeTaken = typeof dailyGameState.timeTaken === 'number' && !isNaN(dailyGameState.timeTaken) ? dailyGameState.timeTaken : 0;
-
-            const minutes = Math.floor(safeTimeTaken / 60);
-            const seconds = Math.floor(safeTimeTaken % 60);
-            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-            const totalBlanksForPuzzle = allAnswers[dailyGameState.questionPuzzleNum] ? allAnswers[dailyGameState.questionPuzzleNum].length : 0;
-            const questionElement = allQuestions[dailyGameState.questionPuzzleNum - 1];
-            const inputs = questionElement ? questionElement.querySelectorAll('input[type="text"]') : [];
-            let correctBlanksCount = 0;
-            inputs.forEach((input, index) => {
-                if (allAnswers[dailyGameState.questionPuzzleNum] && allAnswers[dailyGameState.questionPuzzleNum][index]) {
-                    const userAnswer = input.value.trim();
-                    const correctForThisBlank = Array.isArray(allAnswers[dailyGameState.questionPuzzleNum][index]) ? allAnswers[dailyGameState.questionPuzzleNum][index] : [allAnswers[dailyGameState.questionPuzzleNum][index]];
-
-                    if (correctForThisBlank.includes(normalize(userAnswer))) {
-                        correctBlanksCount++;
-                    }
-                }
-            });
-
-            // Calculate score for the copy text
-            let baseScore = correctBlanksCount * 25;
-            let hintPenalty = dailyGameState.hintsUsedCount * 5; // Use hintsUsedCount
-            let timePenalty = Math.floor(safeTimeTaken / 5);
-            let finalScore = Math.max(0, baseScore - hintPenalty - timePenalty);
-
-            // Simplified copy text format
-            const resultText = `Redividers Daily Challenge #${dailyGameState.questionPuzzleNum}\nStatus: ${dailyGameState.isCorrect ? 'Solved' : 'Unsolved'}\nCorrect: ${correctBlanksCount}/${totalBlanksForPuzzle}\nHints Used: ${dailyGameState.hintsUsedCount}\nTime: ${timeString}\n\n#Redividers`;
-
-            // Show the custom modal with the copy feature
-            showModal('Your Result:', true, resultText);
         }
 
         // --- CALENDAR LOGIC ---
