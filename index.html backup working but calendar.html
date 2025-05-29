@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redividers Daily Word Challenge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            text-align: center;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #logo {
+            max-width: 150px; /* Changed to 150px (3/5 of 250px) */
+            height: auto;
+        }
+
+        #timer {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .question {
+            display: none; /* IMPORTANT: Hide all questions by default */
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .question.active {
+            display: block; /* Only show the active question */
+        }
+
+        .question p {
+            margin: 8px 0;
+        }
+
+        .question p strong {
+            margin-right: 5px;
+        }
+
+        input[type="text"] {
+            padding: 8px 10px;
+            margin-left: 8px;
+            font-size: 1em;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            vertical-align: middle;
+            box-sizing: border-box;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        input.medium {
+            width: 150px;
+            text-align: left;
+        }
+
+        input.small {
+            width: 100px;
+            text-align: left;
+        }
+
+        input:focus {
+            border-color: #66afe9;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .score-display-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        #dailyResult {
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            color: #333;
+            margin: 0;
+        }
+
+        input.correct {
+            border-color: #28a745;
+            background-color: #e6ffe6;
+            color: #155724;
+        }
+
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #ffe6e6;
+            color: #721c24;
+        }
+
+        .hint-btn {
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-bottom: 10px;
+        }
+
+        .hint-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .hint-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .hint-button-container {
+            text-align: center;
+            margin-bottom: 15px;
+            display: flex; /* Use flex to align button and hint span */
+            align-items: center; /* Vertically align them */
+            justify-content: center; /* Center the group */
+            gap: 10px; /* Space between button and hint */
+        }
+
+        #copyResultButton {
+            margin-left: 15px;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+
+        /* --- Calendar Specific Styles --- */
+        #calendarButton {
+            background-color: #28a745;
+        }
+        #calendarButton:hover {
+            background-color: #218838;
+        }
+
+        #calendarContainer {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calendar-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-header button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #333;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .calendar-header button:hover {
+            color: #007bff;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-name, .calendar-day-cell {
+            padding: 8px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .calendar-day-name {
+            background-color: #e9ecef;
+            color: #555;
+        }
+
+        .calendar-day-cell {
+            background-color: #f8f9fa;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .calendar-day-cell:hover {
+            background-color: #e2e6ea;
+        }
+
+        .calendar-day-cell.empty {
+            background-color: #f1f3f5;
+            cursor: default;
+        }
+
+        .calendar-day-cell.today {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day-cell.solved {
+            background-color: #28a745; /* Green for solved puzzles */
+            color: white;
+        }
+
+        .calendar-day-cell.unsolved {
+            background-color: #ffc107; /* Orange for unsolved puzzles */
+            color: #333;
+        }
+
+        .calendar-day-cell.selected-date {
+            border: 2px solid #dc3545; /* Red border for selected date */
+        }
+
+        /* New style for past dates */
+        .calendar-day-cell.past {
+            background-color: #e9ecef; /* Lighter background */
+            color: #aaa; /* Faded text */
+            pointer-events: none; /* Prevent click events */
+            /* text-decoration: line-through; Optional: cross out */
+        }
+
+        /* Custom Modal Styles */
+        #customModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000; /* Higher than calendar */
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalContentWrapper {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            max-width: 350px; /* Slightly wider for text */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #modalMessage {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        #modalResultText {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f8f8;
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 80px;
+        }
+
+        #modalButtons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* New style for hint display span */
+        .hint-display {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 1.4em; /* Made hint letters even bigger */
+            color: #6c757d;
+            min-width: 80px;
+            text-align: left;
+            vertical-align: middle;
+            border: 1px dashed #ccc;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
+        <p id="timer">Elapsed time: 0:00</p>
+    </div>
+
+    <div class="score-display-wrapper">
+        <button id="calendarButton">Calendar</button>
+        <button id="checkAnswerBtn">Check Answer</button>
+        <p id="dailyResult"></p>
+        <button id="copyResultButton" style="display:none;">Copy Result</button>
+        <button id="goToTodayBtn" style="display:none; background-color: #6c757d;">Go to Today's Puzzle</button>
+    </div>
+
+    <div class="question" id="question1">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="1" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="1" data-blank-index="0"></span>
+        </div>
+        <p><strong>1.</strong> Susan hadn't slept since her neighbor's favorite CD started playing at 3 AM. She had a presentation to give that morning at work, and though her husband tried to reassure her, she was
+            <input type="text" id="answer1" placeholder="Answer" class="medium" data-question-num="1" data-blank-index="0">.
+        </p>
+        <p>"Why," she wondered angrily, "had he put his
+            <input type="text" id="answer2" placeholder="Answer" class="medium" data-question-num="1" data-blank-index="1">?!
+        </p>
+    </div>
+
+    <div class="question" id="question2">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="2" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="2" data-blank-index="0"></span>
+        </div>
+        <p><strong>2.</strong> Even a Supreme Court <input type="text" id="answer3" placeholder="Answer" class="medium" data-question-num="2" data-blank-index="0"> needs an occasional break.</p>
+        <p>Sotomayor takes her tea without lemon or sugar; she has it with <input type="text" id="answer4" placeholder="Answer" class="medium" data-question-num="2" data-blank-index="1">.</p>
+    </div>
+
+    <div class="question" id="question3">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="3" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="3" data-blank-index="0"></span>
+        </div>
+        <p><strong>3.</strong> My dog couldn't control his bladder in the house and peed on my <input type="text" id="answer5" placeholder="Answer" class="medium" data-question-num="3" data-blank-index="0">.</p>
+        <p>Now he stays in my automobile. He's a <input type="text" id="answer6" placeholder="Answer" class="medium" data-question-num="3" data-blank-index="1">.</p>
+    </div>
+
+    <div class="question" id="question4">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="4" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="4" data-blank-index="0"></span>
+        </div>
+        <p><strong>4.</strong> Jennifer was suspicious of the police officers huddled <input type="text" id="answer7" placeholder="Answer" class="medium" data-question-num="4" data-blank-index="0">.</p>
+        <p>She was sure they were out <input type="text" id="answer8" placeholder="Answer" class="medium" data-question-num="4" data-blank-index="1">.</p>
+    </div>
+
+    <div class="question" id="question5">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="5" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="5" data-blank-index="0"></span>
+        </div>
+        <p><strong>5.</strong> It took hours, but Tom finally shaved off his beard and <input type="text" id="answer9" placeholder="Answer" class="medium" data-question-num="5" data-blank-index="0">.</p>
+        <p>I really think his arm <input type="text" id="answer10" placeholder="Answer" class="medium" data-question-num="5" data-blank-index="1"> from all the effort.</p>
+    </div>
+
+    <div class="question" id="question6">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="6" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="6" data-blank-index="0"></span>
+        </div>
+        <p><strong>6.</strong> In Paris I visited the National <input type="text" id="answer11" placeholder="Answer" class="medium" data-question-num="6" data-blank-index="0">.</p>
+        <p>And then the Triumphal <input type="text" id="answer12" placeholder="Answer" class="small" data-question-num="6" data-blank-index="1">. <input type="text" id="answer13" placeholder="Answer" class="small" data-question-num="6" data-blank-index="2"> never seen anything so impressive.</p>
+    </div>
+
+    <div class="question" id="question7">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="7" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="7" data-blank-index="0"></span>
+        </div>
+        <p><strong>7.</strong> You shouldn't sit around and let your muscles <input type="text" id="answer14" placeholder="Answer" class="medium" data-question-num="7" data-blank-index="0">.</p>
+        <p>You'd better train for the marathon if you want to win <input type="text" id="answer15" placeholder="Answer" class="medium" data-question-num="7" data-blank-index="1">.</p>
+    </div>
+
+    <div class="question" id="question8">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="8" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="8" data-blank-index="0"></span>
+        </div>
+        <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="0"> sapphires, the listless queen felt undecided.</p>
+        <p>Should she go to the banquet <input type="text" id="answer17" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="1">?</p>
+    </div>
+
+    <div class="question" id="question9">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="9" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="9" data-blank-index="0"></span>
+        </div>
+        <p><strong>9.</strong> The clumsy chemist <input type="text" id="answer18" placeholder="Answer" class="medium" data-question-num="9" data-blank-index="0"> and spilled the slimy serum on the floor.</p>
+        <p>Overnight, this <input type="text" id="answer19" placeholder="Answer" class="medium" data-question-num="9" data-blank-index="1"> a swarm of ants that then gained superpowers.</p>
+    </div>
+
+    <div class="question" id="question10">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="10" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="10" data-blank-index="0"></span>
+        </div>
+        <p><strong>10.</strong> The old deer was exhausted and his legs nearly <input type="text" id="answer20" placeholder="Answer" class="medium" data-question-num="10" data-blank-index="0">.</p>
+        <p>Still, the <input type="text" id="answer21" placeholder="Answer" class="medium" data-question-num="10" data-blank-index="1"> his herd through the dense forest to safety.</p>
+    </div>
+
+    <div class="question" id="question11">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="11" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="11" data-blank-index="0"></span>
+        </div>
+        <p><strong>11.</strong> With acid and a metal plate, she’s an
+            <input type="text" id="answer22" placeholder="Answer" class="medium" data-question-num="11" data-blank-index="0"> like no other.
+        </p>
+        <p>She can do lettering, illustrations, patterns,
+            <input type="text" id="answer23" placeholder="Answer" class="small" data-question-num="11" data-blank-index="1">.
+            <input type="text" id="answer24" placeholder="Answer" class="small" data-question-num="11" data-blank-index="2"> talents are truly limitless.
+        </p>
+    </div>
+
+    <div class="question" id="question12">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="12" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="12" data-blank-index="0"></span>
+        </div>
+        <p><strong>12.</strong> My <input type="text" id="answer25" placeholder="Answer" class="medium" data-question-num="12" data-blank-index="0"> other insists on a prenup before marriage.</p>
+        <p>I don’t agree, but I’ll <input type="text" id="answer26" placeholder="Answer" class="medium" data-question-num="12" data-blank-index="1"> change her mind.</p>
+    </div>
+
+    <div class="question" id="question13">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="13" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="13" data-blank-index="0"></span>
+        </div>
+        <p><strong>13.</strong> Rocco grew up in a rundown part of Chicago where
+            <input type="text" id="answer27" placeholder="Answer" class="medium" data-question-num="13" data-blank-index="0"> forced him to fight for what little was available.
+        </p>
+        <p>So you want to know about his facial
+            <input type="text" id="answer28" placeholder="Answer" class="small" data-question-num="13" data-blank-index="1">?
+            <input type="text" id="answer29" placeholder="Answer" class="small" data-question-num="13" data-blank-index="2"> life takes its toll!
+        </p>
+    </div>
+
+    <div class="question" id="question14">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="14" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="14" data-blank-index="0"></span>
+        </div>
+        <p><strong>14.</strong> I stopped watching Game of Thrones. You've seen one <input type="text" id="answer30" placeholder="Answer" class="medium" data-question-num="14" data-blank-index="0">, you've seen them all.</p>
+        <p>After a few episodes the series seemed to <input type="text" id="answer31" placeholder="Answer" class="medium" data-question-num="14" data-blank-index="1">.</p>
+    </div>
+
+    <div class="question" id="question15">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="15" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="15" data-blank-index="0"></span>
+        </div>
+        <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer32" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="0"> to prove my feelings since our freshman year?</p>
+        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="1"> you a love ballad.</p>
+    </div>
+
+    <div class="question" id="question16">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="16" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="16" data-blank-index="0"></span>
+        </div>
+        <p><strong>16.</strong> The queen can’t stop <input type="text" id="answer34" placeholder="Answer" class="medium" data-question-num="16" data-blank-index="0"> about how her husband has changed for the better.</p>
+        <p>The newly <input type="text" id="answer35" placeholder="Answer" class="medium" data-question-num="16" data-blank-index="1"> is the picture of health.</p>
+    </div>
+
+    <div class="question" id="question17">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="17" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="17" data-blank-index="0"></span>
+        </div>
+        <p><strong>17.</strong> The picnic was going great, with me winning 21-16 at <input type="text" id="answer36" placeholder="Answer" class="medium" data-question-num="17" data-blank-index="0">.</p>
+        <p>But when it came time to eat, with one taste I knew I'd put <input type="text" id="answer37" placeholder="Answer" class="medium" data-question-num="17" data-blank-index="1"> the lamb.</p>
+    </div>
+
+    <div class="question" id="question18">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="18" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="18" data-blank-index="0"></span>
+        </div>
+        <p><strong>18.</strong> Our pet Misty seems depressed and even <input type="text" id="answer38" placeholder="Answer" class="medium" data-question-num="18" data-blank-index="0">, staring blankly at the wall for hours.</p>
+        <p>We need to give that <input type="text" id="answer39" placeholder="Answer" class="medium" data-question-num="18" data-blank-index="1"> for her nerves.</p>
+    </div>
+
+    <div class="question" id="question19">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="19" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="19" data-blank-index="0"></span>
+        </div>
+        <p><strong>19.</strong> I stayed with my mother's older brother, and he was appalled at how <input type="text" id="answer40" placeholder="Answer" class="medium" data-question-num="19" data-blank-index="0"> I left the room.</p>
+        <p>I felt terrible and gave my <input type="text" id="answer41" placeholder="Answer" class="medium" data-question-num="19" data-blank-index="1"> an apology.</p>
+    </div>
+
+    <div class="question" id="question20">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="20" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="20" data-blank-index="0"></span>
+        </div>
+        <p><strong>20.</strong> What you don’t do to help endangered animals may doom them like the <input type="text" id="answer42" placeholder="Answer" class="medium" data-question-num="20" data-blank-index="0"> bird.</p>
+        <p>What you <input type="text" id="answer43" placeholder="Answer" class="medium" data-question-num="20" data-blank-index="1"> can ensure their survival for years to come.</p>
+    </div>
+
+    <div class="question" id="question21">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="21" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="21" data-blank-index="0"></span>
+        </div>
+        <p><strong>21.</strong> The stylist took one look at Henry's brittle nails, and asked if he'd like to add keratin treatments to his <input type="text" id="answer44" placeholder="Answer" class="medium" data-question-num="21" data-blank-index="0">.</p>
+        <p>She added, "I assure you, every <input type="text" id="answer45" placeholder="Answer" class="medium" data-question-num="21" data-blank-index="1"> of this condition says it's well worth the cost!"</p>
+    </div>
+
+    <div class="question" id="question22">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="22" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="22" data-blank-index="0"></span>
+        </div>
+        <p><strong>22.</strong> Dangerously, the tiny boat began to <input type="text" id="answer46" placeholder="Answer" class="medium" data-question-num="22" data-blank-index="0"> in the storm.</p>
+        <p>Engine problems arose as the wrong <input type="text" id="answer47" placeholder="Answer" class="medium" data-question-num="22" data-blank-index="1"> on the fuel tank let in seawater.</p>
+    </div>
+
+    <div class="question" id="question23">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="23" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="23" data-blank-index="0"></span>
+        </div>
+        <p><strong>23.</strong> Janet favors aggressive investments in untested ventures;
+            <input type="text" id="answer48" placeholder="Answer" class="medium" data-question-num="23" data-blank-index="0">, her partner rarely shies away from risk.
+        </p>
+        <p>On the other hand, their clients
+            <input type="text" id="answer49" placeholder="Answer" class="medium" data-question-num="23" data-blank-index="1"> choices that offer slow but steady growth.
+        </p>
+    </div>
+
+    <div class="question" id="question24">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="24" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="24" data-blank-index="0"></span>
+        </div>
+        <p><strong>24.</strong> After my recent
+            <input type="text" id="answer50" placeholder="Answer" class="medium" data-question-num="24" data-blank-index="0"> of my parents' vinyl in the attic, I find the 70s folk songs rather boring.
+        </p>
+        <p>Still, I find
+            <input type="text" id="answer51" placeholder="Answer" class="medium" data-question-num="24" data-blank-index="1"> fun to dance to.
+        </p>
+    </div>
+
+    <div class="question" id="question25">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="25" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="25" data-blank-index="0"></span>
+        </div>
+        <p><strong>25.</strong> He warned his friend about the charming
+            <input type="text" id="answer52" placeholder="Answer" class="medium" data-question-num="25" data-blank-index="0"> who seemed too good to be true.
+        </p>
+        <p>He even pointed to the stray, synthetic
+            <input type="text" id="answer53" placeholder="Answer" class="medium" data-question-num="25" data-blank-index="1"> lying on the floor, likely from her extensions.
+        </p>
+    </div>
+
+    <div class="question" id="question26">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="26" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="26" data-blank-index="0"></span>
+        </div>
+        <p><strong>26.</strong> We watched as trucks slowly rumbled past us with their hazardous
+            <input type="text" id="answer54" placeholder="Answer" class="medium" data-question-num="26" data-blank-index="0">, escorted by police vehicles.
+        </p>
+        <p>An officer finally waved us forward and let our
+            <input type="text" id="answer55" placeholder="Answer" class="medium" data-question-num="26" data-blank-index="1"> through the intersection.
+        </p>
+    </div>
+
+    <div class="question" id="question27">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="27" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="27" data-blank-index="0"></span>
+        </div>
+        <p><strong>27.</strong> Volunteers at the festival sold souvenirs to raise money for
+            <input type="text" id="answer56" placeholder="Answer" class="medium" data-question-num="27" data-blank-index="0"> protection in Florida.
+        </p>
+        <p>Or job was to
+            <input type="text" id="answer57" placeholder="Answer" class="medium" data-question-num="27" data-blank-index="1"> shirt booth.
+        </p>
+    </div>
+
+    <div class="question" id="question28">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="28" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="28" data-blank-index="0"></span>
+        </div>
+        <p><strong>28.</strong> The landlord ousted his
+            <input type="text" id="answer58" placeholder="Answer" class="medium" data-question-num="28" data-blank-index="0">, who turned out to be an amateur entomologist.
+        </p>
+        <p>Around the apartment were 35 terrariums of beetles, spiders, you name it, including
+            <input type="text" id="answer59" placeholder="Answer" class="medium" data-question-num="28" data-blank-index="1"> farms.
+        </p>
+    </div>
+
+    <div class="question" id="question29">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="29" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="29" data-blank-index="0"></span>
+        </div>
+        <p><strong>29.</strong> Giuseppe crafts each sandwich with
+            <input type="text" id="answer60" placeholder="Answer" class="medium" data-question-num="29" data-blank-index="0"> care and patience.
+        </p>
+        <p>Some customers at his
+            <input type="text" id="answer61" placeholder="Answer" class="medium" data-question-num="29" data-blank-index="1"> him for his slow service, but he believes quality can’t be rushed.
+        </p>
+    </div>
+
+    <div class="question" id="question30">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="30" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="30" data-blank-index="0"></span>
+        </div>
+        <p><strong>30.</strong> Australian English differs from American English in its
+            <input type="text" id="answer62" placeholder="Answer" class="medium" data-question-num="30" data-blank-index="0"> features, such as the rising pitch at the ends of statements.
+        </p>
+        <p>I’d like to do further research
+            <input type="text" id="answer63" placeholder="Answer" class="medium" data-question-num="30" data-blank-index="1"> accents, such as those of Canadian and Haitian French.
+        </p>
+    </div>
+
+    <div class="question" id="question31">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="31" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="31" data-blank-index="0"></span>
+        </div>
+        <p><strong>31.</strong> Lenny is about the
+            <input type="text" id="answer64" placeholder="Answer" class="medium" data-question-num="31" data-blank-index="0"> person I know; he's downright cruel.
+        </p>
+        <p>For my birthday, he gift-wrapped and gave
+            <input type="text" id="answer65" placeholder="Answer" class="medium" data-question-num="31" data-blank-index="1"> of hornets.
+        </p>
+    </div>
+
+    <div class="question" id="question32">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="32" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="32" data-blank-index="0"></span>
+        </div>
+        <p><strong>32.</strong> We offer various
+            <input type="text" id="answer66" placeholder="Answer" class="medium" data-question-num="32" data-blank-index="0"> for yoga practice, such as group sessions or private lessons.
+        </p>
+        <p>We also offer discounts
+            <input type="text" id="answer67" placeholder="Answer" class="medium" data-question-num="32" data-blank-index="1"> purchased along with class packages.
+        </p>
+    </div>
+
+    <div class="question" id="question33">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="33" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="33" data-blank-index="0"></span>
+        </div>
+        <p><strong>33.</strong> There's no
+            <input type="text" id="answer68" placeholder="Answer" class="medium" data-question-num="33" data-blank-index="0"> in their advertising; the pigs really do eat top-quality grub off nice plates.
+        </p>
+        <p>And after each meal, the farmhands wash every
+            <input type="text" id="answer69" placeholder="Answer" class="medium" data-question-num="33" data-blank-index="1"> at a time with care.
+        </p>
+    </div>
+
+    <div class="question" id="question34">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="34" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="34" data-blank-index="0"></span>
+        </div>
+        <p><strong>34.</strong> After the warehouse workers voted to strike, the board members speculated
+            <input type="text" id="answer70" placeholder="Answer" class="medium" data-question-num="34" data-blank-index="0"> whether one young staff member, a summer hire in the HR department, was to blame.
+        </p>
+        <p>Did this
+            <input type="text" id="answer71" placeholder="Answer" class="medium" data-question-num="34" data-blank-index="1"> with the union, sharing confidential data that fueled their outrage?
+        </p>
+    </div>
+
+    <div class="question" id="question35">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="35" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="35" data-blank-index="0"></span>
+        </div>
+        <p><strong>35.</strong> Her fiancé had schemed to
+            <input type="text" id="answer72" placeholder="Answer" class="medium" data-question-num="35" data-blank-index="0"> everything he claimed to be.
+        </p>
+        <p>So the woman holding the white, shimmery
+            <input type="text" id="answer73" placeholder="Answer" class="medium" data-question-num="35" data-blank-index="1"> the last piece of her wedding cake, before tossing the dress into the fire.
+        </p>
+    </div>
+
+    <div class="question" id="question36">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="36" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="36" data-blank-index="0"></span>
+        </div>
+        <p><strong>36.</strong> The strict parents made their
+            <input type="text" id="answer74" placeholder="Answer" class="medium" data-question-num="36" data-blank-index="0"> quite clear: education was the priority, not romantic relationships.
+        </p>
+        <p>That's why they wouldn't let the young
+            <input type="text" id="answer75" placeholder="Answer" class="medium" data-question-num="36" data-blank-index="1"> their daughter until she had graduated.
+        </p>
+    </div>
+
+    <div class="question" id="question37">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="37" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="37" data-blank-index="0"></span>
+        </div>
+        <p><strong>37.</strong> The young campers planned to visit the local park and
+            <input type="text" id="answer76" placeholder="Answer" class="medium" data-question-num="37" data-blank-index="0"> for wild mushrooms.
+        </p>
+        <p>But first they had to present their IDs to the ranger
+            <input type="text" id="answer77" placeholder="Answer" class="medium" data-question-num="37" data-blank-index="1"> verification.
+        </p>
+    </div>
+
+    <div class="question" id="question38">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="38" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="38" data-blank-index="0"></span>
+        </div>
+        <p><strong>38.</strong> The general store sold
+            <input type="text" id="answer78" placeholder="Answer" class="medium" data-question-num="38" data-blank-index="0"> items, from fishing lures to homemade jams.
+        </p>
+        <p> On summer days, a batch of freshly picked herbs would
+            <input type="text" id="answer79" placeholder="Answer" class="medium" data-question-num="38" data-blank-index="1"> on racks outside.
+        </p>
+    </div>
+
+    <div class="question" id="question39">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="39" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="39" data-blank-index="0"></span>
+        </div>
+        <p><strong>39.</strong> The low-flying
+            <input type="text" id="answer80" placeholder="Answer" class="medium" data-question-num="39" data-blank-index="0"> from the nearby military base caused the ground to shake and buildings to rattle.
+        </p>
+        <p>It got so bad it would crack plaster walls in homes and even
+            <input type="text" id="answer81" placeholder="Answer" class="medium" data-question-num="39" data-blank-index="1"> at the bowling alley.
+        </p>
+    </div>
+
+    <div class="question" id="question40">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="40" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="40" data-blank-index="0"></span>
+        </div>
+        <p><strong>40.</strong> The guests at the gallery politely nibbled on delicate
+            <input type="text" id="answer82" placeholder="Answer" class="medium" data-question-num="40" data-blank-index="0">, a selection of toasted bread, caviar and smoked salmon, as they admired the artwork.
+        </p>
+        <p>It was a chaotic blob of paint on a canvas, like it had been flung by a chimpanzee, and I wondered,
+            <input type="text" id="answer83" placeholder="Answer" class="medium" data-question-num="40" data-blank-index="1"> be taught to create art?
+        </p>
+    </div>
+
+    <div class="question" id="question41">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="41" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="41" data-blank-index="0"></span>
+        </div>
+        <p><strong>41.</strong> Look, I want to be
+            <input type="text" id="answer84" placeholder="Answer" class="medium" data-question-num="41" data-blank-index="0"> with you because you're fooling yourself. You've really got to get tutored if you're going to pass this math exam.
+        </p>
+        <p>It's not enough to say you'll do to the best of your abilities. Doing what you
+            <input type="text" id="answer85" placeholder="Answer" class="medium" data-question-num="41" data-blank-index="1"> not help the last time around.
+        </p>
+    </div>
+
+    <div class="question" id="question42">
+        <div class="hint-button-container">
+            <button class="hint-btn" data-question-num="42" data-blank-index="0">Hint</button>
+            <span class="hint-display" data-question-num="42" data-blank-index="0"></span>
+        </div>
+        <p><strong>42.</strong> Here is a dummy
+            <input type="text" id="answer86" placeholder="Answer" class="medium" data-question-num="42" data-blank-index="0"> to add new questions.
+        </p>
+        <p>This
+            <input type="text" id="answer87" placeholder="Answer" class="medium" data-question-num="42" data-blank-index="1"> will make it easy.
+        </p>
+    </div>
+
+    <div id="calendarContainer">
+        <div id="calendar-content">
+            <div class="calendar-header">
+                <button id="prevMonth">&lt;</button>
+                <h3 id="currentMonthYear"></h3>
+                <button id="nextMonth">&gt;</button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day-name">Sun</div>
+                <div class="calendar-day-name">Mon</div>
+                <div class="calendar-day-name">Tue</div>
+                <div class="calendar-day-name">Wed</div>
+                <div class="calendar-day-name">Thu</div>
+                <div class="calendar-day-name">Fri</div>
+                <div class="calendar-day-name">Sat</div>
+            </div>
+            <button onclick="document.getElementById('calendarContainer').style.display='none';" style="margin-top: 20px;">Close</button>
+        </div>
+    </div>
+
+    <div id="customModal">
+        <div id="modalContentWrapper">
+            <p id="modalMessage"></p>
+            <textarea id="modalResultText" readonly style="display:none;"></textarea>
+            <div id="modalButtons">
+                <button id="modalCopyButton" style="display:none;">Copy</button>
+                <button id="modalCloseButton">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL VARIABLES & CONFIG ---
+        let secondsElapsed = 0;
+        const timerDisplay = document.getElementById("timer");
+        let timerInterval;
+
+        // Configuration for daily challenge
+        // Set to a fixed start date for consistent puzzle numbering.
+        // Defined as UTC timestamp to avoid timezone issues.
+        // If May 29th, 2025 is intended to be "Puzzle #1" for everyone, this is the correct UTC start.
+        const GAME_START_DATE_UTC = Date.UTC(2025, 4, 29); // Month is 0-indexed (May is 4)
+
+        const allQuestions = document.querySelectorAll('.question');
+        let currentLoadedDate = null; // The date for the puzzle currently displayed (today or archived)
+        let currentDailyQuestionIndex = -1; // The index of the puzzle for currentLoadedDate (0-indexed)
+        let dailyGameState = {}; // State for the current puzzle being viewed/played
+        let allGameStates = {}; // Stores all past game states from localStorage
+
+        const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+        const copyResultButton = document.getElementById('copyResultButton');
+        const dailyResultElement = document.getElementById('dailyResult');
+        const goToTodayBtn = document.getElementById('goToTodayBtn');
+
+        // References for the new modal elements
+        const customModal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalResultText = document.getElementById('modalResultText');
+        const modalCopyButton = document.getElementById('modalCopyButton');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+
+        // --- ANSWERS & HINTS ---
+        const allAnswers = {
+            1: ["disconsolate", "disc on so late"],
+            2: ["justice", "just ice"],
+            3: ["carpet", "car pet"],
+            4: ["together", "to get her"],
+            5: ["mustache", "must ache"],
+            6: ["archive", "arch", "i've"],
+            7: ["atrophy", "a trophy"],
+            8: ["orbed", "or bed"],
+            9: ["goofed", "goo fed"],
+            10: ["buckled", "buck led"],
+            11: ["etcher", "etc", "her"],
+            12: ["significant", "sign if i can't"],
+            13: ["scarcity", "scar", "city"],
+            14: ["dragon", "drag on"],
+            15: ["promising", "prom i sing"],
+            16: ["thinking", "thin king"],
+            17: ["badminton", "bad mint on"],
+            18: ["catatonic", "cat a tonic"],
+            19: ["unclean", "uncle an"],
+            20: ["dodo", "do do"],
+            21: ["manicure", "man i cure"],
+            22: ["capsize", "cap size"],
+            23: ["likewise", "like wise"],
+            24: ["discovery", "disco very"],
+            25: ["temptress", "temp tress"],
+            26: ["cargo", "car go"],
+            27: ["manatee", "man a tee"],
+            28: ["tenant", "ten ant"],
+            29: ["deliberate", "deli berate"],
+            30: ["intonational", "into national"],
+            31: ["meanest", "me a nest"],
+            32: ["formats", "for mats"],
+            33: ["dishonesty", "dish one sty"],
+            34: ["internally", "intern ally"],
+            35: ["fabricate", "fabric ate"],
+            36: ["mandate", "man date"],
+            37: ["forage", "for age"],
+            38: ["sundry", "sun dry"],
+            39: ["warplanes", "warp lanes"],
+            40: ["canapes", "can apes"],
+            41: ["candid", "can did"],
+            42: ["placeholder", "place holder"]
+        };
+
+
+        // --- UTILITY FUNCTIONS ---
+
+        // Custom modal function - now more flexible for different content
+        function showModal(message, showCopyFeature = false, textToCopy = '') {
+            modalMessage.textContent = message;
+            if (showCopyFeature) {
+                modalResultText.value = textToCopy;
+                modalResultText.style.display = 'block';
+                modalCopyButton.style.display = 'inline-block';
+                modalCloseButton.textContent = 'Close'; // Change button text
+            } else {
+                modalResultText.style.display = 'none';
+                modalCopyButton.style.display = 'none';
+                modalCloseButton.textContent = 'OK'; // Reset button text
+            }
+            customModal.style.display = 'flex';
+        }
+
+        function getTodayDateString(date = new Date()) {
+            // Use local date components directly to getYYYY-MM-DD based on user's local timezone
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`; // Format:YYYY-MM-DD
+        }
+
+        function getDaysSinceStart(dateString) {
+            const parts = dateString.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+            const day = parseInt(parts[2]);
+
+            // Create a Date object from the parts, then get its UTC milliseconds
+            const targetDateObj = new Date(year, month, day);
+            const targetUTC_MS = Date.UTC(targetDateObj.getFullYear(), targetDateObj.getMonth(), targetDateObj.getDate());
+
+            const startUTC_MS = GAME_START_DATE_UTC; // Already defined as UTC timestamp
+
+            console.log(`getDaysSinceStart: Target Date String: ${dateString}, Target UTC (ms): ${targetUTC_MS}, Game Start UTC (ms): ${startUTC_MS}`);
+
+            const diffTime = targetUTC_MS - startUTC_MS;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            console.log(`getDaysSinceStart: Diff Time (ms): ${diffTime}, Diff Days: ${diffDays}`);
+            return diffDays;
+        }
+
+        function normalize(str) {
+            // This function handles spaces for multi-word answers while removing all punctuation
+            // It also lowercases and trims.
+            if (typeof str !== 'string') {
+                return ''; // Ensure it's a string
+            }
+            // Remove all punctuation and then normalize spaces
+            return str.trim().toLowerCase().replace(/[.,!?;:'"-]+/g, "").replace(/\s+/g, " ");
+        }
+
+        function loadAllGameStates() {
+            const savedState = localStorage.getItem('redividersGameArchive');
+            if (savedState) {
+                try {
+                    allGameStates = JSON.parse(savedState);
+                    // Ensure old boolean 'hintsUsed' is converted to 'hintsUsedCount'
+                    for (const date in allGameStates) {
+                        if (allGameStates[date].hintsUsed !== undefined && typeof allGameStates[date].hintsUsed === 'boolean') {
+                            allGameStates[date].hintsUsedCount = allGameStates[date].hintsUsed ? 1 : 0;
+                            delete allGameStates[date].hintsUsed; // Remove old property
+                        } else if (allGameStates[date].hintsUsedCount === undefined) {
+                            allGameStates[date].hintsUsedCount = 0; // Initialize if missing
+                        }
+                        // Ensure timeTaken is a number, default to 0 if not
+                        if (typeof allGameStates[date].timeTaken !== 'number' || isNaN(allGameStates[date].timeTaken)) {
+                            allGameStates[date].timeTaken = 0;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing localStorage game archive:", e);
+                    allGameStates = {}; // Reset if corrupted
+                }
+            } else {
+                allGameStates = {};
+            }
+        }
+
+        function saveAllGameStates() {
+            localStorage.setItem('redividersGameArchive', JSON.stringify(allGameStates));
+        }
+
+        function getOrCreateDailyGameState(dateString) {
+            const questionIndex = getDaysSinceStart(dateString);
+
+            // If date is before GAME_START_DATE, return invalid state
+            if (questionIndex < 0) {
+                console.warn(`getOrCreateDailyGameState: Date (${dateString}) is before GAME_START_DATE. Calculated index: ${questionIndex}`);
+                return {
+                    questionPuzzleNum: -1, // Invalid puzzle number
+                    answered: false,
+                    isCorrect: false,
+                    inputs: [],
+                    hintsUsedCount: 0,
+                    timeTaken: 0, // Ensure timeTaken is initialized to 0
+                    revealedLetters: {}
+                };
+            }
+
+            // If game state already exists for this date, return it
+            if (allGameStates[dateString]) {
+                return allGameStates[dateString];
+            }
+
+            // For any date on or after GAME_START_DATE, map to a puzzle number by cycling
+            // This ensures that puzzles always exist by looping through the defined ones.
+            const totalAvailablePuzzles = Object.keys(allAnswers).length;
+            const mappedPuzzleNum = (questionIndex % totalAvailablePuzzles) + 1; // 1-indexed
+
+            const numBlanks = allAnswers[mappedPuzzleNum] ? allAnswers[mappedPuzzleNum].length : 0;
+            const initialInputs = Array(numBlanks).fill('');
+            const initialRevealedLetters = {};
+            for (let i = 0; i < numBlanks; i++) {
+                const wordLength = allAnswers[mappedPuzzleNum]?.[i]?.length || 0;
+                initialRevealedLetters[i] = Array(wordLength).fill(false);
+            }
+
+            allGameStates[dateString] = {
+                questionPuzzleNum: mappedPuzzleNum,
+                answered: false,
+                isCorrect: false,
+                inputs: initialInputs,
+                hintsUsedCount: 0,
+                timeTaken: 0, // Ensure timeTaken is initialized to 0
+                revealedLetters: initialRevealedLetters
+            };
+            return allGameStates[dateString];
+        }
+
+        // Helper function to render the hint display span
+        function renderHintDisplay(hintDisplayElement, correctWord, revealedLetters) {
+            if (!hintDisplayElement || !correctWord) {
+                hintDisplayElement.textContent = ''; // Clear if no word or element
+                return;
+            }
+
+            let displayString = '';
+            for (let i = 0; i < correctWord.length; i++) {
+                if (revealedLetters[i]) {
+                    displayString += correctWord[i];
+                } else {
+                    displayString += '_';
+                }
+            }
+            hintDisplayElement.textContent = displayString;
+        }
+
+
+        // --- GAME INITIALIZATION & DISPLAY ---
+
+        function initializeGame() {
+            loadAllGameStates();
+            const todayDate = new Date(); // Get today's local date
+            const todayDateString = getTodayDateString(todayDate);
+            console.log(`initializeGame: Today's local date object: ${todayDate.toISOString()}, string: ${todayDateString}`);
+            loadAndDisplayQuestionForDate(todayDateString);
+
+            // Set up input event listeners for saving raw input
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.addEventListener('input', (event) => {
+                    const currentQNum = parseInt(input.dataset.questionNum);
+                    const blankIndex = parseInt(input.dataset.blankIndex);
+                    const todayStr = getTodayDateString();
+
+                    // Only save raw input if it's the currently loaded and active puzzle AND it's today's puzzle
+                    // and not already answered
+                    if (currentLoadedDate === todayStr && !dailyGameState.answered && currentQNum === dailyGameState.questionPuzzleNum) {
+                        dailyGameState.inputs[blankIndex] = event.target.value; // Store raw input
+                        saveAllGameStates();
+                        // No need to call updateInputDisplay here, as the input value is native.
+                        // The hint display will be updated by giveHint or loadAndDisplayQuestionForDate.
+                    }
+                });
+            });
+        }
+
+        function loadAndDisplayQuestionForDate(dateString) {
+            stopTimer(); // Stop any running timer
+            currentLoadedDate = dateString;
+            // Define todayDateString locally within this function
+            const todayDateString = getTodayDateString(); 
+
+            // Get the game state for the selected date (from archive or create new if today)
+            dailyGameState = getOrCreateDailyGameState(dateString);
+            currentDailyQuestionIndex = dailyGameState.questionPuzzleNum - 1; // Convert back to 0-indexed for array access
+
+            // Hide all questions
+            allQuestions.forEach(q => q.classList.remove('active'));
+
+            const currentQuestionElement = allQuestions[currentDailyQuestionIndex]; // Use 0-indexed
+
+            if (!currentQuestionElement || dailyGameState.questionPuzzleNum === -1) {
+                // If there's no question for this index (e.g., invalid date before start date), show a message
+                console.error(`loadAndDisplayQuestionForDate: Invalid puzzle number for date ${dateString}. Puzzle index: ${currentDailyQuestionIndex}.`);
+                checkAnswerBtn.disabled = true;
+                copyResultButton.style.display = 'none';
+                dailyResultElement.textContent = 'Puzzle not available for this date.';
+                timerDisplay.textContent = 'Elapsed time: 0:00'; // Default timer to 0:00 for unavailable puzzles
+                goToTodayBtn.style.display = 'inline-block'; // Show "Go to Today's Puzzle"
+                return; // Stop execution
+            }
+
+            currentQuestionElement.classList.add('active');
+            const questionNumberDisplay = currentQuestionElement.querySelector('p strong');
+            if (questionNumberDisplay) {
+                // Display the actual puzzle number (1-indexed)
+                questionNumberDisplay.textContent = `${dailyGameState.questionPuzzleNum}.`;
+            }
+
+            // Reset inputs and classes, and update their display
+            const inputs = currentQuestionElement.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.value = dailyGameState.inputs[parseInt(input.dataset.blankIndex)] || ''; // Set input value to raw saved input
+                input.classList.remove('correct', 'incorrect');
+                input.disabled = false; // Inputs are always enabled for multiple checks
+                input.placeholder = "Answer"; // Reset placeholder
+
+                // Update the corresponding hint display span
+                const blankIndex = parseInt(input.dataset.blankIndex);
+                const hintDisplaySpan = currentQuestionElement.querySelector(`.hint-display[data-blank-index="${blankIndex}"]`);
+                if (hintDisplaySpan) {
+                    const correctWord = allAnswers[dailyGameState.questionPuzzleNum]?.[blankIndex];
+                    const revealedChars = dailyGameState.revealedLetters[blankIndex] || [];
+                    renderHintDisplay(hintDisplaySpan, correctWord, revealedChars);
+                }
+            });
+
+            // Apply saved state
+            if (dailyGameState.answered) {
+                // For answered puzzles, apply correct/incorrect classes based on last check
+                applySavedAnswers(currentQuestionElement, dailyGameState.inputs, allAnswers[dailyGameState.questionPuzzleNum]);
+                displayResult(dailyGameState.isCorrect, dailyGameState.timeTaken, dailyGameState.hintsUsedCount, dailyGameState.questionPuzzleNum);
+                checkAnswerBtn.disabled = false; // Keep enabled for re-checks
+                copyResultButton.style.display = 'inline-block';
+                // Display saved time
+                const minutes = Math.floor(dailyGameState.timeTaken / 60);
+                const seconds = Math.floor(dailyGameState.timeTaken % 60);
+                timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                // For unanswered puzzles, ensure button states are correct
+                // Timer already handled at the top of the function
+                checkAnswerBtn.disabled = false; // Always enabled for current puzzle
+                copyResultButton.style.display = 'none';
+                dailyResultElement.textContent = ''; // Clear result message
+                dailyResultElement.style.backgroundColor = '#e9ecef';
+                dailyResultElement.style.color = '#333';
+            }
+
+            // Handle hint button state - ALLOW HINTS FOR ANY DATE IF NOT ANSWERED AND NOT ALL HINTS USED
+            const hintButton = currentQuestionElement.querySelector('.hint-btn');
+            if (hintButton) {
+                // Hint button is disabled if the puzzle is answered, or if all letters for the first blank are revealed
+                if (dailyGameState.answered) {
+                    hintButton.disabled = true;
+                } else {
+                    const correctWordForBlank0 = allAnswers[dailyGameState.questionPuzzleNum]?.[0];
+                    if (correctWordForBlank0 && dailyGameState.revealedLetters[0] && dailyGameState.revealedLetters[0].every(flag => flag === true)) {
+                        hintButton.disabled = true;
+                    } else {
+                        hintButton.disabled = false;
+                    }
+                }
+            }
+
+            // Show/hide "Go to Today's Puzzle" button
+            if (dateString === todayDateString) { 
+                goToTodayBtn.style.display = 'none';
+            } else {
+                goToTodayBtn.style.display = 'inline-block';
+            }
+
+            // Hide calendar if it's open
+            document.getElementById('calendarContainer').style.display = 'none';
+        }
+
+        function applySavedAnswers(questionElement, savedInputs, correctAnswersForQuestion) {
+            const inputs = questionElement.querySelectorAll('input[type="text"]');
+            inputs.forEach((input, index) => {
+                const savedValue = savedInputs[index] || '';
+                input.value = savedValue;
+                // input.disabled = true; // Inputs are no longer disabled after checking
+
+                const correctSpellings = Array.isArray(correctAnswersForQuestion[index]) ? correctAnswersForQuestion[index] : [correctAnswersForQuestion[index]];
+                let isBlankCorrect = false;
+                for (const correctSpelling of correctSpellings) {
+                    if (normalize(savedValue) === normalize(correctSpelling)) {
+                        isBlankCorrect = true;
+                        break;
+                    }
+                }
+
+                if (isBlankCorrect) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                }
+
+                // Also clear hint display for answered puzzles
+                const hintDisplaySpan = questionElement.querySelector(`.hint-display[data-blank-index="${index}"]`);
+                if (hintDisplaySpan) {
+                    hintDisplaySpan.textContent = '';
+                }
+            });
+        }
+
+        // --- TIMER LOGIC ---
+
+        function updateTimer() {
+            secondsElapsed++;
+            const minutes = Math.floor(secondsElapsed / 60);
+            const seconds = Math.floor(secondsElapsed % 60);
+            timerDisplay.textContent = `Elapsed time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            console.log(`updateTimer: secondsElapsed: ${secondsElapsed}, display: ${timerDisplay.textContent}`); // Debug log
+            if (getTodayDateString() === currentLoadedDate && !dailyGameState.answered) {
+                dailyGameState.timeTaken = secondsElapsed; // Only save time if actively playing today's puzzle
+                saveAllGameStates();
+            }
+        }
+
+        function startTimer(initialSeconds = 0) {
+            clearInterval(timerInterval); // Clear any existing timer
+            secondsElapsed = initialSeconds;
+            console.log(`startTimer: Timer started with initialSeconds: ${initialSeconds}, secondsElapsed: ${secondsElapsed}`);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        // --- ANSWER CHECKING ---
+
+        function checkDailyAnswer() {
+            const currentQuestionElement = allQuestions[currentDailyQuestionIndex];
+            const inputs = currentQuestionElement.querySelectorAll('input[type="text"]');
+            const correctAnswersForCurrentPuzzle = allAnswers[dailyGameState.questionPuzzleNum];
+            let correctCount = 0;
+            let totalBlanks = 0;
+            let allCorrect = true;
+
+            // Only update dailyGameState.inputs if it's today's puzzle being answered
+            if (currentLoadedDate === getTodayDateString()) {
+                // Re-read current input values just before checking
+                inputs.forEach((input, index) => {
+                    dailyGameState.inputs[index] = input.value.trim();
+                });
+                saveAllGameStates(); // Save raw input state
+            }
+
+            inputs.forEach((input, index) => {
+                const userAnswer = input.value.trim();
+                totalBlanks++;
+
+                // Ensure validAnswersForBlank is always an array for iteration
+                const validAnswersForBlank = Array.isArray(correctAnswersForCurrentPuzzle[index]) ? correctAnswersForCurrentPuzzle[index] : [correctAnswersForCurrentPuzzle[index]];
+
+                let isBlankCorrect = false;
+                for (const correctSpelling of validAnswersForBlank) {
+                    if (normalize(userAnswer) === normalize(correctSpelling)) {
+                        isBlankCorrect = true;
+                        break;
+                    }
+                }
+
+                if (isBlankCorrect) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                    correctCount++;
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                    allCorrect = false;
+                }
+            });
+
+            // Only update game state for today's puzzle if it's being answered
+            if (currentLoadedDate === getTodayDateString()) {
+                dailyGameState.answered = allCorrect; // Mark as answered ONLY if all are correct
+                dailyGameState.isCorrect = allCorrect; // Store if all were correct
+                dailyGameState.timeTaken = secondsElapsed; // Final time taken
+                saveAllGameStates(); // Save ALL states
+            } else if (allCorrect) {
+                // If it's a past puzzle and they get it all correct, mark it as solved in the archive
+                dailyGameState.answered = true;
+                dailyGameState.isCorrect = true;
+                saveAllGameStates();
+                // Reload the current puzzle to reflect the solved status in the calendar
+                loadAndDisplayQuestionForDate(currentLoadedDate);
+            }
+
+
+            displayResult(allCorrect, dailyGameState.timeTaken, dailyGameState.hintsUsedCount, dailyGameState.questionPuzzleNum);
+            copyResultButton.style.display = 'inline-block'; // Show copy button
+        }
+
+        function displayResult(allCorrect, timeTaken, hintsUsedCount, questionPuzzleNum) {
+            // Ensure timeTaken is a number, default to 0 if not
+            const safeTimeTaken = typeof timeTaken === 'number' && !isNaN(timeTaken) ? timeTaken : 0;
+
+            const minutes = Math.floor(safeTimeTaken / 60);
+            const seconds = Math.floor(safeTimeTaken % 60);
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            const totalBlanksForPuzzle = allAnswers[questionPuzzleNum] ? allAnswers[questionPuzzleNum].length : 0;
+            const questionElement = allQuestions[questionPuzzleNum - 1];
+            const inputs = questionElement ? questionElement.querySelectorAll('input[type="text"]') : [];
+            let correctBlanksCount = 0;
+            inputs.forEach((input, index) => {
+                if (allAnswers[questionPuzzleNum] && allAnswers[questionPuzzleNum][index]) {
+                    const userAnswer = input.value.trim();
+                    const correctForThisBlank = Array.isArray(allAnswers[questionPuzzleNum][index]) ? allAnswers[questionPuzzleNum][index] : [allAnswers[questionPuzzleNum][index]];
+
+                    if (correctForThisBlank.includes(normalize(userAnswer))) {
+                        correctBlanksCount++;
+                    }
+                }
+            });
+
+            // Simplified message format
+            let message = `Correct: ${correctBlanksCount}/${totalBlanksForPuzzle}, Hints used: ${hintsUsedCount}, Time: ${timeString}`; // Changed "Used" to "used"
+
+            dailyResultElement.textContent = message;
+            console.log("Displaying result message:", message); // Debug log
+            console.log("dailyResultElement.textContent after update:", dailyResultElement.textContent); // Debug log
+
+            if (allCorrect) {
+                dailyResultElement.style.backgroundColor = '#d4edda'; // Light green
+                dailyResultElement.style.color = '#155724'; // Dark green text
+            } else {
+                dailyResultElement.style.backgroundColor = '#f8d7da'; // Light red
+                dailyResultElement.style.color = '#721c24'; // Dark red text
+            }
+        }
+
+        // --- HINT SYSTEM ---
+
+        document.querySelectorAll('.hint-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                console.log("Hint button clicked!"); // Debug log
+                const questionNum = parseInt(event.target.dataset.questionNum);
+                const blankIndex = parseInt(event.target.dataset.blankIndex); // Get the blank index from the button
+                
+                // Allow hint for any loaded puzzle as long as it's not answered yet
+                if (questionNum === dailyGameState.questionPuzzleNum && !dailyGameState.answered) {
+                    console.log(`Hint logic triggered for Q${questionNum}, Blank ${blankIndex}. Current answered status: ${dailyGameState.answered}`); // Debug log
+                    giveHint(questionNum, blankIndex); // Pass blankIndex to giveHint
+                    dailyGameState.hintsUsedCount++; // Increment hint count
+                    saveAllGameStates(); // Save state after using hint
+                    // The hint button will be disabled by giveHint if all letters are revealed
+                } else {
+                    console.log(`Hint not allowed. QNum: ${questionNum}, current: ${dailyGameState.questionPuzzleNum}, Answered: ${dailyGameState.answered}`); // Debug log
+                }
+            });
+        });
+
+        function giveHint(qNum, blankIndex) { // Accept blankIndex as argument
+            console.log(`giveHint function called for Q${qNum}, Blank ${blankIndex}`); // Debug log
+            const currentQuestionElement = allQuestions[qNum - 1]; // Use 0-indexed for allQuestions array
+            const inputEl = currentQuestionElement.querySelector(`input[data-blank-index="${blankIndex}"]`); // Target specific input
+            const hintDisplaySpan = currentQuestionElement.querySelector(`.hint-display[data-blank-index="${blankIndex}"]`); // Target specific hint span
+            const correctWordForBlank = allAnswers[qNum] && allAnswers[qNum][blankIndex] ? allAnswers[qNum][blankIndex] : ''; // Get correct word for this blank
+
+            if (!correctWordForBlank || correctWordForBlank.length === 0) {
+                console.warn(`No correct word found for question ${qNum}, blank ${blankIndex} to give hint or word is empty.`);
+                return;
+            }
+
+            // Ensure revealedLetters for this blank is initialized in dailyGameState
+            if (!dailyGameState.revealedLetters[blankIndex]) {
+                dailyGameState.revealedLetters[blankIndex] = Array(correctWordForBlank.length).fill(false);
+                console.log(`Initialized revealedLetters for blank ${blankIndex}:`, dailyGameState.revealedLetters[blankIndex]); // Debug log
+            }
+
+            let unrevealedIndices = [];
+            for (let i = 0; i < correctWordForBlank.length; i++) {
+                if (!dailyGameState.revealedLetters[blankIndex][i]) {
+                    unrevealedIndices.push(i);
+                }
+            }
+            console.log(`Unrevealed indices for blank ${blankIndex}:`, unrevealedIndices); // Debug log
+
+            if (unrevealedIndices.length === 0) {
+                // All letters are already revealed, disable hint button
+                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
+                if (hintButton) {
+                    hintButton.disabled = true;
+                    console.log(`All letters revealed for blank ${blankIndex}, disabling hint button.`); // Debug log
+                }
+                return;
+            }
+
+            const randomIndex = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+            // Mark the letter as revealed in the revealedLetters state
+            dailyGameState.revealedLetters[blankIndex][randomIndex] = true;
+            console.log(`Revealed letter at index ${randomIndex}. New revealedLetters:`, dailyGameState.revealedLetters[blankIndex]); // Debug log
+            saveAllGameStates(); // Save state after revealing hint
+
+            // Update the hint display without touching the input value
+            renderHintDisplay(hintDisplaySpan, correctWordForBlank, dailyGameState.revealedLetters[blankIndex]);
+            console.log(`Hint display updated for blank ${blankIndex}.`); // Debug log
+
+            // Check if all letters for this blank are now revealed
+            const allLettersRevealedForThisBlank = dailyGameState.revealedLetters[blankIndex].every(flag => flag === true);
+            if (allLettersRevealedForThisBlank) {
+                const hintButton = currentQuestionElement.querySelector(`.hint-btn[data-blank-index="${blankIndex}"]`);
+                if (hintButton) {
+                    hintButton.disabled = true;
+                    console.log(`All letters revealed for blank ${blankIndex}, disabling hint button.`); // Debug log
+                }
+
+                // Populate the actual input box with the full word (original casing/punctuation)
+                if (inputEl) {
+                    inputEl.value = correctWordForBlank; // Use the original correct word
+                    dailyGameState.inputs[blankIndex] = correctWordForBlank; // Update saved input
+                    saveAllGameStates(); // Save this change
+                    console.log(`Input field populated with full word for blank ${blankIndex}.`); // Debug log
+                }
+            }
+
+            // Keep focus on the input field so user can continue typing
+            if (inputEl) {
+                inputEl.focus();
+                console.log(`Focus set on input for blank ${blankIndex}.`); // Debug log
+            }
+        }
+
+
+        // --- COPY RESULT ---
+
+        function copyDailyResult() {
+            // Ensure timeTaken is a number, default to 0 if not
+            const safeTimeTaken = typeof dailyGameState.timeTaken === 'number' && !isNaN(dailyGameState.timeTaken) ? dailyGameState.timeTaken : 0;
+
+            const minutes = Math.floor(safeTimeTaken / 60);
+            const seconds = Math.floor(safeTimeTaken % 60);
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            const totalBlanksForPuzzle = allAnswers[dailyGameState.questionPuzzleNum] ? allAnswers[dailyGameState.questionPuzzleNum].length : 0;
+            const questionElement = allQuestions[dailyGameState.questionPuzzleNum - 1];
+            const inputs = questionElement ? questionElement.querySelectorAll('input[type="text"]') : [];
+            let correctBlanksCount = 0;
+            inputs.forEach((input, index) => {
+                if (allAnswers[dailyGameState.questionPuzzleNum] && allAnswers[dailyGameState.questionPuzzleNum][index]) {
+                    const userAnswer = input.value.trim();
+                    const correctForThisBlank = Array.isArray(allAnswers[dailyGameState.questionPuzzleNum][index]) ? allAnswers[dailyGameState.questionPuzzleNum][index] : [allAnswers[dailyGameState.questionPuzzleNum][index]];
+
+                    if (correctForThisBlank.includes(normalize(userAnswer))) {
+                        correctBlanksCount++;
+                    }
+                }
+            });
+
+            // Calculate score for the copy text
+            let baseScore = correctBlanksCount * 25;
+            let hintPenalty = dailyGameState.hintsUsedCount * 5; // Use hintsUsedCount
+            let timePenalty = Math.floor(safeTimeTaken / 5);
+            let finalScore = Math.max(0, baseScore - hintPenalty - timePenalty);
+
+            // Simplified copy text format
+            const resultText = `Redividers Daily Challenge #${dailyGameState.questionPuzzleNum}\nStatus: ${dailyGameState.isCorrect ? 'Solved' : 'Unsolved'}\nCorrect: ${correctBlanksCount}/${totalBlanksForPuzzle}\nHints used: ${dailyGameState.hintsUsedCount}\nTime: ${timeString}\n\n#Redividers`;
+
+            // Show the custom modal with the copy feature
+            showModal('Your Result:', true, resultText);
+        }
+
+        // --- CALENDAR LOGIC ---
+        const calendarContainer = document.getElementById('calendarContainer');
+        const currentMonthYearHeader = document.getElementById('currentMonthYear');
+        const calendarGrid = document.querySelector('.calendar-grid'); // Selects the div for day cells
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+
+        let currentCalendarDate = new Date(); // Tracks the month/year currently displayed in the calendar
+
+        function renderCalendar() {
+            // Clear all previous day cells, preserving the day names header
+            // Select all children except the first 7 (which are the day names)
+            const childrenToRemove = Array.from(calendarGrid.children).slice(7);
+            childrenToRemove.forEach(child => child.remove());
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth(); // 0-indexed
+
+            currentMonthYearHeader.textContent = `${new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+
+            // Get first day of the month (0 = Sunday, 1 = Monday, etc.)
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            // Get last day of the month
+            const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+
+            // Prepare 'today' date for comparison (local midnight)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to midnight for consistent comparison
+
+            // Add empty cells for days before the 1st
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('calendar-day-cell', 'empty');
+                calendarGrid.appendChild(emptyCell);
+            }
+
+            // Add day cells
+            for (let day = 1; day <= lastDayOfMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('calendar-day-cell');
+                dayCell.textContent = day;
+
+                const dateForCell = new Date(year, month, day); // This is the date for the current calendar cell
+                dateForCell.setHours(0, 0, 0, 0); // Ensure it's midnight for comparison
+                const dateString = getTodayDateString(dateForCell); // GetYYYY-MM-DD for this cell
+
+                dayCell.dataset.date = dateString; // Store date string for click handling
+
+                if (dateString === getTodayDateString(today)) { // Compare against today's date string
+                    dayCell.classList.add('today');
+                }
+
+                // Check if this date has a game state in the archive
+                if (allGameStates[dateString]) {
+                    if (allGameStates[dateString].answered) {
+                        dayCell.classList.add('solved');
+                    } else {
+                        // Mark as unsolved only if it's a valid puzzle number (>= 0) and hasn't been answered
+                        const puzzleIndexForDate = getDaysSinceStart(dateString);
+                        if (puzzleIndexForDate >= 0) { // Only mark as unsolved if it's a valid puzzle number
+                            dayCell.classList.add('unsolved');
+                        }
+                    }
+                }
+
+                // Add selected-date class if this is the currently loaded puzzle's date
+                if (dateString === currentLoadedDate) {
+                    dayCell.classList.add('selected-date');
+                }
+
+                // Add click listener logic
+                // Dates that are empty should never be clickable
+                if (dayCell.classList.contains('empty')) {
+                    dayCell.style.cursor = 'default';
+                } else if (dateForCell.getTime() < today.getTime()) { // If the cell's date is strictly before today
+                    dayCell.classList.add('past');
+                    dayCell.style.cursor = 'default';
+                    // No click listener for past dates
+                } else { // Today or future dates, and not empty
+                    dayCell.addEventListener('click', (event) => {
+                        const clickedDate = event.target.dataset.date;
+                        loadAndDisplayQuestionForDate(clickedDate);
+                        document.querySelectorAll('.calendar-day-cell').forEach(cell => cell.classList.remove('selected-date'));
+                        event.target.classList.add('selected-date');
+                    });
+                }
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        // Event Listeners for Calendar Navigation
+        prevMonthBtn.addEventListener('click', () => {
+            console.log("Previous month clicked!"); // Debug log
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            console.log("Next month clicked!"); // Debug log
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        document.getElementById('calendarButton').addEventListener('click', () => {
+            currentCalendarDate = new Date(); // Reset calendar to current month when opened
+            renderCalendar();
+            calendarContainer.style.display = 'flex'; // Explicitly set to flex
+        });
+
+        goToTodayBtn.addEventListener('click', () => {
+            loadAndDisplayQuestionForDate(getTodayDateString());
+        });
+
+        // Event listener for the new modal copy button
+        modalCopyButton.addEventListener('click', () => {
+            modalResultText.select(); // Select the text in the textarea
+            document.execCommand('copy'); // Copy the selected text
+            showModal('Copied to clipboard!'); // Show a confirmation message
+            // You might want to close the modal automatically after a short delay or keep it open
+            // For now, it will stay open until the user clicks 'OK'
+        });
+
+        // Event listener for the modal close button (always closes the modal)
+        modalCloseButton.addEventListener('click', () => {
+            customModal.style.display = 'none';
+        });
+
+
+        // Initialize the game when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+        // Manual attachment for checkAnswerBtn and copyResultButton
+        checkAnswerBtn.addEventListener('click', checkDailyAnswer);
+        copyResultButton.addEventListener('click', copyDailyResult);
+    </script>
+</body>
+</html>
