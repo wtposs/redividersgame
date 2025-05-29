@@ -1,11 +1,14 @@
 // A simple seedable random number generator function
 // From: https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
 // This function ensures that for a given date, the same puzzle is always presented.
+// IMPORTANT: Replaced with a more robust version to prevent negative indices.
 Math.seedrandom = Math.seedrandom || function(seed) {
-    var x = Math.sin(seed || 0) * 10000;
+    let _seed = seed % 2147483647; // Ensure seed is within a reasonable integer range
+
+    // Simple LCG (Linear Congruential Generator)
     return function() {
-        x = ((x % 1) * 100000) ^ 0; // Ensures integer seed for next cycle
-        return (x = (x * 9301 + 49297) % 233280) / 233280;
+        _seed = (_seed * 9301 + 49297) % 233280;
+        return _seed / 233280;
     };
 };
 
@@ -255,13 +258,13 @@ const modalCloseButton = document.getElementById('modalCloseButton');
 
 // --- Utility Functions ---
 
-// Helper to get today's date inilizce-MM-DD format
+// Helper to get today's date in YYYY-MM-DD format
 function getTodayDateString() {
     const today = new Date();
     return today.toISOString().split('T')[0];
 }
 
-// Helper to format a date asilizce-MM-DD
+// Helper to format a date as YYYY-MM-DD
 function formatDate(date) {
     const d = new Date(date); // Ensure it's a date object
     const year = d.getFullYear();
@@ -320,7 +323,7 @@ function showQuestion(index) {
         q.querySelectorAll('.hint-btn').forEach(btn => btn.disabled = false); // Re-enable hint buttons
     });
 
-    if (questions[index]) {
+    if (index >= 0 && index < questions.length) { // Ensure index is valid
         console.log(`[DEBUG] Displaying question with ID: ${questions[index].id}`); // Debug log
         questions[index].classList.add('active'); // Show the active question
         currentQuestionIndex = index; // Update global index
@@ -684,6 +687,7 @@ function renderCalendar(date) {
 function loadPuzzleForDate(date) {
     console.log(`[DEBUG] loadPuzzleForDate called for date: ${date}`); // Debug log
     // Generate a consistent "seed" for the date
+    // Use the date components as the seed for Math.seedrandom
     const dateSeed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
     const seededRand = Math.seedrandom(dateSeed); // Get a seeded random function
 
@@ -750,6 +754,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set the initial daily puzzle date to today
     dailyPuzzleDate = new Date();
     selectedCalendarDate = new Date(); // Select today on load
+
+    // Initialize currentCalendarDate here, within the DOMContentLoaded scope
+    // This ensures it's defined before any event listeners use it.
+    let currentCalendarDate = new Date();
 
     loadPuzzleForDate(dailyPuzzleDate); // Load today's puzzle initially
 
