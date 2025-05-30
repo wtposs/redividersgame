@@ -17,7 +17,7 @@
         #header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center; /* Center logo if it's the only element */
             max-width: 600px;
             margin: 0 auto 20px;
             padding-bottom: 10px;
@@ -33,6 +33,7 @@
             font-weight: bold;
             font-size: 1.2em;
             color: #555;
+            margin-top: 10px; /* Add some space below the buttons */
         }
 
         .question {
@@ -115,12 +116,12 @@
             max-width: 600px; /* Keep consistent width */
         }
 
-        .score-buttons-row {
+        .top-row-buttons, .main-action-row { /* Styles for both new rows */
             display: flex;
             align-items: center;
             gap: 15px;
             justify-content: center;
-            width: 100%; /* Take full full width of parent */
+            width: 100%; /* Take full width of parent */
         }
 
 
@@ -329,18 +330,81 @@
             pointer-events: none; /* Not clickable */
             font-style: italic;
         }
+
+        /* Instructions Modal specific styles */
+        #instructionsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .instructions-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px; /* Slightly wider for readability */
+            text-align: left; /* Text aligns left inside instructions */
+            max-height: 80vh; /* Limit height for scrollability */
+            overflow-y: auto; /* Enable scrolling if content is long */
+        }
+
+        .instructions-content h3 {
+            text-align: center;
+            margin-top: 0;
+            color: #007bff;
+            font-size: 1.5em;
+        }
+
+        .instructions-content p {
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .instructions-content strong {
+            color: #555;
+        }
+
+        .instructions-content ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .instructions-content li {
+            margin-bottom: 5px;
+        }
+
+        .instructions-content button {
+            display: block; /* Make close button take full width */
+            margin: 20px auto 0;
+            background-color: #6c757d;
+        }
+        .instructions-content button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
 
     <div id="header">
         <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
-        <p id="timer">Elapsed time: 0:00</p>
     </div>
 
     <div class="score-display-wrapper">
-        <div class="score-buttons-row">
+        <div class="top-row-buttons">
             <button id="calendarButton">Calendar</button>
+            <button id="instructionsButton">Instructions</button>
+        </div>
+        <p id="timer">Elapsed time: 0:00</p> <div class="main-action-row">
             <button id="checkAnswerBtn">Check Answer</button>
             <p id="dailyResult"></p>
             <button id="copyResultButton" style="display:none;">Copy Result</button>
@@ -494,7 +558,7 @@
             <span class="hint-display" data-question-num="15" data-blank-index="0"></span>
         </div>
         <p><strong>15.</strong> You say you’re fed up, that I've been <input type="text" id="answer32" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="0"> to prove my feelings since our freshman year?</p>
-        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="1"> you a love ballad.</p>
+        <p>You'll see when at the <input type="text" id="answer33" placeholder="Answer" class="medium" data-question-num="15" data-blank-index="1"> you a love ballad. </p>
     </div>
 
     <div class="question" id="question16">
@@ -840,6 +904,26 @@
         </div>
     </div>
 
+    <div id="instructionsModal">
+        <div class="instructions-content">
+            <h3>How to Play Redividers Daily Word Challenge</h3>
+            <p>Welcome to Redividers! This is a daily word puzzle where you solve a two-part riddle by finding a word and then re-dividing it into new words.</p>
+            <ul>
+                <li><strong>The Goal:</strong> Each question presents a sentence with two (or sometimes three) blanks. Your task is to fill these blanks correctly.</li>
+                <li><strong>The Redivider Rule:</strong> The word you enter in the <strong>first blank</strong> must be a single, complete word. The words you enter in the <strong>subsequent blank(s)</strong> must be formed by re-dividing the letters of the first word.</li>
+                <li><strong>Example:</strong>
+                    <br>My new wife has a young boy from her first marriage, so now I have a (STEPSON).
+                    <br>He still forgets to tie his shoes, so sometimes he (STEPS ON) his own laces, causing him to stumble.
+                </li>
+                <li><strong>Hints:</strong> Click the "Hint" button next to each question to reveal one letter at a time for the *first* blank's answer. The letters will appear in random order. Once all letters are revealed, the first blank will auto-populate with the correct word in ALL CAPS.</li>
+                <li><strong>Checking Answers:</strong> Click the "Check Answer" button to see if your entries are correct. Green indicates correct, red indicates incorrect. You can keep trying until you get it right!</li>
+                <li><strong>Calendar:</strong> Use the "Calendar" button to navigate to past puzzles and see your performance history (solved/unsolved).</li>
+                <li><strong>Copy Results:</strong> After successfully completing a puzzle, a "Copy Result" button will appear. Click it to get a formatted text summary of your performance that you can paste into emails or messages.</li>
+            </ul>
+            <button onclick="document.getElementById('instructionsModal').style.display='none';">Got It!</button>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('script.js loaded and DOM content parsed. Initializing game.');
@@ -855,7 +939,8 @@
             const currentMonthYear = document.getElementById('currentMonthYear');
             const prevMonthBtn = document.getElementById('prevMonth');
             const nextMonthBtn = document.getElementById('nextMonth');
-            // Removed goToTodayBtn as it's no longer in the HTML
+            const instructionsButton = document.getElementById('instructionsButton'); // Get instructions button
+            const instructionsModal = document.getElementById('instructionsModal'); // Get instructions modal
 
             // Store correct answers (key: answer ID, value: correct answer)
             // All answers should be in lowercase for case-insensitive checking
@@ -1341,30 +1426,28 @@
                 // Restore hint progress
                 const hintSource = hintSourceAnswers[questionNum];
                 // Ensure hintData is a mutable reference to the object within savedPuzzleData
-                let hintData = savedPuzzleData.hintsData[questionNum];
-
-                // Initialize hint data if not present
-                if (!hintData || !hintData.shuffledIndices || hintData.shuffledIndices.length === 0) {
+                // This line now correctly gets the reference, or creates it if it doesn't exist
+                if (!savedPuzzleData.hintsData[questionNum] || !savedPuzzleData.hintsData[questionNum].shuffledIndices || savedPuzzleData.hintsData[questionNum].shuffledIndices.length === 0) {
                     const nonSpaceIndices = [];
                     for(let i = 0; i < hintSource.length; i++) {
                         if (hintSource[i] !== ' ') {
                             nonSpaceIndices.push(i);
                         }
                     }
-                    // Reassign hintData within savedPuzzleData
-                    savedPuzzleData.hintsData[questionNum] = {
+                    savedPuzzleData.hintsData[questionNum] = { // Corrected: assign to currentPuzzleData.hintsData[questionNum]
                         shuffledIndices: shuffleArray(nonSpaceIndices),
                         nextIndexToReveal: 0
                     };
-                    hintData = savedPuzzleData.hintsData[questionNum]; // Update local reference
-                    saveGameState(); // Save initial shuffled state
+                    saveGameState();
                 }
+                const hintData = savedPuzzleData.hintsData[questionNum]; // Now hintData is always a const reference to the correct object
+
 
                 const revealedCount = hintData.nextIndexToReveal;
                 
                 const hintDisplaySpan = activeQuestionDiv.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="0"]`);
                 const hintButton = activeQuestionDiv.querySelector(`.hint-btn[data-question-num="${questionNum}"][data-blank-index="0"]`);
-                const firstInputBox = activeQuestionDiv.querySelector(`input[data-question-num="${questionNum}"][data-blank-index="0"]`);
+                const firstInputBox = activeQuestionDiv.querySelector(`input[data-blank-index="0"]`); // Corrected selector for first input box
 
 
                 if (hintSource && hintDisplaySpan) {
@@ -1400,7 +1483,7 @@
                 }
 
 
-                // Timer handling for showQuestion
+                // Timer handling
                 stopTimer(); // Always stop any active timer when loading a new question
 
                 if (savedPuzzleData.completed) {
@@ -1542,7 +1625,7 @@
                 renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth()); // Directly call renderCalendar here
             });
 
-            // Helper to disable inputs and buttons (now only handles inputs and checkAnswerBtn)
+            // Helper to disable inputs and buttons (now only handles inputs and and checkAnswerBtn)
             const disableInputsAndButtons = (disable) => {
                 const activeQuestion = document.querySelector('.question.active');
                 if (!activeQuestion) return;
@@ -1582,22 +1665,22 @@
                     }
                     const currentPuzzleData = puzzleAttempts[currentPuzzleDateFormatted];
 
-                    let hintData = currentPuzzleData.hintsData[questionNum];
-
-                    // Initialize hintData for this question if it doesn't exist or is incomplete
-                    if (!hintData || !hintData.shuffledIndices || hintData.shuffledIndices.length === 0) {
+                    // Ensure hintData for this specific question exists and is initialized
+                    if (!currentPuzzleData.hintsData[questionNum] || !currentPuzzleData.hintsData[questionNum].shuffledIndices || currentPuzzleData.hintsData[questionNum].shuffledIndices.length === 0) {
                         const nonSpaceIndices = [];
                         for(let i = 0; i < hintSource.length; i++) {
                             if (hintSource[i] !== ' ') {
                                 nonSpaceIndices.push(i);
                             }
                         }
-                        hintData = {
+                        currentPuzzleData.hintsData[questionNum] = {
                             shuffledIndices: shuffleArray(nonSpaceIndices),
                             nextIndexToReveal: 0
                         };
-                        currentPuzzleData.hintsData[questionNum] = hintData;
+                        saveGameState();
                     }
+                    const hintData = currentPuzzleData.hintsData[questionNum]; // Now hintData is always a const reference to the correct object
+
 
                     let revealedCount = hintData.nextIndexToReveal;
 
@@ -1661,6 +1744,7 @@
                     });
 
                     copyResultDisplay.value = resultText; // Set the value of the textarea
+                    copyResultDisplay.style.display = 'block'; // Ensure it's displayed as block
                     copyResultDisplay.classList.add('show'); // Show the textarea
                     copyResultDisplay.select(); // Select the text
                     document.execCommand('copy'); // Copy to clipboard
@@ -1749,7 +1833,6 @@
                             currentPuzzleNumber = getPuzzleNumberForDate(selectedCalendarDate);
                             showQuestion(currentPuzzleNumber); // Load the puzzle for the selected date
                             calendarContainer.style.display = 'none'; // Hide calendar
-                            // goToTodayBtn is removed, so no need to show/hide it
                             updateCheckButtonState(); // Update button state for new puzzle
                         }
                     });
@@ -1772,8 +1855,6 @@
                 currentMonth.setMonth(currentMonth.getMonth() + 1);
                 renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
             });
-
-            // Removed goToTodayBtn event listener as the button is removed
 
 
             // Initial setup
