@@ -107,12 +107,22 @@
 
         .score-display-wrapper {
             display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center horizontally */
+            gap: 15px;
+            justify-content: center;
+            margin: 30px auto 20px; /* Center wrapper itself */
+            max-width: 600px; /* Keep consistent width */
+        }
+
+        .score-buttons-row {
+            display: flex;
             align-items: center;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
-            margin-bottom: 20px;
+            width: 100%; /* Take full full width of parent */
         }
+
 
         #dailyResult {
             font-weight: bold;
@@ -168,10 +178,34 @@
         }
 
         #copyResultButton {
-            margin-left: 15px;
             padding: 10px 20px;
             font-size: 1em;
         }
+        
+        /* New style for the in-place copy display */
+        #copyResultDisplay {
+            width: 100%; /* Take full width of parent */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff; /* White background */
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical; /* Allow resizing */
+            min-height: 80px;
+            display: none; /* HIDDEN BY DEFAULT */
+            opacity: 0; /* For fade effect */
+            transition: opacity 0.3s ease-in-out;
+            box-sizing: border-box; /* Include padding/border in width */
+            cursor: text; /* Indicate it's selectable text */
+            text-align: left; /* Ensure text aligns left within the box */
+        }
+
+        #copyResultDisplay.show {
+            opacity: 1;
+            display: block; /* Make it block to take up space */
+        }
+
 
         /* --- Calendar Specific Styles --- */
         #calendarButton {
@@ -188,7 +222,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0,0,0,0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -234,7 +268,6 @@
             border-radius: 4px;
             font-size: 0.9em;
             font-weight: bold;
-            /* Added borders */
             border: 1px solid #ddd;
             display: flex;
             justify-content: center;
@@ -289,68 +322,12 @@
             pointer-events: none; /* Prevent click events */
         }
 
-        /* Custom Modal Styles */
-        #customModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 2000; /* Higher than calendar */
-            justify-content: center;
-            align-items: center;
-        }
-
-        #modalContentWrapper {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            max-width: 350px; /* Slightly wider for text */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        #modalMessage {
-            margin: 0;
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        #modalResultText {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f8f8f8;
-            font-family: monospace;
-            font-size: 0.9em;
-            resize: vertical; /* Allow vertical resizing */
-            min-height: 80px;
-        }
-
-        #modalButtons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        /* New style for hint display span */
-        .hint-display {
-            display: inline-block;
-            font-family: monospace;
-            font-size: 1.4em; /* Made hint letters even bigger */
-            color: #6c757d;
-            min-width: 80px;
-            text-align: left;
-            vertical-align: middle;
-            border: 1px dashed #ccc;
-            padding: 2px 5px;
-            border-radius: 3px;
+        /* New style for dates with no questions */
+        .calendar-day-cell.no-question {
+            background-color: #f1f3f5; /* Light grey, similar to empty */
+            color: #ccc; /* Very faded text */
+            pointer-events: none; /* Not clickable */
+            font-style: italic;
         }
     </style>
 </head>
@@ -362,11 +339,13 @@
     </div>
 
     <div class="score-display-wrapper">
-        <button id="calendarButton">Calendar</button>
-        <button id="checkAnswerBtn">Check Answer</button>
-        <p id="dailyResult"></p>
-        <button id="copyResultButton" style="display:none;">Copy Result</button>
-        <button id="goToTodayBtn" style="display:none; background-color: #6c757d;">Go to Today's Puzzle</button>
+        <div class="score-buttons-row">
+            <button id="calendarButton">Calendar</button>
+            <button id="checkAnswerBtn">Check Answer</button>
+            <p id="dailyResult"></p>
+            <button id="copyResultButton" style="display:none;">Copy Result</button>
+        </div>
+        <textarea id="copyResultDisplay" readonly style="display:none;"></textarea>
     </div>
 
     <div class="question" id="question1">
@@ -861,18 +840,948 @@
         </div>
     </div>
 
-    <div id="customModal">
-        <div id="modalContentWrapper">
-            <p id="modalMessage"></p>
-            <textarea id="modalResultText" readonly style="display:none;"></textarea>
-            <div id="modalButtons">
-                <button id="modalCopyButton" style="display:none;">Copy</button>
-                <button id="modalCloseButton">OK</button>
-            </div>
-        </div>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('script.js loaded and DOM content parsed. Initializing game.');
 
-    <script src="script.js"></script>
+            const questions = document.querySelectorAll('.question');
+            const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+            const dailyResult = document.getElementById('dailyResult');
+            const copyResultButton = document.getElementById('copyResultButton');
+            const copyResultDisplay = document.getElementById('copyResultDisplay'); // Get the new textarea for in-place display
+            const timerDisplay = document.getElementById('timer');
+            const calendarButton = document.getElementById('calendarButton');
+            const calendarContainer = document.getElementById('calendarContainer');
+            const currentMonthYear = document.getElementById('currentMonthYear');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            // Removed goToTodayBtn as it's no longer in the HTML
+
+            // Store correct answers (key: answer ID, value: correct answer)
+            // All answers should be in lowercase for case-insensitive checking
+            const correctAnswers = {
+                // Question 1
+                'answer1': 'disconsolate',
+                'answer2': 'disk on so late',
+                // Question 2
+                'answer3': 'justice',
+                'answer4': 'just ice',
+                // Question 3
+                'answer5': 'carpet',
+                'answer6': 'car pet',
+                // Question 4
+                'answer7': 'together',
+                'answer8': 'to get her',
+                // Question 5
+                'answer9': 'mustache',
+                'answer10': 'must ache',
+                // Question 6
+                'answer11': 'archive',
+                'answer12': 'arch',
+                'answer13': 'ive',
+                // Question 7
+                'answer14': 'atrophy',
+                'answer15': 'a trophy',
+                // Question 8
+                'answer16': 'orbed',
+                'answer17': 'or bed',
+                // Question 9
+                'answer18': 'goofed',
+                'answer19': 'goo fed',
+                // Question 10
+                'answer20': 'buckled',
+                'answer21': 'buck led',
+                // Question 11
+                'answer22': 'etcher',
+                'answer23': 'etc',
+                'answer24': 'her',
+                // Question 12
+                'answer25': 'significant',
+                'answer26': 'sign if i can\'t',
+                // Question 13
+                'answer27': 'scarcity',
+                'answer28': 'scar',
+                'answer29': 'city',
+                // Question 14
+                'answer30': 'dragon',
+                'answer31': 'drag on',
+                // Question 15
+                'answer32': 'promising',
+                'answer33': 'prom i sing',
+                // Question 16
+                'answer34': 'thinking',
+                'answer35': 'thin king',
+                // Question 17
+                'answer36': 'badminton',
+                'answer37': 'bad mint on',
+                // Question 18
+                'answer38': 'catatonic',
+                'answer39': 'cat a tonic',
+                // Question 19
+                'answer40': 'unclean',
+                'answer41': 'uncle an',
+                // Question 20
+                'answer42': 'dodo',
+                'answer43': 'do do',
+                // Question 21
+                'answer44': 'manicure',
+                'answer45': 'man i cure',
+                // Question 22
+                'answer46': 'capsize',
+                'answer47': 'cap size',
+                // Question 23
+                'answer48': 'likewise',
+                'answer49': 'like wise',
+                // Question 24
+                'answer50': 'discovery',
+                'answer51': 'disco very',
+                // Question 25
+                'answer52': 'temptress',
+                'answer53': 'temp tress',
+                // Question 26
+                'answer54': 'cargo',
+                'answer55': 'car go',
+                // Question 27
+                'answer56': 'manatee',
+                'answer57': 'man a tee',
+                // Question 28
+                'answer58': 'tenant',
+                'answer59': 'ten ant',
+                // Question 29
+                'answer60': 'deliberate',
+                'answer61': 'deli berate',
+                // Question 30
+                'answer62': 'intonational',
+                'answer63': 'into national',
+                // Question 31
+                'answer64': 'meanest',
+                'answer65': 'me a nest',
+                // Question 32
+                'answer66': 'formats',
+                'answer67': 'for mats',
+                // Question 33
+                'answer68': 'dishonesty',
+                'answer69': 'dish one sty',
+                // Question 34
+                'answer70': 'internally',
+                'answer71': 'intern ally',
+                // Question 35
+                'answer72': 'fabricate',
+                'answer73': 'fabric ate',
+                // Question 36
+                'answer74': 'mandate',
+                'answer75': 'man date',
+                // Question 37
+                'answer76': 'forage',
+                'answer77': 'for age',
+                // Question 38
+                'answer78': 'sundry',
+                'answer79': 'sun dry',
+                // Question 39
+                'answer80': 'warplanes',
+                'answer81': 'warp lanes',
+                // Question 40
+                'answer82': 'canapes',
+                'answer83': 'can apes',
+                // Question 41
+                'answer84': 'canapes', // Corrected based on your provided list
+                'answer85': 'can apes', // Corrected based on your provided list
+                // Question 42 (dummy)
+                'answer86': 'question',
+                'answer87': 'temp late'
+            };
+
+            // Correct Answers with optional spacing for comparison
+            const correctAnswersFlexible = {
+                // Question 1
+                'answer1': ['disconsolate'],
+                'answer2': ['disk on so late'],
+                // Question 2
+                'answer3': ['justice'],
+                'answer4': ['just ice'],
+                // Question 3
+                'answer5': ['carpet'],
+                'answer6': ['car pet'],
+                // Question 4
+                'answer7': ['together'],
+                'answer8': ['to get her', 'together'], // Added 'together' as a potential flexible match
+                // Question 5
+                'answer9': ['mustache'],
+                'answer10': ['must ache'],
+                // Question 6
+                'answer11': ['archive', 'archive'],
+                'answer12': ['arch'],
+                'answer13': ['ive'],
+                // Question 7
+                'answer14': ['atrophy'],
+                'answer15': ['a trophy', 'atrophy'],
+                // Question 8
+                'answer16': ['orbed'],
+                'answer17': ['or bed'],
+                // Question 9
+                'answer18': ['goofed'],
+                'answer19': ['goo fed'],
+                // Question 10
+                'answer20': ['buckled'],
+                'answer21': ['buck led', 'buckled'],
+                // Question 11
+                'answer22': ['etcher'],
+                'answer23': ['etc'],
+                'answer24': ['her'],
+                // Question 12
+                'answer25': ['significant'],
+                'answer26': ['sign if i can\'t'],
+                // Question 13
+                'answer27': ['scarcity'],
+                'answer28': ['scar'],
+                'answer29': ['city'],
+                // Question 14
+                'answer30': ['dragon'],
+                'answer31': ['drag on', 'dragon'],
+                // Question 15
+                'answer32': ['promising'],
+                'answer33': ['prom i sing', 'promising'],
+                // Question 16
+                'answer34': ['thinking'],
+                'answer35': ['thin king', 'thinking'],
+                // Question 17
+                'answer36': ['badminton'],
+                'answer37': ['bad mint on', 'badminton'],
+                // Question 18
+                'answer38': ['catatonic'],
+                'answer39': ['cat a tonic', 'catatonic'],
+                // Question 19
+                'answer40': ['unclean'],
+                'answer41': ['uncle an', 'unclean'],
+                // Question 20
+                'answer42': ['dodo'],
+                'answer43': ['do do', 'dodo'],
+                // Question 21
+                'answer44': ['manicure'],
+                'answer45': ['man i cure', 'manicure'],
+                // Question 22
+                'answer46': ['capsize'],
+                'answer47': ['cap size', 'capsize'],
+                // Question 23
+                'answer48': ['likewise'],
+                'answer49': ['like wise', 'likewise'],
+                // Question 24
+                'answer50': ['discovery'],
+                'answer51': ['disco very', 'discovery'],
+                // Question 25
+                'answer52': ['temptress'],
+                'answer53': ['temp tress', 'temptress'],
+                // Question 26
+                'answer54': ['cargo'],
+                'answer55': ['car go', 'cargo'],
+                // Question 27
+                'answer56': ['manatee'],
+                'answer57': ['man a tee', 'manatee'],
+                // Question 28
+                'answer58': ['tenant'],
+                'answer59': ['ten ant', 'tenant'],
+                // Question 29
+                'answer60': ['deliberate'],
+                'answer61': ['deli berate', 'deliberate'],
+                // Question 30
+                'answer62': ['intonational'],
+                'answer63': ['into national', 'intonational'],
+                // Question 31
+                'answer64': ['meanest'],
+                'answer65': ['me a nest', 'meanest'],
+                // Question 32
+                'answer66': ['formats'],
+                'answer67': ['for mats', 'formats'],
+                // Question 33
+                'answer68': ['dishonesty'],
+                'answer69': ['dish one sty', 'dishonesty'],
+                // Question 34
+                'answer70': ['internally'],
+                'answer71': ['intern ally', 'internally'],
+                // Question 35
+                'answer72': ['fabricate'],
+                'answer73': ['fabric ate', 'fabricate'],
+                // Question 36
+                'answer74': ['mandate'],
+                'answer75': ['man date', 'mandate'],
+                // Question 37
+                'answer76': ['forage'],
+                'answer77': ['for age', 'forage'],
+                // Question 38
+                'answer78': ['sundry'],
+                'answer79': ['sun dry', 'sundry'],
+                // Question 39
+                'answer80': ['warplanes'],
+                'answer81': ['warp lanes', 'warplanes'],
+                // Question 40
+                'answer82': ['canapes'],
+                'answer83': ['can apes', 'canapes'],
+                // Question 41
+                'answer84': ['canapes'], // Corrected based on your provided list
+                'answer85': ['can apes', 'canapes'], // Corrected based on your provided list
+                // Question 42 (dummy)
+                'answer86': ['question'],
+                'answer87': ['temp late', 'template']
+            };
+
+
+            // This object holds the *actual answers* for the FIRST blank of each question,
+            // which will be used for revealing letters in the hint.
+            const hintSourceAnswers = {
+                '1': 'disconsolate',
+                '2': 'justice',
+                '3': 'carpet',
+                '4': 'together',
+                '5': 'mustache',
+                '6': 'archive',
+                '7': 'atrophy',
+                '8': 'orbed',
+                '9': 'goofed',
+                '10': 'buckled',
+                '11': 'etcher',
+                '12': 'significant',
+                '13': 'scarcity',
+                '14': 'dragon',
+                '15': 'promising',
+                '16': 'thinking',
+                '17': 'badminton',
+                '18': 'catatonic',
+                '19': 'unclean',
+                '20': 'dodo',
+                '21': 'manicure',
+                '22': 'capsize',
+                '23': 'likewise',
+                '24': 'discovery',
+                '25': 'temptress',
+                '26': 'cargo',
+                '27': 'manatee',
+                '28': 'tenant',
+                '29': 'deliberate',
+                '30': 'intonational',
+                '31': 'meanest',
+                '32': 'formats',
+                '33': 'dishonesty',
+                '34': 'internally',
+                '35': 'fabricate',
+                '36': 'mandate',
+                '37': 'forage',
+                '38': 'sundry',
+                '39': 'warplanes',
+                '40': 'canapes',
+                '41': 'canapes', // Corrected based on your provided list
+                '42': 'question'
+            };
+
+
+            let currentQuestionIndex = 0;
+            let startTime;
+            let timerInterval;
+            let puzzleStartTime; // To track start time for the current puzzle
+            let puzzleAttempts = {}; // Store attempts for each puzzleDate
+            // This will now also store hint progress: {'2023-10-26': {hintsData: {'1': {shuffledIndices: [2,0,1], nextIndexToReveal: 1}}}}
+            let selectedCalendarDate = null; // Stores the date selected from the calendar
+            const TODAY = new Date();
+            TODAY.setHours(0, 0, 0, 0); // Normalize today's date to midnight
+
+            // Helper to format date asYYYY-MM-DD
+            const formatDate = (date) => {
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            // Helper to get day difference
+            const getDayDifference = (date1, date2) => {
+                const d1 = new Date(date1);
+                const d2 = new Date(date2);
+                d1.setHours(0, 0, 0, 0);
+                d2.setHours(0, 0, 0, 0);
+                const diffTime = Math.abs(d2.getTime() - d1.getTime());
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            };
+
+            // Determine today's puzzle number based on the start date
+            // Assuming the puzzle challenge started on May 29, 2025 (Q1)
+            const CHALLENGE_START_DATE = new Date('2025-05-29T00:00:00'); // May 29, 2025
+            const getPuzzleNumberForDate = (date) => {
+                const diffDays = getDayDifference(CHALLENGE_START_DATE, date);
+                return diffDays + 1; // Puzzle 1 is for CHALLENGE_START_DATE
+            };
+
+            const todayPuzzleNumber = getPuzzleNumberForDate(TODAY);
+            // const LAST_QUESTION_DATE is now declared as let
+            let LAST_QUESTION_DATE = new Date(CHALLENGE_START_DATE);
+            LAST_QUESTION_DATE.setDate(CHALLENGE_START_DATE.getDate() + (questions.length - 1));
+            LAST_QUESTION_DATE.setHours(0,0,0,0); // Normalize to midnight
+
+
+            // Initial load: show today's puzzle
+            let currentPuzzleNumber = todayPuzzleNumber;
+
+            // Load state from localStorage
+            const loadGameState = () => {
+                const savedState = localStorage.getItem('redividersGameState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    puzzleAttempts = state.puzzleAttempts || {};
+                }
+            };
+
+            // Save state to localStorage
+            const saveGameState = () => {
+                const state = {
+                    puzzleAttempts: puzzleAttempts,
+                };
+                localStorage.setItem('redividersGameState', JSON.stringify(state));
+            };
+
+            // Fisher-Yates (Knuth) Shuffle for array randomization
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Function to update check button and hint button state (moved to top for hoisting)
+            const updateCheckButtonState = () => {
+                const activeQuestion = document.querySelector('.question.active');
+                if (!activeQuestion) {
+                    checkAnswerBtn.disabled = true;
+                    return;
+                }
+
+                const currentPuzzleDate = selectedCalendarDate || TODAY;
+                const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
+                const puzzleData = puzzleAttempts[currentPuzzleDateFormatted];
+
+                if (puzzleData && puzzleData.completed) {
+                    disableInputsAndButtons(true);
+                    const questionNum = parseInt(activeQuestion.id.replace('question', ''));
+                    const hintsUsedCount = (puzzleData.hintsData[questionNum] && puzzleData.hintsData[questionNum].nextIndexToReveal) || 0;
+                    dailyResult.innerHTML = `<strong>Correct: ${puzzleData.score}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(puzzleData.timeTaken)}</strong>`;
+                    copyResultButton.style.display = 'inline-block';
+                } else {
+                    disableInputsAndButtons(false);
+                    checkAnswerBtn.disabled = false; // Re-enable if not completed
+                    copyResultButton.style.display = 'none';
+                    // If not completed, show current score/hints/time
+                    const questionNum = parseInt(activeQuestion.id.replace('question', ''));
+                    const hintsUsedCount = (puzzleData && puzzleData.hintsData[questionNum] && puzzleData.hintsData[questionNum].nextIndexToReveal) || 0;
+                    const currentElapsedTime = puzzleStartTime ? Math.floor((new Date() - puzzleStartTime) / 1000) : 0;
+                    dailyResult.innerHTML = `<strong>Correct: ${puzzleData ? puzzleData.score : '0/0'}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(currentElapsedTime)}</strong>`;
+                    startTimer(); // Ensure timer is running if not completed
+                }
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth()); // Directly call renderCalendar here
+            };
+
+
+            // Function to show a specific question
+            const showQuestion = (questionNum) => {
+                questions.forEach((q, index) => {
+                    q.classList.remove('active');
+                    if (index + 1 === questionNum) {
+                        q.classList.add('active');
+                    }
+                });
+
+                const activeQuestionDiv = document.getElementById(`question${questionNum}`);
+                if (!activeQuestionDiv) return; // Exit if no active question
+
+                const inputs = activeQuestionDiv.querySelectorAll('input[type="text"]');
+                const hintBtns = activeQuestionDiv.querySelectorAll('.hint-btn');
+                const hintDisplaySpans = activeQuestionDiv.querySelectorAll('.hint-display');
+
+                // Reset inputs and hint displays for the current question
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('correct', 'incorrect');
+                    // Ensure inputs are enabled by default, unless explicitly disabled later
+                    input.disabled = false;
+                });
+                hintDisplaySpans.forEach(span => span.textContent = '');
+                hintBtns.forEach(btn => btn.disabled = false);
+
+                const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
+                // Ensure puzzleAttempts[currentPuzzleDateFormatted] is always an object
+                if (!puzzleAttempts[currentPuzzleDateFormatted]) {
+                    puzzleAttempts[currentPuzzleDateFormatted] = {
+                        answers: {},
+                        results: {},
+                        hintsData: {},
+                        score: '0/0',
+                        completed: false,
+                        timeTaken: 0,
+                        startTime: null // Initialize startTime
+                    };
+                }
+                const savedPuzzleData = puzzleAttempts[currentPuzzleDateFormatted]; // Now safe to declare as const
+
+
+                // Restore saved answers
+                if (savedPuzzleData.answers) {
+                    inputs.forEach(input => {
+                        const answerId = input.id;
+                        if (savedPuzzleData.answers[answerId]) {
+                            input.value = savedPuzzleData.answers[answerId];
+                            if (savedPuzzleData.results && savedPuzzleData.results[answerId] !== undefined) {
+                                if (savedPuzzleData.results[answerId]) {
+                                    input.classList.add('correct');
+                                } else {
+                                    input.classList.add('incorrect');
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Restore hint progress
+                const hintSource = hintSourceAnswers[questionNum];
+                // Ensure hintData is a mutable reference to the object within savedPuzzleData
+                let hintData = savedPuzzleData.hintsData[questionNum];
+
+                // Initialize hint data if not present
+                if (!hintData || !hintData.shuffledIndices || hintData.shuffledIndices.length === 0) {
+                    const nonSpaceIndices = [];
+                    for(let i = 0; i < hintSource.length; i++) {
+                        if (hintSource[i] !== ' ') {
+                            nonSpaceIndices.push(i);
+                        }
+                    }
+                    // Reassign hintData within savedPuzzleData
+                    savedPuzzleData.hintsData[questionNum] = {
+                        shuffledIndices: shuffleArray(nonSpaceIndices),
+                        nextIndexToReveal: 0
+                    };
+                    hintData = savedPuzzleData.hintsData[questionNum]; // Update local reference
+                    saveGameState(); // Save initial shuffled state
+                }
+
+                const revealedCount = hintData.nextIndexToReveal;
+                
+                const hintDisplaySpan = activeQuestionDiv.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="0"]`);
+                const hintButton = activeQuestionDiv.querySelector(`.hint-btn[data-question-num="${questionNum}"][data-blank-index="0"]`);
+                const firstInputBox = activeQuestionDiv.querySelector(`input[data-question-num="${questionNum}"][data-blank-index="0"]`);
+
+
+                if (hintSource && hintDisplaySpan) {
+                    let displayedHintArray = Array(hintSource.length).fill('_');
+                    // Fill in existing spaces
+                    for (let i = 0; i < hintSource.length; i++) {
+                        if (hintSource[i] === ' ') {
+                            displayedHintArray[i] = ' ';
+                        }
+                    }
+
+                    // Populate revealed letters based on shuffled indices
+                    for (let i = 0; i < revealedCount; i++) {
+                        const originalIndex = hintData.shuffledIndices[i];
+                        if (originalIndex !== undefined && originalIndex < hintSource.length) {
+                             displayedHintArray[originalIndex] = hintSource[originalIndex].toUpperCase(); // Convert to uppercase
+                        }
+                    }
+                    hintDisplaySpan.textContent = displayedHintArray.join('');
+
+                    if (hintButton) {
+                        // Hint button is disabled if puzzle is completed OR all letters are revealed
+                        if (savedPuzzleData.completed || revealedCount >= hintSource.replace(/\s/g, '').length) { // Check against non-space length
+                            hintButton.disabled = true;
+                            // If all letters revealed, auto-populate the first input box
+                            if (revealedCount >= hintSource.replace(/\s/g, '').length && firstInputBox) {
+                                firstInputBox.value = hintSource.toUpperCase(); // Convert to uppercase
+                            }
+                        } else {
+                            hintButton.disabled = false; // Always enable if not completed and not all letters revealed
+                        }
+                    }
+                }
+
+
+                // Timer handling for showQuestion
+                stopTimer(); // Always stop any active timer when loading a new question
+
+                if (savedPuzzleData.completed) {
+                    // If puzzle is completed, display final time and disable inputs/buttons
+                    timerDisplay.textContent = `Completed in ${formatTime(savedPuzzleData.timeTaken || 0)}`;
+                    disableInputsAndButtons(true);
+                    puzzleStartTime = null; // Explicitly set to null for completed puzzles
+                } else {
+                    // If puzzle is not completed, start/resume timer
+                    if (savedPuzzleData.startTime) {
+                        puzzleStartTime = new Date(savedPuzzleData.startTime); // Resume from saved time
+                    } else {
+                        puzzleStartTime = new Date(); // Start new timer
+                        savedPuzzleData.startTime = puzzleStartTime.toISOString(); // Save new start time
+                        saveGameState();
+                    }
+                    startTimer(); // Start the timer interval
+                    disableInputsAndButtons(false); // Enable inputs and check button
+                }
+
+                updateCheckButtonState(); // Update button states after loading question
+            };
+
+            // Timer functions
+            const startTimer = () => {
+                if (timerInterval) clearInterval(timerInterval); // Clear existing interval
+
+                const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
+                // Ensure puzzleAttempts[currentPuzzleDateFormatted] is initialized
+                if (!puzzleAttempts[currentPuzzleDateFormatted]) {
+                    puzzleAttempts[currentPuzzleDateFormatted] = {
+                        answers: {},
+                        results: {},
+                        hintsData: {},
+                        score: '0/0',
+                        completed: false,
+                        timeTaken: 0,
+                        startTime: null
+                    };
+                }
+
+                // Now it's safe to access puzzleAttempts[currentPuzzleDateFormatted].startTime
+                if (!puzzleStartTime) {
+                    puzzleStartTime = new Date();
+                }
+
+                if (!puzzleAttempts[currentPuzzleDateFormatted].startTime) {
+                    puzzleAttempts[currentPuzzleDateFormatted].startTime = puzzleStartTime.toISOString(); // Store as ISO string
+                    saveGameState();
+                }
+
+                timerInterval = setInterval(() => {
+                    const currentTime = new Date();
+                    const elapsed = Math.floor((currentTime - puzzleStartTime) / 1000);
+                    timerDisplay.textContent = `Elapsed time: ${formatTime(elapsed)}`;
+                }, 1000);
+            };
+
+            const stopTimer = () => {
+                clearInterval(timerInterval);
+            };
+
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+            };
+
+            // Event listener for check answer button
+            checkAnswerBtn.addEventListener('click', () => {
+                const activeQuestion = document.querySelector('.question.active');
+                if (!activeQuestion) return;
+
+                let allCorrect = true;
+                let score = 0;
+                let totalBlanks = 0;
+                const currentPuzzleDate = selectedCalendarDate || TODAY;
+                const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
+
+                // Initialize or retrieve puzzle data for the current date
+                if (!puzzleAttempts[currentPuzzleDateFormatted]) {
+                    puzzleAttempts[currentPuzzleDateFormatted] = { answers: {}, results: {}, hintsData: {}, score: '0/0', completed: false, timeTaken: 0, startTime: null };
+                }
+                const currentPuzzleData = puzzleAttempts[currentPuzzleDateFormatted];
+
+                const inputs = activeQuestion.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => {
+                    const userAnswer = input.value.trim().toLowerCase();
+                    const correctAnswerId = input.id;
+                    const possibleCorrectAnswers = correctAnswersFlexible[correctAnswerId];
+
+                    totalBlanks++;
+
+                    // Check if userAnswer is in the array of possible correct answers
+                    const isCorrect = possibleCorrectAnswers && possibleCorrectAnswers.includes(userAnswer);
+
+                    currentPuzzleData.answers[correctAnswerId] = input.value.trim(); // Save user's input
+                    currentPuzzleData.results[correctAnswerId] = isCorrect; // Save result
+
+                    if (isCorrect) {
+                        input.classList.remove('incorrect');
+                        input.classList.add('correct');
+                        score++;
+                    } else {
+                        input.classList.remove('correct');
+                        input.classList.add('incorrect');
+                        allCorrect = false;
+                    }
+                });
+
+                currentPuzzleData.score = `${score}/${totalBlanks}`;
+
+                // Calculate hints used for the current question (number of letters revealed)
+                const questionNum = parseInt(activeQuestion.id.replace('question', ''));
+                const hintsUsedCount = (currentPuzzleData.hintsData[questionNum] && currentPuzzleData.hintsData[questionNum].nextIndexToReveal) || 0;
+
+
+                if (allCorrect) {
+                    stopTimer();
+                    const elapsedSinceStart = (new Date() - new Date(currentPuzzleData.startTime));
+                    const elapsedTimeSeconds = Math.floor(elapsedSinceStart / 1000);
+                    currentPuzzleData.timeTaken = elapsedTimeSeconds;
+                    currentPuzzleData.completed = true;
+
+                    // Updated dailyResult text to match requested format
+                    dailyResult.innerHTML = `<strong>Correct: ${score}/${totalBlanks}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(elapsedTimeSeconds)}</strong>`;
+                    copyResultButton.style.display = 'inline-block';
+                    
+                    // Removed goToTodayBtn logic as the button is removed
+                    
+                    disableInputsAndButtons(true);
+                    // Removed showCustomModal call here as per user request
+                } else {
+                    // Reverted: No modal on incorrect answers.
+                    dailyResult.innerHTML = `<strong>Correct: ${score}/${totalBlanks}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(Math.floor((new Date() - new Date(currentPuzzleData.startTime)) / 1000))}</strong>`; // Update with current time
+                    copyResultButton.style.display = 'none';
+                }
+                saveGameState(); // Save state after checking answers
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth()); // Directly call renderCalendar here
+            });
+
+            // Helper to disable inputs and buttons (now only handles inputs and checkAnswerBtn)
+            const disableInputsAndButtons = (disable) => {
+                const activeQuestion = document.querySelector('.question.active');
+                if (!activeQuestion) return;
+
+                const inputs = activeQuestion.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => input.disabled = disable);
+                checkAnswerBtn.disabled = disable;
+            };
+
+            // Hint button functionality - Modified to reveal one letter at a time in random order
+            document.querySelectorAll('.hint-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const questionNum = event.target.dataset.questionNum;
+                    const hintDisplaySpan = document.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="0"]`);
+                    const hintSource = hintSourceAnswers[questionNum]; // Get the full answer for the hint
+                    // Corrected: Use querySelector on the active question div to find the first input box
+                    const activeQuestionDiv = document.getElementById(`question${questionNum}`);
+                    const firstInputBox = activeQuestionDiv.querySelector(`input[data-blank-index="0"]`);
+
+
+                    if (!hintSource || !hintDisplaySpan || !firstInputBox) return;
+
+                    const currentPuzzleDate = selectedCalendarDate || TODAY;
+                    const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
+
+                    // Ensure puzzle data exists and hint data is initialized
+                    if (!puzzleAttempts[currentPuzzleDateFormatted]) {
+                        puzzleAttempts[currentPuzzleDateFormatted] = {
+                            answers: {},
+                            results: {},
+                            hintsData: {},
+                            score: '0/0',
+                            completed: false,
+                            timeTaken: 0,
+                            startTime: null
+                        };
+                    }
+                    const currentPuzzleData = puzzleAttempts[currentPuzzleDateFormatted];
+
+                    let hintData = currentPuzzleData.hintsData[questionNum];
+
+                    // Initialize hintData for this question if it doesn't exist or is incomplete
+                    if (!hintData || !hintData.shuffledIndices || hintData.shuffledIndices.length === 0) {
+                        const nonSpaceIndices = [];
+                        for(let i = 0; i < hintSource.length; i++) {
+                            if (hintSource[i] !== ' ') {
+                                nonSpaceIndices.push(i);
+                            }
+                        }
+                        hintData = {
+                            shuffledIndices: shuffleArray(nonSpaceIndices),
+                            nextIndexToReveal: 0
+                        };
+                        currentPuzzleData.hintsData[questionNum] = hintData;
+                    }
+
+                    let revealedCount = hintData.nextIndexToReveal;
+
+                    if (revealedCount < hintSource.replace(/\s/g, '').length) { // Compare to actual letters, not total length
+                        // Reveal the next letter in the shuffled sequence
+                        revealedCount++;
+                        hintData.nextIndexToReveal = revealedCount;
+                        currentPuzzleData.hintsData[questionNum] = hintData; // Update saved data
+                        saveGameState(); // Save state immediately after revealing a hint
+
+                        let displayedHintArray = Array(hintSource.length).fill('_');
+                        for (let i = 0; i < hintSource.length; i++) {
+                            if (hintSource[i] === ' ') {
+                                displayedHintArray[i] = ' '; // Keep spaces in hints
+                            }
+                        }
+
+                        // Populate revealed letters based on shuffled indices
+                        for (let i = 0; i < revealedCount; i++) {
+                            const originalIndex = hintData.shuffledIndices[i];
+                            if (originalIndex !== undefined && originalIndex < hintSource.length) {
+                                displayedHintArray[originalIndex] = hintSource[originalIndex].toUpperCase(); // Convert to uppercase
+                            }
+                        }
+                        hintDisplaySpan.textContent = displayedHintArray.join('');
+
+                        if (revealedCount >= hintSource.replace(/\s/g, '').length) { // Compare to actual letters, not total length
+                            event.target.disabled = true; // Disable button if all letters are revealed
+                            firstInputBox.value = hintSource.toUpperCase(); // Auto-populate the input box
+                        }
+                    } else {
+                        event.target.disabled = true; // Should already be disabled if all revealed, but good to ensure
+                    }
+                    // Update the dailyResult display immediately after hint click
+                    updateCheckButtonState();
+                });
+            });
+
+            // Copy Result button functionality
+            copyResultButton.addEventListener('click', () => {
+                const currentPuzzleDate = selectedCalendarDate || TODAY;
+                const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
+                const puzzleData = puzzleAttempts[currentPuzzleDateFormatted];
+
+                if (puzzleData && puzzleData.completed) {
+                    const activeQuestion = document.querySelector('.question.active');
+                    const questionNum = parseInt(activeQuestion.id.replace('question', ''));
+                    const hintsUsedCount = (puzzleData.hintsData[questionNum] && puzzleData.hintsData[questionNum].nextIndexToReveal) || 0; // Number of letters revealed
+
+                    let resultText = '';
+                    resultText += `REVIDERS DAILY WORD CHALLENGE\n`;
+                    resultText += `PUZZLE ${currentPuzzleNumber}: CORRECT: ${puzzleData.score}, HINTS: ${hintsUsedCount}, TIME USED: ${formatTime(puzzleData.timeTaken)}\n`;
+                    resultText += `-------------------------------------------\n`; // Separator
+
+                    // Get answers for the current question
+                    const inputs = activeQuestion.querySelectorAll('input[type="text"]');
+                    inputs.forEach(input => {
+                        const answerId = input.id;
+                        const isCorrect = puzzleData.results[answerId];
+                        resultText += `[${isCorrect ? '✅' : '❌'}] ${input.value.toUpperCase()}\n`; // Convert to uppercase for copied result
+                    });
+
+                    copyResultDisplay.value = resultText; // Set the value of the textarea
+                    copyResultDisplay.classList.add('show'); // Show the textarea
+                    copyResultDisplay.select(); // Select the text
+                    document.execCommand('copy'); // Copy to clipboard
+
+                    // Fade out and hide after a delay
+                    setTimeout(() => {
+                        copyResultDisplay.classList.remove('show');
+                        // Optional: Set display to none after transition for accessibility/layout
+                        setTimeout(() => { copyResultDisplay.style.display = 'none'; }, 300); // Match transition duration
+                    }, 2000); // Show for 2 seconds
+                }
+            });
+
+            // Calendar logic
+            let currentMonth = new Date();
+            currentMonth.setDate(1); // Set to the first day of the month
+
+            const renderCalendar = (year, month) => {
+                const calendarGrid = document.querySelector('.calendar-grid');
+                // Clear previous days, but keep day names
+                while (calendarGrid.children.length > 7) {
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
+
+                currentMonthYear.textContent = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+                const firstDayOfMonth = new Date(year, month, 1);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const startDay = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+                // Add empty cells for the days before the 1st
+                for (let i = 0; i < startDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.classList.add('calendar-day-cell', 'empty');
+                    calendarGrid.appendChild(emptyCell);
+                }
+
+                // Add day cells
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.classList.add('calendar-day-cell');
+                    dayCell.textContent = day;
+
+                    const cellDate = new Date(year, month, day);
+                    const cellDateFormatted = formatDate(cellDate);
+
+                    // Add classes for styling
+                    if (cellDateFormatted === formatDate(TODAY)) {
+                        dayCell.classList.add('today');
+                    }
+                    if (cellDateFormatted === formatDate(selectedCalendarDate)) {
+                        dayCell.classList.add('selected-date');
+                    }
+
+                    // Mark past dates as unclickable/faded
+                    if (cellDate < TODAY) {
+                        dayCell.classList.add('past');
+                    }
+                    
+                    // Mark future dates beyond the last question as no-question
+                    if (cellDate > LAST_QUESTION_DATE) {
+                        dayCell.classList.add('no-question');
+                    }
+
+
+                    // Check puzzle status for this date
+                    const puzzleData = puzzleAttempts[cellDateFormatted];
+                    if (puzzleData) {
+                        if (puzzleData.completed) {
+                            dayCell.classList.add('solved');
+                        } else {
+                            dayCell.classList.add('unsolved');
+                        }
+                    }
+
+                    // Event listener for selecting a date
+                    dayCell.addEventListener('click', () => {
+                        if (!dayCell.classList.contains('empty') && !dayCell.classList.contains('past') && !dayCell.classList.contains('no-question')) {
+                            // Remove selected-date from previous selection
+                            const prevSelected = document.querySelector('.calendar-day-cell.selected-date');
+                            if (prevSelected) {
+                                prevSelected.classList.remove('selected-date');
+                            }
+                            dayCell.classList.add('selected-date');
+                            selectedCalendarDate = cellDate;
+                            currentPuzzleNumber = getPuzzleNumberForDate(selectedCalendarDate);
+                            showQuestion(currentPuzzleNumber); // Load the puzzle for the selected date
+                            calendarContainer.style.display = 'none'; // Hide calendar
+                            // goToTodayBtn is removed, so no need to show/hide it
+                            updateCheckButtonState(); // Update button state for new puzzle
+                        }
+                    });
+
+                    calendarGrid.appendChild(dayCell);
+                }
+            };
+
+            calendarButton.addEventListener('click', () => {
+                calendarContainer.style.display = 'flex';
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
+            });
+
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() - 1);
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() + 1);
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
+            });
+
+            // Removed goToTodayBtn event listener as the button is removed
+
+
+            // Initial setup
+            loadGameState();
+            showQuestion(currentPuzzleNumber);
+            updateCheckButtonState(); // Apply initial state based on loaded data
+        });
+    </script>
 
 </body>
 </html>
