@@ -32,14 +32,13 @@
             max-width: 500px; /* Max width for content box */
             width: 90%; /* Responsive width */
             box-sizing: border-box; /* Include padding in width */
-            /* This will be shown by default, gameContent will be hidden */
         }
 
         .landing-button-group {
             display: flex;
             flex-direction: column; /* Stack vertically on small screens */
             gap: 15px;
-            margin-top: 30px;
+            margin-top: 15px; /* Reduced from 30px */
             width: 100%; /* Take full width of parent */
             align-items: center; /* Center buttons horizontally */
         }
@@ -71,8 +70,53 @@
         .landing-button.blue { background-color: #007bff; }
         .landing-button.blue:hover { background-color: #0056b3; }
 
+        /* Instructions section on landing page */
+        #game-instructions {
+            width: 100%;
+            margin-top: 10px; /* Half the distance from 20px */
+            padding-top: 5px; /* Half the distance from 10px */
+            border-top: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        #game-instructions h3 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+        #game-instructions ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        #game-instructions li {
+            margin-bottom: 10px;
+        }
+        #game-instructions .example-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        #game-instructions .example-box p {
+            font-weight: normal; /* Reset font-weight from strong */
+            margin-bottom: 0; /* Reset margin for paragraphs inside example */
+            text-align: left;
+        }
+        #game-instructions .example-box p:first-of-type {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #game-instructions .example-box span {
+            font-weight: bold;
+            border: 1px solid #888;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
 
-        /* --- General Game Styles (mostly from your original CSS) --- */
+
+        /* --- Main Game Content (Initially Hidden) --- */
         #gameContent {
             display: none; /* Hidden by default, shown by JS */
             flex-direction: column; /* To stack header, score, questions */
@@ -85,15 +129,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            max-width: 600px; /* Will be constrained by gameContent's max-width */
+            max-width: 600px;
             margin: 0 auto 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #ccc;
         }
 
-        #logo {
-            max-width: 150px;
+        /* Adjusted logo size for game pages */
+        #logo-game {
+            max-width: 33px; /* 1/3 of original 99px */
             height: auto;
+            margin-right: 15px; /* Space between logo and title */
         }
 
         #timer {
@@ -110,7 +156,7 @@
             border-radius: 8px;
             padding: 15px 25px;
             margin: 20px auto;
-            max-width: 600px; /* Will be constrained by gameContent's max-width */
+            max-width: 600px;
             text-align: left;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -179,11 +225,20 @@
             align-items: center;
             gap: 15px;
             justify-content: center;
-            margin: 30px auto 20px;
+            margin: 5px auto 20px;
             max-width: 600px;
         }
 
-        .top-row-buttons, .main-action-row {
+        .top-row-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            z-index: 100; /* Ensure buttons are on top */
+            position: relative; /* Needed for z-index to work */
+        }
+        .main-action-row {
             display: flex;
             align-items: center;
             gap: 15px;
@@ -276,13 +331,14 @@
         /* --- Calendar Specific Styles --- */
         #calendarButton {
             background-color: #28a745;
+            pointer-events: auto; /* Ensure it's clickable */
         }
         #calendarButton:hover {
             background-color: #218838;
         }
 
         #calendarContainer {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 0;
             left: 0;
@@ -293,6 +349,11 @@
             justify-content: center;
             align-items: center;
         }
+        /* New class to make calendar visible */
+        #calendarContainer.is-visible {
+            display: flex;
+        }
+
 
         .calendar-content {
             background-color: white;
@@ -381,10 +442,11 @@
             border: 2px solid #dc3545;
         }
 
-        .calendar-day-cell.past {
-            background-color: #e9ecef;
-            color: #aaa;
-            pointer-events: none;
+        /* New style for unavailable past dates */
+        .calendar-day-cell.unavailable-past {
+            background-color: #e9ecef; /* Lighter background */
+            color: #aaa; /* Faded text */
+            pointer-events: none; /* Prevent click events */
         }
 
         .calendar-day-cell.no-question {
@@ -404,23 +466,40 @@
         <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
         <h1 style="margin-top: 10px; font-size: 1.8em; color: #555;">Redividers Daily Word Challenge</h1>
         <div class="landing-button-group">
-            <button id="landingInstructionsBtn" class="landing-button blue">Instructions</button>
             <button id="landingCalendarBtn" class="landing-button green">Calendar</button>
             <button id="landingStartPuzzleBtn" class="landing-button purple">Go to Today's Puzzle!</button>
+        </div>
+
+        <div id="game-instructions" style="width: 100%; margin-top: 10px; padding-top: 5px; border-top: 1px solid #e0e0e0; text-align: left;">
+            <h3 style="text-align: center; font-size: 1.5em; margin-bottom: 15px; color: #007bff;">How to Play:</h3>
+            <ol style="list-style-type: decimal; margin-left: 20px; margin-bottom: 20px;">
+                <li style="margin-bottom: 10px;">
+                    Choose a single word for the first blank.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    Divide that word into two or more new words by adding spaces and type those into the remaining blank(s).
+                </li>
+            </ol>
+            
+            <div class="example-box">
+                <p style="font-weight: bold; margin-bottom: 10px;">Here's an example:</p>
+                <p style="margin-bottom: 5px;">My new wife has a young boy from her first marriage, so now I have a <span style="font-weight: bold; border: 1px solid #888; padding: 2px 5px; border-radius: 4px;">STEPSON</span>.</p>
+                <p>He still forgets to tie his shoes, so sometimes he <span style="font-weight: bold; border: 1px solid #888; padding: 2px 5px; border-radius: 4px;">STEPS ON</span> his own laces.</p>
+            </div>
         </div>
     </div>
 
     <div id="gameContent" style="display: none;">
         <div id="header">
-            <img id="logo-game" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
-            <h1 style="margin-left: 20px; font-size: 1.8em; color: #555;">Redividers</h1> </div>
+            <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
+        </div>
 
         <div class="score-display-wrapper">
             <div class="top-row-buttons">
-                <button id="instructionsButton" class="button">Instructions</button> 
-                <button id="calendarButton">Calendar</button>
+                <button id="calendarButton" class="button">Calendar</button>
+                <button id="instructionsButton" class="button">Instructions</button>
             </div>
-            <p id="timer">Elapsed time: 0:00</p>
+            <p id="timer">Elapsed time: 0:00</p> 
             <div class="main-action-row">
                 <button id="checkAnswerBtn">Check Answer</button>
                 <p id="dailyResult"></p>
@@ -501,7 +580,8 @@
                 <button class="hint-btn" data-question-num="8" data-blank-index="0">Hint</button>
                 <span class="hint-display" data-question-num="8" data-blank-index="0"></span>
             </div>
-            <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="0"> sapphires, the listless queen felt undecided.</p>
+            <p><strong>8.</strong> Wearing her crown adorned with oval and <input type="text" id="answer16" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="0"> sapphires, the listless queen felt undecided.
+            </p>
             <p>Should she go to the banquet <input type="text" id="answer17" placeholder="Answer" class="medium" data-question-num="8" data-blank-index="1">?</p>
         </div>
 
@@ -901,8 +981,6 @@
             </p>
         </div>
         
-        <button id="backToHomeFromGameBtn" style="margin-top: 30px; background-color: #6c757d;">Back to Home</button>
-
     </div> <div id="calendarContainer">
         <div class="calendar-content">
             <div class="calendar-header">
@@ -925,18 +1003,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('script.js loaded and DOM content parsed. Initializing game.');
+            console.log('--- Script started and DOM loaded ---');
 
             // --- Get references to new landing page elements ---
             const landingPage = document.getElementById('landingPage');
             const gameContent = document.getElementById('gameContent');
             const landingStartPuzzleBtn = document.getElementById('landingStartPuzzleBtn');
-            const landingInstructionsBtn = document.getElementById('landingInstructionsBtn');
             const landingCalendarBtn = document.getElementById('landingCalendarBtn');
-            const backToHomeFromGameBtn = document.getElementById('backToHomeFromGameBtn'); // New button
+            // const backToHomeFromGameBtn = document.getElementById('backToHomeFromGameBtn'); // Removed button
 
             // --- Your Existing Game Elements ---
             const questions = document.querySelectorAll('.question');
+            console.log('Number of questions found:', questions.length); // Debugging questions.length
             const checkAnswerBtn = document.getElementById('checkAnswerBtn');
             const dailyResult = document.getElementById('dailyResult');
             const copyResultButton = document.getElementById('copyResultButton');
@@ -947,15 +1025,16 @@
             const currentMonthYear = document.getElementById('currentMonthYear');
             const prevMonthBtn = document.getElementById('prevMonth');
             const nextMonthBtn = document.getElementById('nextMonth');
-            const instructionsButton = document.getElementById('instructionsButton'); // On game page
-            // Removed instructionsModal reference as it's being removed
+            const instructionsButton = document.getElementById('instructionsButton'); // Re-added instructions button on game page
 
             // --- New Close Buttons for Modals ---
             const closeCalendarBtn = document.getElementById('closeCalendarBtn');
-            // Removed closeInstructionsBtn reference as the modal is being removed
+
+            // State to track where the calendar was opened from
+            let openedFromPage = 'landingPage'; // Default to landing page
 
 
-            // --- Your Existing Game Data ---
+            // --- Your Existing Game Data (restored to original format) ---
             const correctAnswers = {
                 'answer1': 'disconsolate', 'answer2': 'disk on so late',
                 'answer3': 'justice', 'answer4': 'just ice',
@@ -979,25 +1058,25 @@
                 'answer42': 'dodo', 'answer43': 'do do',
                 'answer44': 'manicure', 'answer45': 'man i cure',
                 'answer46': 'capsize', 'answer47': 'cap size',
-                'answer48': 'likewise', 'answer49': ['like wise', 'likewise'], // Corrected based on your provided list
-                'answer50': 'discovery', 'answer51': ['disco very', 'discovery'], // Corrected based on your provided list
-                'answer52': 'temptress', 'answer53': ['temp tress', 'temptress'], // Corrected based on your provided list
-                'answer54': 'cargo', 'answer55': ['car go', 'cargo'], // Corrected based on your provided list
-                'answer56': 'manatee', 'answer57': ['man a tee', 'manatee'], // Corrected based on your provided list
-                'answer58': 'tenant', 'answer59': ['ten ant', 'tenant'], // Corrected based on your provided list
-                'answer60': 'deliberate', 'answer61': ['deli berate', 'deliberate'], // Corrected based on your provided list
-                'answer62': 'intonational', 'answer63': ['into national', 'intonational'], // Corrected based on your provided list
-                'answer64': 'meanest', 'answer65': ['me a nest', 'meanest'], // Corrected based on your provided list
-                'answer66': 'formats', 'answer67': ['for mats', 'formats'], // Corrected based on your provided list
-                'answer68': 'dishonesty', 'answer69': ['dish one sty', 'dishonesty'], // Corrected based on your provided list
-                'answer70': 'internally', 'answer71': ['intern ally', 'internally'], // Corrected based on your provided list
-                'answer72': 'fabricate', 'answer73': ['fabric ate', 'fabricate'], // Corrected based on your provided list
-                'answer74': 'mandate', 'answer75': ['man date', 'mandate'], // Corrected based on your provided list
-                'answer76': 'forage', 'answer77': ['for age', 'forage'], // Corrected based on your provided list
-                'answer78': 'sundry', 'answer79': ['sun dry', 'sundry'], // Corrected based on your provided list
-                'answer80': 'warplanes', 'answer81': ['warp lanes', 'warplanes'], // Corrected based on your provided list
-                'answer82': 'canapes', 'answer83': ['can apes', 'canapes'], // Corrected based on your provided list
-                'answer84': 'canapes', 'answer85': ['can apes', 'canapes'], // Corrected based on your provided list
+                'answer48': 'likewise', 'answer49': 'like wise',
+                'answer50': 'discovery', 'answer51': 'disco very',
+                'answer52': 'temptress', 'answer53': 'temp tress',
+                'answer54': 'cargo', 'answer55': 'car go',
+                'answer56': 'manatee', 'answer57': 'man a tee',
+                'answer58': 'tenant', 'answer59': 'ten ant',
+                'answer60': 'deliberate', 'answer61': 'deli berate',
+                'answer62': 'intonational', 'answer63': 'into national',
+                'answer64': 'meanest', 'answer65': 'me a nest',
+                'answer66': 'formats', 'answer67': 'for mats',
+                'answer68': 'dishonesty', 'answer69': 'dish one sty',
+                'answer70': 'internally', 'answer71': ['intern ally', 'internally'],
+                'answer72': 'fabricate', 'answer73': ['fabric ate', 'fabricate'],
+                'answer74': 'mandate', 'answer75': ['man date', 'mandate'],
+                'answer76': 'forage', 'answer77': ['for age', 'forage'],
+                'answer78': 'sundry', 'answer79': ['sun dry', 'sundry'],
+                'answer80': 'warplanes', 'answer81': ['warp lanes', 'warplanes'],
+                'answer82': 'canapes', 'answer83': ['can apes', 'canapes'],
+                'answer84': 'canapes', 'answer85': ['can apes', 'canapes'],
                 'answer86': 'question', 'answer87': ['temp late', 'template']
             };
 
@@ -1018,12 +1097,14 @@
             let currentQuestionIndex = 0;
             let startTime;
             let timerInterval;
-            let puzzleStartTime;
-            let puzzleAttempts = {};
-            let selectedCalendarDate = null;
+            let puzzleStartTime; // To track start time for the current puzzle
+            let puzzleAttempts = {}; // Store attempts for each puzzleDate
+            // This will now also store hint progress: {'2023-10-26': {hintsData: {'1': {shuffledIndices: [2,0,1], nextIndexToReveal: 1}}}}
+            let selectedCalendarDate = null; // Stores the date selected from the calendar
             const TODAY = new Date();
-            TODAY.setHours(0, 0, 0, 0);
+            TODAY.setHours(0, 0, 0, 0); // Normalize today's date to midnight
 
+            // Helper to format date asYYYY-MM-DD
             const formatDate = (date) => {
                 const d = new Date(date);
                 const year = d.getFullYear();
@@ -1032,6 +1113,7 @@
                 return `${year}-${month}-${day}`;
             };
 
+            // Helper to get day difference
             const getDayDifference = (date1, date2) => {
                 const d1 = new Date(date1);
                 const d2 = new Date(date2);
@@ -1041,18 +1123,25 @@
                 return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             };
 
+            // Determine today's puzzle number based on the start date
+            // Assuming the puzzle challenge started on May 29, 2025 (Q1)
             const CHALLENGE_START_DATE = new Date('2025-05-29T00:00:00'); // May 29, 2025
             const getPuzzleNumberForDate = (date) => {
                 const diffDays = getDayDifference(CHALLENGE_START_DATE, date);
-                return diffDays + 1;
+                return diffDays + 1; // Puzzle 1 is for CHALLENGE_START_DATE
             };
 
+            const todayPuzzleNumber = getPuzzleNumberForDate(TODAY);
+            // const LAST_QUESTION_DATE is now declared as let
             let LAST_QUESTION_DATE = new Date(CHALLENGE_START_DATE);
             LAST_QUESTION_DATE.setDate(CHALLENGE_START_DATE.getDate() + (questions.length - 1));
-            LAST_QUESTION_DATE.setHours(0,0,0,0);
+            LAST_QUESTION_DATE.setHours(0,0,0,0); // Normalize to midnight
 
-            let currentPuzzleNumber; // Will be set when starting puzzle
 
+            // Initial load: show today's puzzle
+            let currentPuzzleNumber = todayPuzzleNumber;
+
+            // Load state from localStorage
             const loadGameState = () => {
                 const savedState = localStorage.getItem('redividersGameState');
                 if (savedState) {
@@ -1061,6 +1150,7 @@
                 }
             };
 
+            // Save state to localStorage
             const saveGameState = () => {
                 const state = {
                     puzzleAttempts: puzzleAttempts,
@@ -1068,6 +1158,7 @@
                 localStorage.setItem('redividersGameState', JSON.stringify(state));
             };
 
+            // Fisher-Yates (Knuth) Shuffle for array randomization
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -1076,6 +1167,7 @@
                 return array;
             }
 
+            // Function to update check button and hint button state (moved to top for hoisting)
             const updateCheckButtonState = () => {
                 const activeQuestion = document.querySelector('.question.active');
                 if (!activeQuestion) {
@@ -1083,7 +1175,7 @@
                     return;
                 }
 
-                const currentPuzzleDate = selectedCalendarDate || TODAY; // Use selectedCalendarDate if set, otherwise TODAY
+                const currentPuzzleDate = selectedCalendarDate || TODAY;
                 const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
                 const puzzleData = puzzleAttempts[currentPuzzleDateFormatted];
 
@@ -1101,11 +1193,12 @@
                     const hintsUsedCount = (puzzleData && puzzleData.hintsData[questionNum] && puzzleData.hintsData[questionNum].nextIndexToReveal) || 0;
                     const currentElapsedTime = puzzleStartTime ? Math.floor((new Date() - puzzleStartTime) / 1000) : 0;
                     dailyResult.innerHTML = `<strong>Correct: ${puzzleData ? puzzleData.score : '0/0'}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(currentElapsedTime)}</strong>`;
-                    // timer is handled by startTimer/stopTimer in showQuestion
                 }
                 renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
             };
 
+
+            // Function to show a specific question
             const showQuestion = (questionNum) => {
                 questions.forEach((q, index) => {
                     q.classList.remove('active');
@@ -1128,22 +1221,33 @@
                 const hintBtns = activeQuestionDiv.querySelectorAll('.hint-btn');
                 const hintDisplaySpans = activeQuestionDiv.querySelectorAll('.hint-display');
 
+                // Reset inputs and hint displays for the current question
                 inputs.forEach(input => {
                     input.value = '';
                     input.classList.remove('correct', 'incorrect');
+                    // Ensure inputs are enabled by default, unless explicitly disabled later
                     input.disabled = false;
                 });
                 hintDisplaySpans.forEach(span => span.textContent = '');
                 hintBtns.forEach(btn => btn.disabled = false);
 
                 const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
+                // Ensure puzzleAttempts[currentPuzzleDateFormatted] is always an object
                 if (!puzzleAttempts[currentPuzzleDateFormatted]) {
                     puzzleAttempts[currentPuzzleDateFormatted] = {
-                        answers: {}, results: {}, hintsData: {}, score: '0/0', completed: false, timeTaken: 0, startTime: null
+                        answers: {},
+                        results: {},
+                        hintsData: {},
+                        score: '0/0',
+                        completed: false,
+                        timeTaken: 0,
+                        startTime: null // Initialize startTime
                     };
                 }
-                const savedPuzzleData = puzzleAttempts[currentPuzzleDateFormatted];
+                const savedPuzzleData = puzzleAttempts[currentPuzzleDateFormatted]; // Now safe to declare as const
 
+
+                // Restore saved answers
                 if (savedPuzzleData.answers) {
                     inputs.forEach(input => {
                         const answerId = input.id;
@@ -1160,7 +1264,10 @@
                     });
                 }
 
+                // Restore hint progress
                 const hintSource = hintSourceAnswers[questionNum];
+                // Ensure hintData is a mutable reference to the object within savedPuzzleData
+                // This line now correctly gets the reference, or or creates it if it doesn't exist
                 if (!savedPuzzleData.hintsData[questionNum] || !savedPuzzleData.hintsData[questionNum].shuffledIndices || savedPuzzleData.hintsData[questionNum].shuffledIndices.length === 0) {
                     const nonSpaceIndices = [];
                     for(let i = 0; i < hintSource.length; i++) {
@@ -1168,84 +1275,105 @@
                             nonSpaceIndices.push(i);
                         }
                     }
-                    savedPuzzleData.hintsData[questionNum] = {
+                    savedPuzzleData.hintsData[questionNum] = { // Corrected: assign to currentPuzzleData.hintsData[questionNum]
                         shuffledIndices: shuffleArray(nonSpaceIndices),
                         nextIndexToReveal: 0
                     };
                     saveGameState();
                 }
-                const hintData = savedPuzzleData.hintsData[questionNum];
-                
+                const hintData = savedPuzzleData.hintsData[questionNum]; // Now hintData is always a const reference to the correct object
+
+
                 const revealedCount = hintData.nextIndexToReveal;
+                
                 const hintDisplaySpan = activeQuestionDiv.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="0"]`);
                 const hintButton = activeQuestionDiv.querySelector(`.hint-btn[data-question-num="${questionNum}"][data-blank-index="0"]`);
                 const firstInputBox = activeQuestionDiv.querySelector(`input[data-blank-index="0"]`);
 
+
                 if (hintSource && hintDisplaySpan) {
                     let displayedHintArray = Array(hintSource.length).fill('_');
+                    // Fill in existing spaces
                     for (let i = 0; i < hintSource.length; i++) {
                         if (hintSource[i] === ' ') {
                             displayedHintArray[i] = ' ';
                         }
                     }
 
+                    // Populate revealed letters based on shuffled indices
                     for (let i = 0; i < revealedCount; i++) {
                         const originalIndex = hintData.shuffledIndices[i];
                         if (originalIndex !== undefined && originalIndex < hintSource.length) {
-                             displayedHintArray[originalIndex] = hintSource[originalIndex].toUpperCase();
+                             displayedHintArray[originalIndex] = hintSource[originalIndex].toUpperCase(); // Convert to uppercase
                         }
                     }
                     hintDisplaySpan.textContent = displayedHintArray.join('');
 
                     if (hintButton) {
-                        if (savedPuzzleData.completed || revealedCount >= hintSource.replace(/\s/g, '').length) {
+                        // Hint button is disabled if puzzle is completed OR all letters are revealed
+                        if (savedPuzzleData.completed || revealedCount >= hintSource.replace(/\s/g, '').length) { // Check against non-space length
                             hintButton.disabled = true;
+                            // If all letters revealed, auto-populate the first input box
                             if (revealedCount >= hintSource.replace(/\s/g, '').length && firstInputBox) {
-                                firstInputBox.value = hintSource.toUpperCase();
+                                firstInputBox.value = hintSource.toUpperCase(); // Convert to uppercase
                             }
                         } else {
-                            hintButton.disabled = false;
+                            hintButton.disabled = false; // Always enable if not completed and not all letters revealed
                         }
                     }
                 }
 
-                stopTimer();
+
+                // Timer handling
+                stopTimer(); // Always stop any timer when loading a new question
 
                 if (savedPuzzleData.completed) {
+                    // If puzzle is completed, display final time and disable inputs/buttons
                     timerDisplay.textContent = `Completed in ${formatTime(savedPuzzleData.timeTaken || 0)}`;
                     disableInputsAndButtons(true);
-                    puzzleStartTime = null;
+                    puzzleStartTime = null; // Explicitly set to null for completed puzzles
                 } else {
+                    // If puzzle is not completed, start/resume timer
                     if (savedPuzzleData.startTime) {
-                        puzzleStartTime = new Date(savedPuzzleData.startTime);
+                        puzzleStartTime = new Date(savedPuzzleData.startTime); // Resume from saved time
                     } else {
-                        puzzleStartTime = new Date();
-                        savedPuzzleData.startTime = puzzleStartTime.toISOString();
+                        puzzleStartTime = new Date(); // Start new timer
+                        savedPuzzleData.startTime = puzzleStartTime.toISOString(); // Save new start time
                         saveGameState();
                     }
-                    startTimer();
-                    disableInputsAndButtons(false);
+                    startTimer(); // Start the timer interval
+                    disableInputsAndButtons(false); // Enable inputs and check button
                 }
 
-                updateCheckButtonState();
+                updateCheckButtonState(); // Update button states after loading question
             };
 
+            // Timer functions
             const startTimer = () => {
-                if (timerInterval) clearInterval(timerInterval);
+                if (timerInterval) clearInterval(timerInterval); // Clear existing interval
 
-                const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
+                const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY); // Corrected: Added closing parenthesis
+                // Remember the current puzzle date in the timer's scope
+                // Ensure puzzleAttempts[currentPuzzleDateFormatted] is initialized
                 if (!puzzleAttempts[currentPuzzleDateFormatted]) {
                     puzzleAttempts[currentPuzzleDateFormatted] = {
-                        answers: {}, results: {}, hintsData: {}, score: '0/0', completed: false, timeTaken: 0, startTime: null
+                        answers: {},
+                        results: {},
+                        hintsData: {},
+                        score: '0/0',
+                        completed: false,
+                        timeTaken: 0,
+                        startTime: null
                     };
                 }
 
+                // Now it's safe to access puzzleAttempts[currentPuzzleDateFormatted].startTime
                 if (!puzzleStartTime) {
                     puzzleStartTime = new Date();
                 }
 
                 if (!puzzleAttempts[currentPuzzleDateFormatted].startTime) {
-                    puzzleAttempts[currentPuzzleDateFormatted].startTime = puzzleStartTime.toISOString();
+                    puzzleAttempts[currentPuzzleDateFormatted].startTime = puzzleStartTime.toISOString(); // Store as ISO string
                     saveGameState();
                 }
 
@@ -1266,6 +1394,7 @@
                 return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
             };
 
+            // Event listener for check answer button
             checkAnswerBtn.addEventListener('click', () => {
                 const activeQuestion = document.querySelector('.question.active');
                 if (!activeQuestion) return;
@@ -1276,6 +1405,7 @@
                 const currentPuzzleDate = selectedCalendarDate || TODAY;
                 const currentPuzzleDateFormatted = formatDate(currentPuzzleDate);
 
+                // Initialize or retrieve puzzle data for the current date
                 if (!puzzleAttempts[currentPuzzleDateFormatted]) {
                     puzzleAttempts[currentPuzzleDateFormatted] = { answers: {}, results: {}, hintsData: {}, score: '0/0', completed: false, timeTaken: 0, startTime: null };
                 }
@@ -1285,14 +1415,15 @@
                 inputs.forEach(input => {
                     const userAnswer = input.value.trim().toLowerCase();
                     const correctAnswerId = input.id;
-                    const possibleCorrectAnswers = correctAnswersFlexible[correctAnswerId];
+                    const possibleCorrectAnswers = correctAnswersFlexible[correctAnswerId]; // Using the flexible answers
 
                     totalBlanks++;
 
+                    // Check if userAnswer is in the array of possible correct answers
                     const isCorrect = possibleCorrectAnswers && possibleCorrectAnswers.includes(userAnswer);
 
-                    currentPuzzleData.answers[correctAnswerId] = input.value.trim();
-                    currentPuzzleData.results[correctAnswerId] = isCorrect;
+                    currentPuzzleData.answers[correctAnswerId] = input.value.trim(); // Save user's input
+                    currentPuzzleData.results[correctAnswerId] = isCorrect; // Save result
 
                     if (isCorrect) {
                         input.classList.remove('incorrect');
@@ -1307,8 +1438,10 @@
 
                 currentPuzzleData.score = `${score}/${totalBlanks}`;
 
+                // Calculate hints used for the current question (number of letters revealed)
                 const questionNum = parseInt(activeQuestion.id.replace('question', ''));
                 const hintsUsedCount = (currentPuzzleData.hintsData[questionNum] && currentPuzzleData.hintsData[questionNum].nextIndexToReveal) || 0;
+
 
                 if (allCorrect) {
                     stopTimer();
@@ -1317,18 +1450,23 @@
                     currentPuzzleData.timeTaken = elapsedTimeSeconds;
                     currentPuzzleData.completed = true;
 
+                    // Updated dailyResult text to match requested format
                     dailyResult.innerHTML = `<strong>Correct: ${score}/${totalBlanks}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(elapsedTimeSeconds)}</strong>`;
                     copyResultButton.style.display = 'inline-block';
                     
+                    // Removed goToTodayBtn logic as the button is removed
+                    
                     disableInputsAndButtons(true);
+                    // Removed showCustomModal call here as per user request
                 } else {
                     dailyResult.innerHTML = `<strong>Correct: ${score}/${totalBlanks}</strong>, Hints: ${hintsUsedCount}, <strong>Time used: ${formatTime(Math.floor((new Date() - new Date(currentPuzzleData.startTime)) / 1000))}</strong>`;
                     copyResultButton.style.display = 'none';
                 }
-                saveGameState();
-                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
+                saveGameState(); // Save state after checking answers
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth()); // Directly call renderCalendar here
             });
 
+            // Helper to disable inputs and buttons (now only handles inputs and and checkAnswerBtn)
             const disableInputsAndButtons = (disable) => {
                 const activeQuestion = document.querySelector('.question.active');
                 if (!activeQuestion) return;
@@ -1433,7 +1571,6 @@
                     copyResultDisplay.value = resultText;
                     copyResultDisplay.style.display = 'block';
                     copyResultDisplay.classList.add('show');
-                    copyResultDisplay.select();
                     document.execCommand('copy');
 
                     setTimeout(() => {
@@ -1445,13 +1582,11 @@
 
             // Calendar logic
             let currentMonth = new Date();
-            currentMonth.setDate(1);
+            currentMonth.setDate(1); // Set to the first day of the month
 
             const renderCalendar = (year, month) => {
                 const calendarGrid = document.querySelector('.calendar-grid');
-                while (calendarGrid.children.length > 7) {
-                    calendarGrid.removeChild(calendarGrid.lastChild);
-                }
+                calendarGrid.innerHTML = ''; // Clear all existing children to prevent duplication
 
                 currentMonthYear.textContent = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
@@ -1488,8 +1623,9 @@
                         dayCell.classList.add('selected-date');
                     }
 
-                    if (cellDate < TODAY) {
-                        dayCell.classList.add('past');
+                    // New condition to grey out dates before CHALLENGE_START_DATE
+                    if (cellDate < CHALLENGE_START_DATE) {
+                        dayCell.classList.add('unavailable-past');
                     }
                     
                     if (cellDate > LAST_QUESTION_DATE) {
@@ -1507,7 +1643,8 @@
                     }
 
                     dayCell.addEventListener('click', () => {
-                        if (!dayCell.classList.contains('empty') && !dayCell.classList.contains('past') && !dayCell.classList.contains('no-question')) {
+                        // Only clickable if it's not empty, not `no-question`, and not `unavailable-past`
+                        if (!dayCell.classList.contains('empty') && !dayCell.classList.contains('no-question') && !dayCell.classList.contains('unavailable-past')) {
                             const prevSelected = document.querySelector('.calendar-day-cell.selected-date');
                             if (prevSelected) {
                                 prevSelected.classList.remove('selected-date');
@@ -1516,8 +1653,7 @@
                             selectedCalendarDate = cellDate;
                             currentPuzzleNumber = getPuzzleNumberForDate(selectedCalendarDate);
                             showQuestion(currentPuzzleNumber);
-                            calendarContainer.style.display = 'none';
-                            // When selecting a new date from calendar, show gameContent
+                            calendarContainer.classList.remove('is-visible'); // Hide calendar
                             landingPage.style.display = 'none'; // Ensure landing is hidden
                             gameContent.style.display = 'flex'; // Show game content
                             updateCheckButtonState();
@@ -1540,50 +1676,48 @@
                 showQuestion(currentPuzzleNumber);
             });
 
-            landingInstructionsBtn.addEventListener('click', () => {
-                landingPage.style.display = 'none'; // Hide landing page
-                // Scroll to instructions section on landing page
-                window.scrollTo({
-                    top: document.getElementById('game-instructions').offsetTop,
-                    behavior: 'smooth'
-                });
-                landingPage.style.display = 'flex'; // Keep landing page visible
-            });
-
 
             landingCalendarBtn.addEventListener('click', () => {
+                console.log('Calendar button (landing page) clicked!'); // Debugging log
+                openedFromPage = 'landingPage'; // Set origin
                 landingPage.style.display = 'none'; // Hide landing page
-                calendarContainer.style.display = 'flex'; // Show calendar modal
+                calendarContainer.classList.add('is-visible'); // Use class to show
                 currentMonth.setDate(1); // Reset to current month
                 renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
             });
 
-            // Back to Home button from Game Content
-            backToHomeFromGameBtn.addEventListener('click', () => {
-                gameContent.style.display = 'none';
-                landingPage.style.display = 'flex'; // Show landing page
-                stopTimer(); // Stop timer if game is active
-            });
-
             // Instructions button on the Game Content (now links to landing page instructions)
-            instructionsButton.addEventListener('click', () => {
+            instructionsButton.addEventListener('click', () => { 
                 gameContent.style.display = 'none'; // Hide game content
                 landingPage.style.display = 'flex'; // Show landing page
                 // Scroll to instructions section on landing page
-                window.scrollTo({
-                    top: document.getElementById('game-instructions').offsetTop,
-                    behavior: 'smooth'
-                });
+                const instructionsSection = document.getElementById('game-instructions');
+                if (instructionsSection) {
+                    instructionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
                 stopTimer(); // Stop timer if game is active
             });
 
 
-            // Update existing Close button handlers for modals to return to landing page
-            closeCalendarBtn.addEventListener('click', () => {
-                calendarContainer.style.display = 'none';
-                landingPage.style.display = 'flex'; // Back to landing page
+            // Calendar button on Game Content (now directly opens calendar)
+            calendarButton.addEventListener('click', () => {
+                console.log('Calendar button (game page) clicked!'); // Debugging log
+                openedFromPage = 'gameContent'; // Set origin
+                gameContent.style.display = 'none'; // Hide game content
+                calendarContainer.classList.add('is-visible'); // Show calendar modal
+                currentMonth.setDate(1); // Reset to current month
+                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
             });
-            // instructionsModal is removed, so closeInstructionsBtn is not needed.
+
+            // Update existing Close button handlers for modals to return to correct page
+            closeCalendarBtn.addEventListener('click', () => {
+                calendarContainer.classList.remove('is-visible'); // Use class to hide
+                if (openedFromPage === 'landingPage') {
+                    landingPage.style.display = 'flex'; // Return to landing page
+                } else if (openedFromPage === 'gameContent') {
+                    gameContent.style.display = 'flex'; // Return to game content
+                }
+            });
 
             prevMonthBtn.addEventListener('click', () => {
                 currentMonth.setMonth(currentMonth.getMonth() - 1);
@@ -1599,8 +1733,7 @@
             // Initial page load: Only show landing page
             landingPage.style.display = 'flex';
             gameContent.style.display = 'none';
-            calendarContainer.style.display = 'none';
-            // instructionsModal is removed, so no need to hide it.
+            calendarContainer.classList.remove('is-visible'); // Ensure it's hidden initially
 
             loadGameState(); // Load game state at startup
         });
