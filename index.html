@@ -34,18 +34,11 @@
             box-sizing: border-box; /* Include padding in width */
         }
 
-        /* Styles for the logo on the landing page (larger) */
-        #logo-landing { /* NEW ID for landing page logo */
-            max-width: 250px; /* Updated size for landing page */
-            height: auto;
-            margin-right: 15px; /* Space between logo and title (if title were beside it) */
-        }
-
-
         .landing-button-group {
             display: flex;
             flex-direction: column; /* Stack vertically on small screens */
             gap: 15px;
+            margin-top: 15px; /* Reduced from 30px */
             width: 100%; /* Take full width of parent */
             align-items: center; /* Center buttons horizontally */
         }
@@ -142,9 +135,9 @@
             border-bottom: 1px solid #ccc;
         }
 
-        /* Styles for the logo on the game pages (smaller) */
-        #logo-game { /* NEW ID for game page logo */
-            max-width: 130px; /* Updated size for game page */
+        /* Adjusted logo size for game pages */
+        #logo-game {
+            max-width: 99px; /* 1.5 times larger than 66px */
             height: auto;
             margin-right: 15px; /* Space between logo and title */
         }
@@ -344,15 +337,6 @@
             background-color: #218838;
         }
 
-        /* Instructions button on game page specific styles */
-        #instructionsButton {
-            background-color: #8a2be2; /* Purple color matching landing page button */
-        }
-        #instructionsButton:hover {
-            background-color: #6a1aab; /* Darker purple on hover */
-        }
-
-
         #calendarContainer {
             display: none; /* Hidden by default */
             position: fixed;
@@ -479,7 +463,7 @@
 <body>
 
     <div id="landingPage">
-        <img id="logo-landing" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
+        <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
         <h1 style="margin-top: 10px; font-size: 1.8em; color: #555;">Redividers Daily Word Challenge</h1>
         <div class="landing-button-group">
             <button id="landingCalendarBtn" class="landing-button green">Calendar</button>
@@ -507,7 +491,7 @@
 
     <div id="gameContent" style="display: none;">
         <div id="header">
-            <img id="logo-game" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
+            <img id="logo" src="https://i.imgur.com/KKd5PmI.png" alt="earap logo" />
         </div>
 
         <div class="score-display-wrapper">
@@ -997,6 +981,8 @@
             </p>
         </div>
         
+        <button id="backToHomeFromGameBtn" style="margin-top: 30px; background-color: #6c757d;">Back to Home</button>
+
     </div> <div id="calendarContainer">
         <div class="calendar-content">
             <div class="calendar-header">
@@ -1026,7 +1012,7 @@
             const gameContent = document.getElementById('gameContent');
             const landingStartPuzzleBtn = document.getElementById('landingStartPuzzleBtn');
             const landingCalendarBtn = document.getElementById('landingCalendarBtn');
-            // const backToHomeFromGameBtn = document.getElementById('backToHomeFromGameBtn'); // Removed button
+            const backToHomeFromGameBtn = document.getElementById('backToHomeFromGameBtn'); // New button
 
             // --- Your Existing Game Elements ---
             const questions = document.querySelectorAll('.question');
@@ -1085,15 +1071,61 @@
                 'answer64': 'meanest', 'answer65': 'me a nest',
                 'answer66': 'formats', 'answer67': 'for mats',
                 'answer68': 'dishonesty', 'answer69': 'dish one sty',
-                'answer70': 'internally', 'answer71': ['intern ally', 'internally'],
-                'answer72': 'fabricate', 'answer73': ['fabric ate', 'fabricate'],
-                'answer74': 'mandate', 'answer75': ['man date', 'mandate'],
-                'answer76': 'forage', 'answer77': ['for age', 'forage'],
-                'answer78': 'sundry', 'answer79': ['sun dry', 'sundry'],
-                'answer80': 'warplanes', 'answer81': ['warp lanes', 'warplanes'],
-                'answer82': 'canapes', 'answer83': ['can apes', 'canapes'],
-                'answer84': 'canapes', 'answer85': ['can apes', 'canapes'],
-                'answer86': 'question', 'answer87': ['temp late', 'template']
+                'answer70': 'internally', 'answer71': 'intern ally',
+                'answer72': 'fabricate', 'answer73': 'fabric ate',
+                'answer74': 'mandate', 'answer75': 'man date',
+                'answer76': 'forage', 'answer77': 'for age',
+                'answer78': 'sundry', 'answer79': 'sun dry',
+                'answer80': 'warplanes', 'answer81': 'warp lanes',
+                'answer82': 'canapes', 'answer83': 'can apes',
+                'answer84': 'canapes', 'answer85': 'can apes',
+                'answer86': 'question', 'answer87': 'temp late'
+            };
+
+            // Corrected: Keys now match the input IDs, and values are arrays for flexible matching
+            const correctAnswersFlexible = {
+                'answer1': ['disconsolate'], 'answer2': ['disk on so late'],
+                'answer3': ['justice'], 'answer4': ['just ice'],
+                'answer5': ['carpet'], 'answer6': ['car pet'],
+                'answer7': ['together'], 'answer8': ['to get her', 'together'],
+                'answer9': ['mustache'], 'answer10': ['must ache'],
+                'answer11': ['archive'], 'answer12': ['arch'], 'answer13': ['ive'],
+                'answer14': ['atrophy'], 'answer15': ['a trophy', 'atrophy'],
+                'answer16': ['orbed'], 'answer17': ['or bed'],
+                'answer18': ['goofed'], 'answer19': ['goo fed'],
+                'answer20': ['buckled'], 'answer21': ['buck led', 'buckled'],
+                'answer22': ['etcher'], 'answer23': ['etc'], 'answer24': ['her'],
+                'answer25': ['significant'], 'answer26': ['sign if i can\'t'],
+                'answer27': ['scarcity'], 'answer28': ['scar'], 'answer29': ['city'],
+                'answer30': ['dragon'], 'answer31': ['drag on', 'dragon'],
+                'answer32': ['promising'], 'answer33': ['prom i sing', 'promising'],
+                'answer34': ['thinking'], 'answer35': ['thin king', 'thinking'],
+                'answer36': ['badminton'], 'answer37': ['bad mint on', 'badminton'],
+                'answer38': ['catatonic'], 'answer39': ['cat a tonic', 'catatonic'],
+                'answer40': ['unclean'], 'answer41': ['uncle an', 'unclean'],
+                'answer42': ['dodo'], 'answer43': ['do do', 'dodo'],
+                'answer44': ['manicure'], 'answer45': ['man i cure', 'manicure'],
+                'answer46': ['capsize'], 'answer47': ['cap size', 'capsize'],
+                'answer48': ['likewise'], 'answer49': ['like wise', 'likewise'],
+                'answer50': ['discovery'], 'answer51': ['disco very', 'discovery'],
+                'answer52': ['temptress'], 'answer53': ['temp tress', 'temptress'],
+                'answer54': ['cargo'], 'answer55': ['car go', 'cargo'],
+                'answer56': ['manatee'], 'answer57': ['man a tee', 'manatee'],
+                'answer58': ['tenant'], 'answer59': ['ten ant', 'tenant'],
+                'answer60': ['deliberate'], 'answer61': ['deli berate', 'deliberate'],
+                'answer62': ['intonational'], 'answer63': ['into national', 'intonational'],
+                'answer64': ['meanest'], 'answer65': ['me a nest', 'meanest'],
+                'answer66': ['formats'], 'answer67': ['for mats', 'formats'],
+                'answer68': ['dishonesty'], 'answer69': ['dish one sty', 'dishonesty'],
+                'answer70': ['internally'], 'answer71': ['intern ally', 'internally'],
+                'answer72': ['fabricate'], 'answer73': ['fabric ate', 'fabricate'],
+                'answer74': ['mandate'], 'answer75': ['man date', 'mandate'],
+                'answer76': ['forage'], 'answer77': ['for age', 'forage'],
+                'answer78': ['sundry'], 'answer79': ['sun dry', 'sundry'],
+                'answer80': ['warplanes'], 'answer81': ['warp lanes', 'warplanes'],
+                'answer82': ['canapes'], 'answer83': ['can apes', 'canapes'],
+                'answer84': ['canapes'], 'answer85': ['can apes', 'canapes'],
+                'answer86': ['question'], 'answer87': ['temp late', 'template']
             };
 
 
@@ -1304,7 +1336,7 @@
                 
                 const hintDisplaySpan = activeQuestionDiv.querySelector(`.hint-display[data-question-num="${questionNum}"][data-blank-index="0"]`);
                 const hintButton = activeQuestionDiv.querySelector(`.hint-btn[data-question-num="${questionNum}"][data-blank-index="0"]`);
-                const firstInputBox = activeQuestionDiv.querySelector(`input[data-blank-index="0"]`);
+                const firstInputBox = activeQuestionDiv.querySelector(`input[data-blank-index="0"]`); // Corrected selector for first input box
 
 
                 if (hintSource && hintDisplaySpan) {
@@ -1369,7 +1401,6 @@
                 if (timerInterval) clearInterval(timerInterval); // Clear existing interval
 
                 const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
-                // Remember the current puzzle date in the timer's scope
                 // Ensure puzzleAttempts[currentPuzzleDateFormatted] is initialized
                 if (!puzzleAttempts[currentPuzzleDateFormatted]) {
                     puzzleAttempts[currentPuzzleDateFormatted] = {
@@ -1602,7 +1633,9 @@
 
             const renderCalendar = (year, month) => {
                 const calendarGrid = document.querySelector('.calendar-grid');
-                calendarGrid.innerHTML = ''; // Clear all existing children to prevent duplication
+                while (calendarGrid.children.length > 7) {
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
 
                 currentMonthYear.textContent = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
@@ -1702,6 +1735,13 @@
                 renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
             });
 
+            // Back to Home button from Game Content
+            backToHomeFromGameBtn.addEventListener('click', () => {
+                gameContent.style.display = 'none';
+                landingPage.style.display = 'flex'; // Show landing page
+                stopTimer(); // Stop timer if game is active
+            });
+
             // Instructions button on the Game Content (now links to landing page instructions)
             instructionsButton.addEventListener('click', () => { 
                 gameContent.style.display = 'none'; // Hide game content
@@ -1757,3 +1797,5 @@
 
 </body>
 </html>
+
+
