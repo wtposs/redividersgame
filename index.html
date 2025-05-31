@@ -1022,6 +1022,30 @@
                 <input type="text" id="answer91" placeholder="Answer" class="medium" data-question-num="44" data-blank-index="1"> to this new policy.
             </p>
         </div>
+        <div class="question" id="question45">
+            <div class="hint-button-container">
+                <button class="hint-btn" data-question-num="45" data-blank-index="0">Hint</button>
+                <span class="hint-display" data-question-num="45" data-blank-index="0"></span>
+            </div>
+            <p><strong>45.</strong> The painter sipped
+                <input type="text" id="answer92" placeholder="Answer" class="medium" data-question-num="45" data-blank-index="0"> as he drifted into a green haze of inspiration.
+            </p>
+            <p>The shirtless model, meanwhile, stood frozen, flexing his
+                <input type="text" id="answer93" placeholder="Answer" class="medium" data-question-num="45" data-blank-index="1"> soft glow of the studio light.
+            </p>
+        </div>
+        <div class="question" id="question46">
+            <div class="hint-button-container">
+                <button class="hint-btn" data-question-num="46" data-blank-index="0">Hint</button>
+                <span class="hint-display" data-question-num="46" data-blank-index="0"></span>
+            </div>
+            <p><strong>46.</strong> I gave my manager my
+                <input type="text" id="answer94" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="0"> apology for missing work today.
+            </p>
+            <p>I’ve been fatigued, and
+                <input type="text" id="answer95" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="1"> is the best remedy, my doctor recommended a day off..
+            </p>
+        </div>
         </div> <div id="calendarContainer">
         <div class="calendar-content">
             <div class="calendar-header">
@@ -1098,7 +1122,7 @@
                 'answer38': ['catatonic'], 'answer39': ['cat a tonic'],
                 'answer40': ['unclean'], 'answer41': ['uncle an'],
                 'answer42': ['novice'], 'answer43': ['no vice', 'novice'],
-                'answer44': ['allowing'], 'answer45': ['all owing', 'allowing'], // NEW: Updated for Q44
+                'answer44': ['allowing'], 'answer45': ['all owing', 'allowing'],
                 'answer46': ['capsize'], 'answer47': ['cap size'],
                 'answer48': ['likewise'], 'answer49': ['like wise'],
                 'answer50': ['discovery'], 'answer51': ['disco very'],
@@ -1119,8 +1143,11 @@
                 'answer80': ['warplanes'], 'answer81': ['warp lanes', 'warplanes'],
                 'answer82': ['canapes'], 'answer83': ['can apes', 'canapes'],
                 'answer84': ['straight'], 'answer85': ['strait'],
-                'answer86': ['question'], 'answer87': ['template', 'temp late'], // This was Q42 before the new Q42 was added. Keeping it here just in case, but it's currently unused.
-                'answer88': ['itself'], 'answer89': ['its elf', 'itself'] // Q43
+                'answer86': ['novice'], 'answer87': ['no vice', 'novice'], // Now question 42
+                'answer88': ['itself'], 'answer89': ['its elf', 'itself'], // Now question 43
+                'answer90': ['allowing'], 'answer91': ['all owing', 'allowing'], // Now question 44
+                'answer92': ['absinthe'], 'answer93': ['abs in the', 'absinthe'], // Now question 45
+                'answer94': ['sincerest'], 'answer95': ['since rest', 'sincerest'] // NEW: Updated for Q46
             };
 
 
@@ -1135,8 +1162,10 @@
                 '36': 'mandate', '37': 'forage', '38': 'sundry', '39': 'warplanes', '40': 'canapes',
                 '41': 'straight',
                 '42': 'novice',
-                '43': 'itself', // Q43 hint
-                '44': 'allowing' // NEW: Updated for Q44
+                '43': 'itself',
+                '44': 'allowing',
+                '45': 'absinthe', // Q45 hint
+                '46': 'sincerest' // NEW: Updated for Q46
             };
 
 
@@ -1639,14 +1668,6 @@
                 const firstDayOfMonth = new Date(year, month, 1);
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const startDay = firstDayOfMonth.getDay();
-
-                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                dayNames.forEach(day => {
-                    const header = document.createElement('div');
-                    header.classList.add('calendar-day-name');
-                    header.textContent = day;
-                    calendarGrid.appendChild(header);
-                });
 
                 for (let i = 0; i < startDay; i++) {
                     const emptyCell = document.createElement('div');
