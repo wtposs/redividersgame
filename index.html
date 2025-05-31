@@ -126,10 +126,10 @@
         /* --- Main Game Content (Initially Hidden) --- */
         #gameContent {
             display: none; /* Hidden by default, shown by JS */
-            flex-direction: column; /* To stack header, score, questions */
+            flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 600px; /* Max width for game content */
+            max-width: 600px;
         }
 
         #header {
@@ -144,9 +144,9 @@
 
         /* Styles for the logo on the game pages (smaller) */
         #logo-game {
-            max-width: 130px; /* Updated size for game page */
+            max-width: 130px;
             height: auto;
-            margin-right: 15px; /* Space between logo and title */
+            margin-right: 15px;
         }
 
         #timer {
@@ -157,7 +157,7 @@
         }
 
         .question {
-            display: none; /* Will be managed by JS */
+            display: none;
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -242,8 +242,8 @@
             gap: 15px;
             justify-content: center;
             width: 100%;
-            z-index: 100; /* Ensure buttons are on top */
-            position: relative; /* Needed for z-index to work */
+            z-index: 100;
+            position: relative;
         }
         .main-action-row {
             display: flex;
@@ -338,7 +338,7 @@
         /* --- Calendar Specific Styles --- */
         #calendarButton {
             background-color: #28a745;
-            pointer-events: auto; /* Ensure it's clickable */
+            pointer-events: auto;
         }
         #calendarButton:hover {
             background-color: #218838;
@@ -346,15 +346,15 @@
 
         /* Instructions button on game page specific styles */
         #instructionsButton {
-            background-color: #8a2be2; /* Purple color matching landing page button */
+            background-color: #8a2be2;
         }
         #instructionsButton:hover {
-            background-color: #6a1aab; /* Darker purple on hover */
+            background-color: #6a1aab;
         }
 
 
         #calendarContainer {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -460,9 +460,9 @@
 
         /* New style for unavailable past dates */
         .calendar-day-cell.unavailable-past {
-            background-color: #e9ecef; /* Lighter background */
-            color: #aaa; /* Faded text */
-            pointer-events: none; /* Prevent click events */
+            background-color: #e9ecef;
+            color: #aaa;
+            pointer-events: none;
         }
 
         .calendar-day-cell.no-question {
@@ -471,9 +471,6 @@
             pointer-events: none;
             font-style: italic;
         }
-
-        /* Instructions Modal specific styles */
-        /* This entire modal will now be removed, as instructions are on landing page */
     </style>
 </head>
 <body>
@@ -624,7 +621,7 @@
             const dailyResult = document.getElementById('dailyResult');
             const copyResultButton = document.getElementById('copyResultButton');
             const copyResultDisplay = document.getElementById('copyResultDisplay');
-            const timerDisplay = document.getElementById('timer');
+            const timerDisplay = document.getElementById('timer'); // Corrected: Get element by ID
             const calendarButton = document.getElementById('calendarButton'); // On game page
             const calendarContainer = document.getElementById('calendarContainer'); // Calendar modal
             const currentMonthYear = document.getElementById('currentMonthYear');
