@@ -139,7 +139,7 @@
             max-width: 600px;
             margin: 0 auto 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #ccc;
+            /* border-bottom: 1px solid #ccc; */ /* This line was removed */
         }
 
         /* Styles for the logo on the game pages (smaller) */
@@ -1043,7 +1043,19 @@
                 <input type="text" id="answer94" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="0"> apology for missing work today.
             </p>
             <p>I’ve been fatigued, and
-                <input type="text" id="answer95" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="1"> is the best remedy, my doctor recommended a day off..
+                <input type="text" id="answer95" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="1"> is the best remedy, my doctor recommended a day off.
+            </p>
+        </div>
+        <div class="question" id="question47">
+            <div class="hint-button-container">
+                <button class="hint-btn" data-question-num="47" data-blank-index="0">Hint</button>
+                <span class="hint-display" data-question-num="47" data-blank-index="0"></span>
+            </div>
+            <p><strong>47.</strong> The seamstress finds
+                <input type="text" id="answer96" placeholder="Answer" class="medium" data-question-num="47" data-blank-index="0"> in renewing old, discarded clothes.
+            </p>
+            <p>The garments are often plain,
+                <input type="text" id="answer97" placeholder="Answer" class="medium" data-question-num="47" data-blank-index="1"> adds a touch of delicate detail.
             </p>
         </div>
         </div> <div id="calendarContainer">
@@ -1147,7 +1159,8 @@
                 'answer88': ['itself'], 'answer89': ['its elf', 'itself'], // Now question 43
                 'answer90': ['allowing'], 'answer91': ['all owing', 'allowing'], // Now question 44
                 'answer92': ['absinthe'], 'answer93': ['abs in the', 'absinthe'], // Now question 45
-                'answer94': ['sincerest'], 'answer95': ['since rest', 'sincerest'] // NEW: Updated for Q46
+                'answer94': ['sincerest'], 'answer95': ['since rest', 'sincerest'], // Now question 46
+                'answer96': ['solace'], 'answer97': ['so lace', 'solace'] // NEW: Updated for Q47
             };
 
 
@@ -1164,8 +1177,9 @@
                 '42': 'novice',
                 '43': 'itself',
                 '44': 'allowing',
-                '45': 'absinthe', // Q45 hint
-                '46': 'sincerest' // NEW: Updated for Q46
+                '45': 'absinthe',
+                '46': 'sincerest',
+                '47': 'solace' // NEW: Updated for Q47
             };
 
 
@@ -1421,42 +1435,6 @@
                 }
 
                 updateCheckButtonState(); // Update button states after loading question
-            };
-
-            // Timer functions
-            const startTimer = () => {
-                if (timerInterval) clearInterval(timerInterval); // Clear existing interval
-
-                const currentPuzzleDateFormatted = formatDate(selectedCalendarDate || TODAY);
-                // Remember the current puzzle date in the timer's scope
-                // Ensure puzzleAttempts[currentPuzzleDateFormatted] is initialized
-                if (!puzzleAttempts[currentPuzzleDateFormatted]) {
-                    puzzleAttempts[currentPuzzleDateFormatted] = {
-                        answers: {},
-                        results: {},
-                        hintsData: {},
-                        score: '0/0',
-                        completed: false,
-                        timeTaken: 0,
-                        startTime: null
-                    };
-                }
-
-                // Now it's safe to access puzzleAttempts[currentPuzzleDateFormatted].startTime
-                if (!puzzleStartTime) {
-                    puzzleStartTime = new Date();
-                }
-
-                if (!puzzleAttempts[currentPuzzleDateFormatted].startTime) {
-                    puzzleAttempts[currentPuzzleDateFormatted].startTime = puzzleStartTime.toISOString(); // Store as ISO string
-                    saveGameState();
-                }
-
-                timerInterval = setInterval(() => {
-                    const currentTime = new Date();
-                    const elapsed = Math.floor((currentTime - puzzleStartTime) / 1000);
-                    timerDisplay.textContent = `Elapsed time: ${formatTime(elapsed)}`;
-                }, 1000);
             };
 
             const stopTimer = () => {
