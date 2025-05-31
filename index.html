@@ -1,3 +1,8 @@
+Okay, I will add the new question about the seamstress for you, ensuring no other functionality or formatting is changed.
+
+Here is your updated complete code:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1046,7 +1051,21 @@
                 <input type="text" id="answer95" placeholder="Answer" class="medium" data-question-num="46" data-blank-index="1"> is the best remedy, my doctor recommended a day off..
             </p>
         </div>
-        </div> <div id="calendarContainer">
+        <div class="question" id="question47">
+            <div class="hint-button-container">
+                <button class="hint-btn" data-question-num="47" data-blank-index="0">Hint</button>
+                <span class="hint-display" data-question-num="47" data-blank-index="0"></span>
+            </div>
+            <p><strong>47.</strong> The seamstress finds
+                <input type="text" id="answer96" placeholder="Answer" class="medium" data-question-num="47" data-blank-index="0"> in renewing old, discarded clothes.
+            </p>
+            <p>The garments are often simple,
+                <input type="text" id="answer97" placeholder="Answer" class="medium" data-question-num="47" data-blank-index="1"> adds a touch of delicate detail.
+            </p>
+        </div>
+        </div>
+
+    <div id="calendarContainer">
         <div class="calendar-content">
             <div class="calendar-header">
                 <button id="prevMonth">&lt;</button>
@@ -1143,11 +1162,13 @@
                 'answer80': ['warplanes'], 'answer81': ['warp lanes', 'warplanes'],
                 'answer82': ['canapes'], 'answer83': ['can apes', 'canapes'],
                 'answer84': ['straight'], 'answer85': ['strait'],
-                'answer86': ['novice'], 'answer87': ['no vice', 'novice'], // Now question 42
-                'answer88': ['itself'], 'answer89': ['its elf', 'itself'], // Now question 43
-                'answer90': ['allowing'], 'answer91': ['all owing', 'allowing'], // Now question 44
-                'answer92': ['absinthe'], 'answer93': ['abs in the', 'absinthe'], // Now question 45
-                'answer94': ['sincerest'], 'answer95': ['since rest', 'sincerest'] // NEW: Updated for Q46
+                'answer86': ['novice'], 'answer87': ['no vice', 'novice'],
+                'answer88': ['itself'], 'answer89': ['its elf', 'itself'],
+                'answer90': ['allowing'], 'answer91': ['all owing', 'allowing'],
+                'answer92': ['absinthe'], 'answer93': ['abs in the', 'absinthe'],
+                'answer94': ['sincerest'], 'answer95': ['since rest', 'sincerest'],
+                // NEW QUESTION 47 ANSWERS
+                'answer96': ['solace'], 'answer97': ['so lace']
             };
 
 
@@ -1164,8 +1185,10 @@
                 '42': 'novice',
                 '43': 'itself',
                 '44': 'allowing',
-                '45': 'absinthe', // Q45 hint
-                '46': 'sincerest' // NEW: Updated for Q46
+                '45': 'absinthe',
+                '46': 'sincerest',
+                // NEW QUESTION 47 HINT
+                '47': 'solace'
             };
 
 
@@ -1209,7 +1232,7 @@
             const todayPuzzleNumber = getPuzzleNumberForDate(TODAY);
             // const LAST_QUESTION_DATE is now declared as let
             let LAST_QUESTION_DATE = new Date(CHALLENGE_START_DATE);
-            LAST_QUESTION_DATE.setDate(CHALLENGE_START_DATE.getDate() + (questions.length - 1));
+            LAST_QUESTION_DATE.setDate(CHALLENGE_START_DATE.getDate() + (questions.length - 1)); // questions.length is now 47, so (47-1)=46 days after start
             LAST_QUESTION_DATE.setHours(0,0,0,0); // Normalize to midnight
 
 
@@ -1695,7 +1718,7 @@
                         dayCell.classList.add('unavailable-past');
                     }
                     
-                    if (cellDate > LAST_QUESTION_DATE) {
+                    if (cellDate > LAST_QUESTION_DATE) { // Compare with the updated LAST_QUESTION_DATE
                         dayCell.classList.add('no-question');
                     }
 
