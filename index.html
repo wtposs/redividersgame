@@ -603,6 +603,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('--- Script started and DOM loaded ---');
+            console.log('--- Version: Final Attempt (with aggressive localStorage.clear()) ---');
+
 
             // --- CANVAS-SPECIFIC FIX: Clear localStorage for a clean run in the emulator ---
             // REMOVE THIS LINE WHEN DEPLOYING TO A LIVE WEBSITE!
@@ -621,7 +623,7 @@
             const dailyResult = document.getElementById('dailyResult');
             const copyResultButton = document.getElementById('copyResultButton');
             const copyResultDisplay = document.getElementById('copyResultDisplay');
-            const timerDisplay = document.getElementById('timer'); // Corrected: Get element by ID
+            const timerDisplay = document.getElementById('timer'); // Corrected this line
             const calendarButton = document.getElementById('calendarButton'); // On game page
             const calendarContainer = document.getElementById('calendarContainer'); // Calendar modal
             const currentMonthYear = document.getElementById('currentMonthYear');
@@ -1260,7 +1262,7 @@
 
                 currentPuzzleData.score = `${score}/${totalBlanks}`;
 
-                const hintsUsedCount = (currentPuzzleData.hintsData[puzzleIdx + 1] && currentPuzzleData.hintsData[puzzleIdx + 1].nextIndexToReveal) || 0;
+                const hintsUsedCount = (currentPuzzleData.hintsData[puzzleIdx + 1] && puzzleData.hintsData[puzzleIdx + 1].nextIndexToReveal) || 0;
 
 
                 if (allCorrect) {
